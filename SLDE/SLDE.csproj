@@ -1,0 +1,202 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1418DA6E-3577-4570-928B-4E58CA48C152}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SLDE</RootNamespace>
+    <AssemblyName>SLDE</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MainIDE.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainIDE.Designer.cs">
+      <DependentUpon>MainIDE.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CodeEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeEditor.Designer.cs">
+      <DependentUpon>CodeEditor.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="CodeEditor.resx">
+      <DependentUpon>CodeEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainIDE.resx">
+      <DependentUpon>MainIDE.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DigitalRune.Windows.TextEditor\DigitalRune.Windows.TextEditor.csproj">
+      <Project>{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}</Project>
+      <Name>DigitalRune.Windows.TextEditor</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_Cancel_16xLG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Copy_6524.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Cut_6523.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FieldIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Find_5650.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FindinFiles_6299.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FindNext_13243.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FindPrevious_13244.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Folder_6222.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Font_6007.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FontSize_5701.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\lines_Text_code_16xMD.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Method_636.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NavigateBackwards_6270.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NavigateForward_6271.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NewFile_6276.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Open_6529.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Paste_6520.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PropertyIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Redo_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Save_6530.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Saveall_6518.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\snippet_16xMD.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\startwithoutdebugging_6556.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StatusAnnotations_Critical_16xLG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StatusAnnotations_Critical_16xLG_color.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StatusAnnotations_Help_and_inconclusive_16xLG_color.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StatusAnnotations_Information_16xLG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StatusAnnotations_Information_16xLG_color.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StatusAnnotations_Warning_16xLG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StatusAnnotations_Warning_16xLG_color.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Structure_507.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Textfile_818_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Undo_16x.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
