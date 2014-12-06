@@ -34,6 +34,7 @@
 			System.Windows.Forms.ToolStripSeparator separator4;
 			System.Windows.Forms.ToolStripSeparator separator1;
 			this.statusStrip = new System.Windows.Forms.StatusStrip();
+			this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.menuStrip = new System.Windows.Forms.MenuStrip();
 			this.file = new System.Windows.Forms.ToolStripMenuItem();
 			this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -76,34 +77,25 @@
 			this.LeftToolStripPanel = new System.Windows.Forms.ToolStripPanel();
 			this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
 			this.toolStripContainer = new System.Windows.Forms.ToolStripContainer();
-			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.close = new System.Windows.Forms.ToolStripMenuItem();
 			this.closePane = new System.Windows.Forms.ToolStripMenuItem();
 			this.closeAllButThis = new System.Windows.Forms.ToolStripMenuItem();
 			this.splitPane = new System.Windows.Forms.ToolStripMenuItem();
 			this.moveTab = new System.Windows.Forms.ToolStripMenuItem();
-			this.tabPage1 = new System.Windows.Forms.TabPage();
-			this.tabPage2 = new System.Windows.Forms.TabPage();
-			this.tabControl2 = new System.Windows.Forms.TabControl();
-			this.tabPage3 = new System.Windows.Forms.TabPage();
-			this.tabPage4 = new System.Windows.Forms.TabPage();
+			this.rootTabControl = new System.Windows.Forms.TabControl();
+			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			separator2 = new System.Windows.Forms.ToolStripSeparator();
 			separator3 = new System.Windows.Forms.ToolStripSeparator();
 			separator4 = new System.Windows.Forms.ToolStripSeparator();
 			separator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.statusStrip.SuspendLayout();
 			this.menuStrip.SuspendLayout();
 			this.mainToolStrip.SuspendLayout();
 			this.toolStripContainer.ContentPanel.SuspendLayout();
 			this.toolStripContainer.TopToolStripPanel.SuspendLayout();
 			this.toolStripContainer.SuspendLayout();
-			this.splitContainer1.Panel1.SuspendLayout();
-			this.splitContainer1.Panel2.SuspendLayout();
-			this.splitContainer1.SuspendLayout();
-			this.tabControl1.SuspendLayout();
 			this.tabContextMenu.SuspendLayout();
-			this.tabControl2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// separator2
@@ -128,11 +120,18 @@
 			// 
 			// statusStrip
 			// 
+			this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.statusLabel});
 			this.statusStrip.Location = new System.Drawing.Point(0, 699);
 			this.statusStrip.Name = "statusStrip";
 			this.statusStrip.Size = new System.Drawing.Size(807, 22);
 			this.statusStrip.TabIndex = 0;
-			this.statusStrip.Text = "statusStrip1";
+			// 
+			// statusLabel
+			// 
+			this.statusLabel.Name = "statusLabel";
+			this.statusLabel.Size = new System.Drawing.Size(39, 17);
+			this.statusLabel.Text = "Ready";
 			// 
 			// menuStrip
 			// 
@@ -344,7 +343,7 @@
 			this.back.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.back.Name = "back";
 			this.back.Size = new System.Drawing.Size(23, 22);
-			this.back.Text = "toolStripButton1";
+			this.back.ToolTipText = "Back";
 			// 
 			// forward
 			// 
@@ -353,7 +352,7 @@
 			this.forward.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.forward.Name = "forward";
 			this.forward.Size = new System.Drawing.Size(23, 22);
-			this.forward.Text = "toolStripButton2";
+			this.forward.ToolTipText = "Forward";
 			// 
 			// newFile
 			// 
@@ -364,7 +363,7 @@
 			this.newFile.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.newFile.Name = "newFile";
 			this.newFile.Size = new System.Drawing.Size(32, 22);
-			this.newFile.Text = "toolStripSplitButton1";
+			this.newFile.ToolTipText = "New";
 			// 
 			// pOPULATEMEToolStripMenuItem
 			// 
@@ -379,7 +378,7 @@
 			this.openFile.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.openFile.Name = "openFile";
 			this.openFile.Size = new System.Drawing.Size(23, 22);
-			this.openFile.Text = "toolStripButton4";
+			this.openFile.ToolTipText = "Open";
 			// 
 			// saveFile
 			// 
@@ -388,7 +387,8 @@
 			this.saveFile.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.saveFile.Name = "saveFile";
 			this.saveFile.Size = new System.Drawing.Size(23, 22);
-			this.saveFile.Text = "toolStripButton5";
+			this.saveFile.ToolTipText = "Save";
+			this.saveFile.Click += new System.EventHandler(this.saveFile_Click);
 			// 
 			// saveAll
 			// 
@@ -397,7 +397,7 @@
 			this.saveAll.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.saveAll.Name = "saveAll";
 			this.saveAll.Size = new System.Drawing.Size(23, 22);
-			this.saveAll.Text = "toolStripButton6";
+			this.saveAll.ToolTipText = "Save all";
 			// 
 			// undo
 			// 
@@ -406,7 +406,7 @@
 			this.undo.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.undo.Name = "undo";
 			this.undo.Size = new System.Drawing.Size(23, 22);
-			this.undo.Text = "toolStripButton1";
+			this.undo.ToolTipText = "Undo";
 			// 
 			// redo
 			// 
@@ -415,7 +415,7 @@
 			this.redo.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.redo.Name = "redo";
 			this.redo.Size = new System.Drawing.Size(23, 22);
-			this.redo.Text = "toolStripButton2";
+			this.redo.ToolTipText = "Redo";
 			// 
 			// compile
 			// 
@@ -424,7 +424,7 @@
 			this.compile.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.compile.Name = "compile";
 			this.compile.Size = new System.Drawing.Size(23, 22);
-			this.compile.Text = "toolStripButton1";
+			this.compile.ToolTipText = "Compile";
 			// 
 			// selectConfig
 			// 
@@ -478,7 +478,7 @@
 			// 
 			// toolStripContainer.ContentPanel
 			// 
-			this.toolStripContainer.ContentPanel.Controls.Add(this.splitContainer1);
+			this.toolStripContainer.ContentPanel.Controls.Add(this.rootTabControl);
 			this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(807, 648);
 			this.toolStripContainer.Location = new System.Drawing.Point(0, -1);
 			this.toolStripContainer.Name = "toolStripContainer";
@@ -490,40 +490,6 @@
 			// 
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.menuStrip);
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.mainToolStrip);
-			// 
-			// splitContainer1
-			// 
-			this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.splitContainer1.Location = new System.Drawing.Point(4, 4);
-			this.splitContainer1.Name = "splitContainer1";
-			// 
-			// splitContainer1.Panel1
-			// 
-			this.splitContainer1.Panel1.Controls.Add(this.tabControl1);
-			// 
-			// splitContainer1.Panel2
-			// 
-			this.splitContainer1.Panel2.Controls.Add(this.tabControl2);
-			this.splitContainer1.Size = new System.Drawing.Size(800, 641);
-			this.splitContainer1.SplitterDistance = 545;
-			this.splitContainer1.TabIndex = 1;
-			this.splitContainer1.DoubleClick += new System.EventHandler(this.splitContainer_DoubleClick);
-			// 
-			// tabControl1
-			// 
-			this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.tabControl1.ContextMenuStrip = this.tabContextMenu;
-			this.tabControl1.Controls.Add(this.tabPage1);
-			this.tabControl1.Controls.Add(this.tabPage2);
-			this.tabControl1.Location = new System.Drawing.Point(0, 0);
-			this.tabControl1.Name = "tabControl1";
-			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(547, 641);
-			this.tabControl1.TabIndex = 0;
 			// 
 			// tabContextMenu
 			// 
@@ -569,60 +535,21 @@
 			this.moveTab.Name = "moveTab";
 			this.moveTab.Size = new System.Drawing.Size(161, 22);
 			this.moveTab.Text = "Move tab";
+			this.moveTab.Click += new System.EventHandler(this.moveTab_Click);
 			// 
-			// tabPage1
+			// rootTabControl
 			// 
-			this.tabPage1.Location = new System.Drawing.Point(4, 22);
-			this.tabPage1.Name = "tabPage1";
-			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage1.Size = new System.Drawing.Size(539, 615);
-			this.tabPage1.TabIndex = 0;
-			this.tabPage1.Text = "tabPage1";
-			this.tabPage1.UseVisualStyleBackColor = true;
-			// 
-			// tabPage2
-			// 
-			this.tabPage2.Location = new System.Drawing.Point(4, 22);
-			this.tabPage2.Name = "tabPage2";
-			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage2.Size = new System.Drawing.Size(539, 615);
-			this.tabPage2.TabIndex = 1;
-			this.tabPage2.Text = "tabPage2";
-			this.tabPage2.UseVisualStyleBackColor = true;
-			// 
-			// tabControl2
-			// 
-			this.tabControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+			this.rootTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tabControl2.ContextMenuStrip = this.tabContextMenu;
-			this.tabControl2.Controls.Add(this.tabPage3);
-			this.tabControl2.Controls.Add(this.tabPage4);
-			this.tabControl2.Location = new System.Drawing.Point(0, 0);
-			this.tabControl2.Name = "tabControl2";
-			this.tabControl2.SelectedIndex = 0;
-			this.tabControl2.Size = new System.Drawing.Size(251, 641);
-			this.tabControl2.TabIndex = 0;
-			// 
-			// tabPage3
-			// 
-			this.tabPage3.Location = new System.Drawing.Point(4, 22);
-			this.tabPage3.Name = "tabPage3";
-			this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage3.Size = new System.Drawing.Size(243, 615);
-			this.tabPage3.TabIndex = 0;
-			this.tabPage3.Text = "tabPage3";
-			this.tabPage3.UseVisualStyleBackColor = true;
-			// 
-			// tabPage4
-			// 
-			this.tabPage4.Location = new System.Drawing.Point(4, 22);
-			this.tabPage4.Name = "tabPage4";
-			this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage4.Size = new System.Drawing.Size(243, 615);
-			this.tabPage4.TabIndex = 1;
-			this.tabPage4.Text = "tabPage4";
-			this.tabPage4.UseVisualStyleBackColor = true;
+			this.rootTabControl.ContextMenuStrip = this.tabContextMenu;
+			this.rootTabControl.Location = new System.Drawing.Point(0, 3);
+			this.rootTabControl.Name = "rootTabControl";
+			this.rootTabControl.SelectedIndex = 0;
+			this.rootTabControl.Size = new System.Drawing.Size(807, 645);
+			this.rootTabControl.TabIndex = 0;
+			this.rootTabControl.SelectedIndexChanged += new System.EventHandler(this.tab_SelectedIndexChange);
+			this.rootTabControl.Enter += new System.EventHandler(this.tab_GotFocus);
 			// 
 			// MainIDE
 			// 
@@ -634,6 +561,8 @@
 			this.MainMenuStrip = this.menuStrip;
 			this.Name = "MainIDE";
 			this.Text = "Main IDE";
+			this.statusStrip.ResumeLayout(false);
+			this.statusStrip.PerformLayout();
 			this.menuStrip.ResumeLayout(false);
 			this.menuStrip.PerformLayout();
 			this.mainToolStrip.ResumeLayout(false);
@@ -643,12 +572,7 @@
 			this.toolStripContainer.TopToolStripPanel.PerformLayout();
 			this.toolStripContainer.ResumeLayout(false);
 			this.toolStripContainer.PerformLayout();
-			this.splitContainer1.Panel1.ResumeLayout(false);
-			this.splitContainer1.Panel2.ResumeLayout(false);
-			this.splitContainer1.ResumeLayout(false);
-			this.tabControl1.ResumeLayout(false);
 			this.tabContextMenu.ResumeLayout(false);
-			this.tabControl2.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -705,13 +629,9 @@
 		private System.Windows.Forms.ToolStripMenuItem findToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem findInFilesToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem replaceToolStripMenuItem;
-		private System.Windows.Forms.SplitContainer splitContainer1;
-		private System.Windows.Forms.TabControl tabControl1;
-		private System.Windows.Forms.TabPage tabPage1;
-		private System.Windows.Forms.TabPage tabPage2;
-		private System.Windows.Forms.TabControl tabControl2;
-		private System.Windows.Forms.TabPage tabPage3;
-		private System.Windows.Forms.TabPage tabPage4;
+		private System.Windows.Forms.ToolStripStatusLabel statusLabel;
+		private System.Windows.Forms.TabControl rootTabControl;
+		private System.Windows.Forms.SaveFileDialog saveFileDialog;
 	}
 }
 

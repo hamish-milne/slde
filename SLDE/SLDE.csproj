@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EditorTab.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="MainIDE.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -57,6 +60,7 @@
     <Compile Include="CodeEditor.Designer.cs">
       <DependentUpon>CodeEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Utility.cs" />
     <EmbeddedResource Include="CodeEditor.resx">
       <DependentUpon>CodeEditor.cs</DependentUpon>
     </EmbeddedResource>
