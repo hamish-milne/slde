@@ -9,13 +9,40 @@ namespace SLDE
 {
 	public class EditorTab : TabPage
 	{
+		static EditorTab activeTab;
+
+		public static EditorTab ActiveEditorTab
+		{
+			get { return activeTab; }
+			protected set
+			{
+				if(value != activeTab)
+				{
+					if (activeTab != null && activeTab.OnInactive != null)
+						activeTab.OnInactive(activeTab, null);
+					if (value != null && value.OnActive != null)
+						value.OnActive(value, null);
+					activeTab = value;
+				}
+			}
+		}
+
 		TextEditorControl textEditor;
 		bool changed;
+		TabControl oldParent;
+
+		public event EventHandler OnActive;
+		public event EventHandler OnInactive;
 
 		public virtual TextEditorControl TextEditor
 		{
 			get { return textEditor; }
 			protected set { textEditor = value; }
+		}
+
+		public virtual bool Active
+		{
+			get { return activeTab == this; }
 		}
 
 		public virtual string FileName
@@ -65,12 +92,32 @@ namespace SLDE
 					Changed = false;
 				} catch(Exception e)
 				{
-					MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					Utility.ShowError(e.Message);
 				}
 			}
 		}
 
-		public virtual void OnTextChange(object sender, DocumentEventArgs e)
+		Language language;
+
+		public virtual Language Language
+		{
+			get
+			{
+				if (language == null)
+					language = NoLanguage.Instance;
+				return language;
+			}
+			set
+			{
+				language = value;
+				if (value == null || value.HighlightingStrategy == null)
+					TextEditor.SetHighlighting("Default");
+				else
+					TextEditor.Document.HighlightingStrategy = value.HighlightingStrategy;
+			}
+		}
+
+		void OnTextChange(object sender, DocumentEventArgs e)
 		{
 			Changed = true;
 		}
@@ -90,7 +137,39 @@ namespace SLDE
 			textEditor.Parent = this;
 			textEditor.FillParent();
 			textEditor.Anchor = Utility.AllAnchors;
-			this.Text = "New file";
+			textEditor.Enter += textEditor_Enter;
+			this.ParentChanged += EditorTab_ParentChanged;
+			this.Text = "New file " + (GetHashCode()&0xF);
+		}
+
+		void textEditor_Enter(object sender, EventArgs e)
+		{
+			ActiveEditorTab = this;
+		}
+
+		void EditorTab_ParentChanged(object sender, EventArgs e)
+		{
+			if(oldParent != null)
+			{
+				oldParent.SelectedIndexChanged -= oldParent_SelectedIndexChanged;
+				oldParent.GotFocus -= oldParent_SelectedIndexChanged;
+			}
+			oldParent = Parent as TabControl;
+			if(oldParent != null)
+			{
+				oldParent.SelectedIndexChanged += oldParent_SelectedIndexChanged;
+				oldParent.GotFocus += oldParent_SelectedIndexChanged;
+			}
+		}
+
+		void oldParent_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			var tabs = sender as TabControl;
+			if (tabs == null)
+				return;
+			var editorTab = tabs.SelectedTab as EditorTab;
+			if (editorTab != null)
+				ActiveEditorTab = editorTab;
 		}
 
 		public EditorTab(string fileName) : this()

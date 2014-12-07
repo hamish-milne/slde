@@ -14,9 +14,23 @@ namespace SLDE
 		private EditorTab CreateEditorTab()
 		{
 			var ret = new EditorTab();
-			ret.TextEditor.GotFocus += editorTab_GotFocus;
-			ret.TextEditor.Enter += editorTab_GotFocus;
+			ret.OnActive += ret_OnActive;
 			return ret;
+		}
+
+		void ret_OnActive(object sender, EventArgs e)
+		{
+			Console.WriteLine("OnActive " + sender);
+			var tab = (EditorTab)sender;
+			languageMenu.SelectLanguage(tab.Language, true);
+
+		}
+
+		void languageMenu_OnSelectLanguage(object sender, LanguageSelectEventArgs e)
+		{
+			var tab = EditorTab.ActiveEditorTab;
+			if (tab != null)
+				tab.Language = e.Language;
 		}
 
 		private EditorTab CreateEditorTab(string fileName)
@@ -28,11 +42,12 @@ namespace SLDE
 		public MainIDE()
 		{
 			InitializeComponent();
+			Language.FindAllLanguages();
+			languageMenu.OnSelectLanguage += languageMenu_OnSelectLanguage;
 		}
 
-		public MainIDE(string[] arguments)
+		public MainIDE(string[] arguments) : this()
 		{
-			InitializeComponent();
 			bool openedFiles = false;
 			foreach (var arg in arguments)
 				openedFiles |= TryOpenFile(arg);
@@ -45,31 +60,11 @@ namespace SLDE
 
 		}
 
-		TabPage activeTab;
-		EditorTab activeEditorTab;
-
-		public TabPage GetActiveTab()
-		{
-			if(activeTab == null)
-			{
-				if (rootTabControl.TabCount == 0)
-					rootTabControl.TabPages.Add(CreateEditorTab());
-				activeTab = rootTabControl.TabPages[rootTabControl.SelectedIndex];
-			}
-			return activeTab;
-		}
-
 		public TabControl GetActivePane()
 		{
-			return (TabControl)GetActiveTab().Parent;
+			return (TabControl)EditorTab.ActiveEditorTab.Parent;
 		}
 
-		public EditorTab GetActiveEditorTab()
-		{
-			if (activeEditorTab == null)
-				activeEditorTab = activeTab as EditorTab;
-			return activeEditorTab;
-		}
 
 		public bool TryOpenFile(string file)
 		{
@@ -79,7 +74,7 @@ namespace SLDE
 				return true;
 			} catch(Exception e)
 			{
-				MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				Utility.ShowError(e.Message);
 				return false;
 			}
 		}
@@ -104,18 +99,11 @@ namespace SLDE
 			ret.Anchor = Utility.AllAnchors;
 			ret.ContextMenuStrip = tabContextMenu;
 			ret.TabPages.Add(CreateEditorTab());
-			ret.GotFocus += tab_GotFocus;
-			ret.SelectedIndexChanged += tab_SelectedIndexChange;
 			ret.HotTrack = true;
 			return ret;
 		}
 
 		private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-		{
-
-		}
-
-		private void selectConfig_Click(object sender, EventArgs e)
 		{
 
 		}
@@ -200,6 +188,10 @@ namespace SLDE
 			var newTabs = CreateTabControl();
 			newTabs.Parent = newContainer.Panel2;
 			newTabs.FillParent();
+			if (newTabs.SelectedTab is EditorTab)
+				((EditorTab)newTabs.SelectedTab).TextEditor.Focus();
+			else
+				newTabs.SelectedTab.Focus();
 		}
 
 		TabPage movingTab;
@@ -222,39 +214,15 @@ namespace SLDE
 			}
 		}
 
-		private void TrySetActiveTab(object sender)
-		{
-			var tab = sender as TabPage;
-			var editorTab = tab as EditorTab;
-			if (tab != null)
-				activeTab = tab;
-			if (editorTab != null)
-				activeEditorTab = editorTab;
-		}
-
-		private void tab_GotFocus(object sender, EventArgs e)
-		{
-			var tabs = (TabControl)sender;
-			TrySetActiveTab(tabs.SelectedTab);
-		}
-
-		private void tab_SelectedIndexChange(object sender, EventArgs e)
-		{
-			var tabs = (TabControl)sender;
-			TrySetActiveTab(tabs.SelectedTab);
-		}
-
-		private void editorTab_GotFocus(object sender, EventArgs e)
-		{
-			var tab = ((Control)sender).Parent;
-			TrySetActiveTab(tab);
-		}
-
 		private void saveFile_Click(object sender, EventArgs e)
 		{
-			var tab = GetActiveEditorTab();
+			var tab = EditorTab.ActiveEditorTab;
 			if (tab != null)
+			{
+				saveFileDialog.Filter = Language.GetFilter();
 				tab.Save(saveFileDialog);
+			}
+
 		}
 	}
 }

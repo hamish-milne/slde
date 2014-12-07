@@ -55,7 +55,7 @@ namespace DigitalRune.Windows.TextEditor
     /// behaviour that waits for the clipboard to be available - the clipboard might never become 
     /// available if it is owned by a process that is paused by the debugger.
     /// </remarks>
-    public static ClipboardContainsTextDelegate GetClipboardContainsText;
+    public static ClipboardContainsTextDelegate GetClipboardContainsText = null;
 		
 
     /// <summary>

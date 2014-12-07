@@ -91,6 +91,7 @@
 			this.findPreviousButton = new System.Windows.Forms.ToolStripButton();
 			this.findNextButton = new System.Windows.Forms.ToolStripButton();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.languageMenu = new SLDE.LanguageMenu();
 			separator2 = new System.Windows.Forms.ToolStripSeparator();
 			separator3 = new System.Windows.Forms.ToolStripSeparator();
@@ -130,9 +131,9 @@
 			// 
 			this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statusLabel});
-			this.statusStrip.Location = new System.Drawing.Point(0, 699);
+			this.statusStrip.Location = new System.Drawing.Point(0, 351);
 			this.statusStrip.Name = "statusStrip";
-			this.statusStrip.Size = new System.Drawing.Size(807, 22);
+			this.statusStrip.Size = new System.Drawing.Size(606, 22);
 			this.statusStrip.TabIndex = 0;
 			// 
 			// statusLabel
@@ -153,7 +154,7 @@
             this.windowToolStripMenuItem});
 			this.menuStrip.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip.Name = "menuStrip";
-			this.menuStrip.Size = new System.Drawing.Size(807, 24);
+			this.menuStrip.Size = new System.Drawing.Size(606, 24);
 			this.menuStrip.TabIndex = 1;
 			this.menuStrip.Text = "menuStrip1";
 			this.menuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
@@ -469,10 +470,10 @@
 			// toolStripContainer.ContentPanel
 			// 
 			this.toolStripContainer.ContentPanel.Controls.Add(this.rootTabControl);
-			this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(807, 623);
+			this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(606, 300);
 			this.toolStripContainer.Location = new System.Drawing.Point(0, -1);
 			this.toolStripContainer.Name = "toolStripContainer";
-			this.toolStripContainer.Size = new System.Drawing.Size(807, 697);
+			this.toolStripContainer.Size = new System.Drawing.Size(606, 349);
 			this.toolStripContainer.TabIndex = 4;
 			this.toolStripContainer.Text = "toolStripContainer1";
 			// 
@@ -492,10 +493,8 @@
 			this.rootTabControl.Location = new System.Drawing.Point(0, 3);
 			this.rootTabControl.Name = "rootTabControl";
 			this.rootTabControl.SelectedIndex = 0;
-			this.rootTabControl.Size = new System.Drawing.Size(807, 620);
+			this.rootTabControl.Size = new System.Drawing.Size(606, 297);
 			this.rootTabControl.TabIndex = 0;
-			this.rootTabControl.SelectedIndexChanged += new System.EventHandler(this.tab_SelectedIndexChange);
-			this.rootTabControl.Enter += new System.EventHandler(this.tab_GotFocus);
 			// 
 			// tabContextMenu
 			// 
@@ -555,7 +554,7 @@
             this.findInFilesButton,
             this.findPreviousButton,
             this.findNextButton});
-			this.editToolStrip.Location = new System.Drawing.Point(3, 49);
+			this.editToolStrip.Location = new System.Drawing.Point(220, 24);
 			this.editToolStrip.Name = "editToolStrip";
 			this.editToolStrip.Size = new System.Drawing.Size(179, 25);
 			this.editToolStrip.TabIndex = 2;
@@ -633,7 +632,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(807, 721);
+			this.ClientSize = new System.Drawing.Size(606, 373);
 			this.Controls.Add(this.toolStripContainer);
 			this.Controls.Add(this.statusStrip);
 			this.MainMenuStrip = this.menuStrip;
@@ -719,6 +718,7 @@
 		private System.Windows.Forms.ToolStripButton findPreviousButton;
 		private System.Windows.Forms.ToolStripButton findNextButton;
 		private LanguageMenu languageMenu;
+		private System.Windows.Forms.OpenFileDialog openFileDialog;
 	}
 }
 
