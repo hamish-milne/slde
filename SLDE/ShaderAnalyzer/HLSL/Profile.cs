@@ -3,8 +3,8 @@ using System;
 
 namespace SLDE.ShaderAnalyzer.HLSL {
     public class Profile {
-        public readonly String signature;
-        public readonly String name;
+        public readonly string signature;
+        public readonly string name;
 
         public static readonly Profile PIXEL_SHADER_2_0 = new Profile("ps_2_0", "Pixel Shader 2.0");
         public static readonly Profile PIXEL_SHADER_3_0 = new Profile("ps_3_0", "Pixel Shader 3.0");
@@ -30,7 +30,7 @@ namespace SLDE.ShaderAnalyzer.HLSL {
         public static readonly Profile COMPUTE_SHADER_4_1 = new Profile("cs_4_1", "Compute Shader 4.1");
         public static readonly Profile COMPUTE_SHADER_5_0 = new Profile("cs_5_0", "Compute Shader 5.0");
                                                                         
-        private Profile(String signature, String name) {
+        private Profile(string signature, string name) {
             this.signature = signature;
             this.name = name;
         }
