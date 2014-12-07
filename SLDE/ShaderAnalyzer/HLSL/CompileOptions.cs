@@ -29,7 +29,7 @@ namespace SLDE.ShaderAnalyzer.HLSL {
 
         public FlowControlFlag flowControl = FlowControlFlag.NotSet;
         public MatrixPackingFlag matrixPacking = MatrixPackingFlag.NotSet;
-        public OptimizationFlag optimization = OptimizationFlag.Level1;
+        public OptimizationFlag optimization = OptimizationFlag.Level3;
         public bool compatibilityMode = false;
         public bool strictMode = false;
     }

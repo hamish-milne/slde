@@ -15,7 +15,22 @@ namespace TestShaderAnalyzer
             string shader = File.ReadAllText(path);
             
             analyzer.UpdateShader(shader, path);
+            Assembly assembly = analyzer.Compile("main", Profile.PIXEL_SHADER_3_0);
 
+
+            Debug.Print("\n---------- Assembly ----------");
+
+            foreach (string line in assembly.GetAssemblyLinesEnumerable()) {
+                Debug.Print(line);
+            }
+
+            Debug.Print("\n---------- Errors ----------");
+
+            foreach (string line in assembly.GetErrorLinesEnumerable()) {
+                Debug.Print(line);
+            }
+
+            Debug.Print("\n");
 
             analyzer.Cleanup();
         }

@@ -59,6 +59,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShaderAnalyzer\HLSL\Compiler.cs" />
     <Compile Include="ShaderAnalyzer\HLSL\Analyzer.cs" />
     <Compile Include="ShaderAnalyzer\HLSL\Assembly.cs" />
     <Compile Include="ShaderAnalyzer\HLSL\CompileOptions.cs" />
@@ -197,10 +198,18 @@
     <None Include="Resources\Undo_16x.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ShaderAnalyzer\HLSL\fxc\d3dcompiler_47.dll" />
-    <Content Include="ShaderAnalyzer\HLSL\fxc\d3dcsxd_47.dll" />
-    <Content Include="ShaderAnalyzer\HLSL\fxc\d3dcsx_47.dll" />
-    <Content Include="ShaderAnalyzer\HLSL\fxc\fxc.exe" />
+    <Content Include="fxc\d3dcompiler_47.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="fxc\d3dcsxd_47.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="fxc\d3dcsx_47.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="fxc\fxc.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ShaderAnalyzer\GLSL\" />

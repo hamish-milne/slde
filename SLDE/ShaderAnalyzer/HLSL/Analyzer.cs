@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -13,8 +12,9 @@ namespace SLDE.ShaderAnalyzer.HLSL {
     public class Analyzer {
         public CompileOptions options;
 
-        private static Regex lineBreakRegex = new Regex(@"\r\n?|\n");
-        private static Regex includeStatementRegex = new Regex(@"^[ \t]*#include ""([^\n""]+)""[ \t]*", RegexOptions.Multiline);
+        private static Regex lineBreakRegex = new Regex(@"\r\n?|\n", RegexOptions.Compiled);
+        private static Regex includeStatementRegex = new Regex(@"^[ \t]*#include ""([^\n""]+)""[ \t]*$",
+                                                               RegexOptions.Multiline | RegexOptions.Compiled);
 
         private Dictionary<string, string> includeCache = new Dictionary<string, string>();
         private string entryFilePath;
@@ -39,7 +39,6 @@ namespace SLDE.ShaderAnalyzer.HLSL {
             lineOffset = lineOffset * 3 + 1; // Multiply by 3 to make the line offset survive through the line break duplication
             string processed = ProcessShader(shader, path, lineOffset); 
             File.WriteAllText(entryFilePath, processed);
-            Debug.Print(processed);
 
             options.includePaths.RemoveAt(options.includePaths.Count - 1);
         }
@@ -51,7 +50,7 @@ namespace SLDE.ShaderAnalyzer.HLSL {
         /// <param name="target">The target shader profile</param>
         /// <returns>Compiled and parsed Assembly object</returns>
         public Assembly Compile(string entryPoint, Profile target) {
-            return new Assembly(entryFilePath, entryPoint, target, options);
+            return Compiler.CompileToAssembly(entryFilePath, entryPoint, target, options);
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
-﻿float constant = 5;
+﻿float _Constant = 5;
 
 float initialize(float param) {
-	return exp(param) * constant;
+	return exp(param) * _Constant;
 }

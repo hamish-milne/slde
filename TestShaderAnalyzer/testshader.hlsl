@@ -1,9 +1,7 @@
 #include "./testinclude.hlsl"
-#include "./testnestedinclude.hlsl"
 
-float3 someParamater;
-float2 anotherOne;
-uint4 andNowAnArray[4];
+float3 _SomeParameter;
+float2 _AnotherOne;
 
 struct v2f
 {
@@ -12,10 +10,10 @@ struct v2f
 };  
 
 float4 main(v2f i) : COLOR {
-	float s = initialize(someParameter.x);
+	float s = initialize(_SomeParameter.x);
 
 	for (float i = 0; i < 4; i ++) {
-		s -= i * anotherOne.y - 0.1;
+		s -= i * _AnotherOne.y - 0.1;
 		s = 1.0 / s;
     }
 		
