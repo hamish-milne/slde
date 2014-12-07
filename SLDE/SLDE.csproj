@@ -60,6 +60,10 @@
     <Compile Include="CodeEditor.Designer.cs">
       <DependentUpon>CodeEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="ShaderAnalyzer\HLSL\Analyzer.cs" />
+    <Compile Include="ShaderAnalyzer\HLSL\Assembly.cs" />
+    <Compile Include="ShaderAnalyzer\HLSL\Profile.cs" />
+    <Compile Include="ShaderAnalyzer\IAssembly.cs" />
     <Compile Include="Utility.cs" />
     <EmbeddedResource Include="CodeEditor.resx">
       <DependentUpon>CodeEditor.cs</DependentUpon>
@@ -194,6 +198,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Undo_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ShaderAnalyzer\HLSL\fxc\d3dcompiler_47.dll" />
+    <Content Include="ShaderAnalyzer\HLSL\fxc\d3dcsxd_47.dll" />
+    <Content Include="ShaderAnalyzer\HLSL\fxc\d3dcsx_47.dll" />
+    <Content Include="ShaderAnalyzer\HLSL\fxc\fxc.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ShaderAnalyzer\GLSL\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
