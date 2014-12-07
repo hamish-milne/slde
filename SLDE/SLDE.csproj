@@ -46,6 +46,7 @@
     <Compile Include="EditorTab.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Language.cs" />
     <Compile Include="MainIDE.cs">
       <SubType>Form</SubType>
     </Compile>

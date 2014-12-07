@@ -14,6 +14,8 @@ namespace SLDE
 		private EditorTab CreateEditorTab()
 		{
 			var ret = new EditorTab();
+			ret.TextEditor.GotFocus += editorTab_GotFocus;
+			ret.TextEditor.Enter += editorTab_GotFocus;
 			return ret;
 		}
 
@@ -104,6 +106,7 @@ namespace SLDE
 			ret.TabPages.Add(CreateEditorTab());
 			ret.GotFocus += tab_GotFocus;
 			ret.SelectedIndexChanged += tab_SelectedIndexChange;
+			ret.HotTrack = true;
 			return ret;
 		}
 
@@ -239,6 +242,12 @@ namespace SLDE
 		{
 			var tabs = (TabControl)sender;
 			TrySetActiveTab(tabs.SelectedTab);
+		}
+
+		private void editorTab_GotFocus(object sender, EventArgs e)
+		{
+			var tab = ((Control)sender).Parent;
+			TrySetActiveTab(tab);
 		}
 
 		private void saveFile_Click(object sender, EventArgs e)
