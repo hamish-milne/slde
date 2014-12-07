@@ -10,6 +10,7 @@ namespace SLDE
 	public class EditorTab : TabPage
 	{
 		static EditorTab activeTab;
+		static int newFilesNumber;
 
 		public static EditorTab ActiveEditorTab
 		{
@@ -30,9 +31,20 @@ namespace SLDE
 		TextEditorControl textEditor;
 		bool changed;
 		TabControl oldParent;
+		int newFileID;
 
 		public event EventHandler OnActive;
 		public event EventHandler OnInactive;
+
+		protected override void Dispose(bool disposing)
+		{
+			if (String.IsNullOrEmpty(FileName) && newFileID >= newFilesNumber)
+				newFilesNumber--;
+			var tabs = Parent as TabControl;
+			if (tabs != null && tabs.SelectedTab == this && tabs.SelectedIndex > 0)
+				tabs.SelectedIndex--;
+			base.Dispose(disposing);
+		}
 
 		public virtual TextEditorControl TextEditor
 		{
@@ -40,7 +52,7 @@ namespace SLDE
 			protected set { textEditor = value; }
 		}
 
-		public virtual bool Active
+		public bool Active
 		{
 			get { return activeTab == this; }
 		}
@@ -50,9 +62,13 @@ namespace SLDE
 			get { return textEditor.FileName; }
 			protected set
 			{
+				if (String.IsNullOrEmpty(textEditor.FileName))
+					newFilesNumber--;
 				textEditor.FileName = value;
 				this.Text = Path.GetFileName(value);
 				Changed = Changed;
+				if (String.IsNullOrEmpty(value))
+					newFilesNumber++;
 			}
 		}
 
@@ -68,6 +84,15 @@ namespace SLDE
 			}
 		}
 
+		public virtual void MakeActive()
+		{
+			var tabs = Parent as TabControl;
+			Console.WriteLine(Parent.GetType());
+			if (tabs != null)
+				tabs.SelectedTab = this;
+			TextEditor.Focus();
+		}
+
 		public virtual bool Changed
 		{
 			get { return changed; }
@@ -76,7 +101,7 @@ namespace SLDE
 				changed = value;
 				var lastChar = String.IsNullOrEmpty(Text) ? '\0' : Text[Text.Length - 1];
 				if (value && lastChar != '*')
-					Text += '*';
+					Text += "*";
 				else if (!value && lastChar == '*')
 					Text = Text.Substring(0, Text.Length - 1);
 			}
@@ -139,7 +164,9 @@ namespace SLDE
 			textEditor.Anchor = Utility.AllAnchors;
 			textEditor.Enter += textEditor_Enter;
 			this.ParentChanged += EditorTab_ParentChanged;
-			this.Text = "New file " + (GetHashCode()&0xF);
+			newFilesNumber++;
+			newFileID = newFilesNumber;
+			this.Text = "New file " + newFilesNumber;
 		}
 
 		void textEditor_Enter(object sender, EventArgs e)
@@ -174,9 +201,13 @@ namespace SLDE
 
 		public EditorTab(string fileName) : this()
 		{
+			if (String.IsNullOrEmpty(fileName))
+				throw new ArgumentNullException("fileName");
 			FileName = fileName;
 			this.Text = Path.GetFileName(fileName);
 			textEditor.Text = File.ReadAllText(fileName);
+			Language = Language.GetByExtension(Path.GetExtension(fileName));
+			Changed = false;
 		}
 	}
 }

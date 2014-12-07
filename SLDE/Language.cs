@@ -133,6 +133,19 @@ namespace SLDE
 			}
 		}
 
+		public static Language GetByExtension(string extension)
+		{
+			for(int i = 0; i < AllLanguages.Count; i++)
+			{
+				var l = AllLanguages[i];
+				if (l == null || l.Extensions == null)
+					continue;
+				if (l.Extensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
+					return AllLanguages[i];
+			}
+			return NoLanguage.Instance;
+		}
+
 		public static void SelectLanguage(Language l)
 		{
 			for (int i = 0; i < AllLanguages.Count; i++)

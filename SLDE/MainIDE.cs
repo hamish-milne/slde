@@ -11,10 +11,12 @@ namespace SLDE
 {
 	public partial class MainIDE : Form
 	{
-		private EditorTab CreateEditorTab()
+		private EditorTab CreateEditorTab(TabControl parent)
 		{
 			var ret = new EditorTab();
 			ret.OnActive += ret_OnActive;
+			parent.TabPages.Add(ret);
+			ret.MakeActive();
 			return ret;
 		}
 
@@ -33,9 +35,12 @@ namespace SLDE
 				tab.Language = e.Language;
 		}
 
-		private EditorTab CreateEditorTab(string fileName)
+		private EditorTab CreateEditorTab(string fileName, TabControl parent)
 		{
 			var ret = new EditorTab(fileName);
+			ret.OnActive += ret_OnActive;
+			parent.TabPages.Add(ret);
+			ret.MakeActive();
 			return ret;
 		}
 
@@ -53,9 +58,9 @@ namespace SLDE
 				openedFiles |= TryOpenFile(arg);
 			if (!openedFiles)
 			{
-				rootTabControl.TabPages.Add(CreateEditorTab());
-				rootTabControl.TabPages.Add(CreateEditorTab());
-				rootTabControl.TabPages.Add(CreateEditorTab());
+				CreateEditorTab(rootTabControl);
+				CreateEditorTab(rootTabControl);
+				CreateEditorTab(rootTabControl);
 			}
 
 		}
@@ -81,8 +86,7 @@ namespace SLDE
 
 		public void OpenFile(string file)
 		{
-			var tab = CreateEditorTab(file);
-			GetActivePane().TabPages.Add(tab);
+			CreateEditorTab(file, GetActivePane());
 		}
 
 		protected virtual SplitContainer CreateSplitContainer()
@@ -98,7 +102,7 @@ namespace SLDE
 			var ret = new TabControl();
 			ret.Anchor = Utility.AllAnchors;
 			ret.ContextMenuStrip = tabContextMenu;
-			ret.TabPages.Add(CreateEditorTab());
+			CreateEditorTab(ret);
 			ret.HotTrack = true;
 			return ret;
 		}
@@ -123,7 +127,7 @@ namespace SLDE
 			if (tabs.TabPages.Count <= 1)
 				ClosePane(tabs);
 			else
-				tabs.TabPages.Remove(tab);
+				tab.Dispose();
 		}
 
 		void MoveTab(TabPage tab, TabControl newLocation)
@@ -223,6 +227,20 @@ namespace SLDE
 				tab.Save(saveFileDialog);
 			}
 
+		}
+
+		private void openFile_Click(object sender, EventArgs e)
+		{
+			openFileDialog.Filter = Language.GetFilter();
+			openFileDialog.ShowDialog();
+		}
+
+		private void openFileDialog_FileOk(object sender, CancelEventArgs e)
+		{
+			var dialog = (OpenFileDialog)sender;
+			var names = dialog.FileNames;
+			for (int i = 0; i < names.Length; i++)
+				TryOpenFile(names[i]);
 		}
 	}
 }

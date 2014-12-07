@@ -92,6 +92,9 @@
 			this.findNextButton = new System.Windows.Forms.ToolStripButton();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+			this.buildToolStrip = new System.Windows.Forms.ToolStrip();
+			this.compileButton = new System.Windows.Forms.ToolStripButton();
+			this.configSelect = new System.Windows.Forms.ToolStripComboBox();
 			this.languageMenu = new SLDE.LanguageMenu();
 			separator2 = new System.Windows.Forms.ToolStripSeparator();
 			separator3 = new System.Windows.Forms.ToolStripSeparator();
@@ -105,6 +108,7 @@
 			this.toolStripContainer.SuspendLayout();
 			this.tabContextMenu.SuspendLayout();
 			this.editToolStrip.SuspendLayout();
+			this.buildToolStrip.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// separator2
@@ -192,6 +196,7 @@
 			this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
 			this.openToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
 			this.openToolStripMenuItem.Text = "Open";
+			this.openToolStripMenuItem.Click += new System.EventHandler(this.openFile_Click);
 			// 
 			// saveToolStripMenuItem
 			// 
@@ -387,6 +392,7 @@
 			this.openFile.Name = "openFile";
 			this.openFile.Size = new System.Drawing.Size(23, 22);
 			this.openFile.ToolTipText = "Open";
+			this.openFile.Click += new System.EventHandler(this.openFile_Click);
 			// 
 			// saveFile
 			// 
@@ -482,6 +488,7 @@
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.menuStrip);
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.controlToolStrip);
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.editToolStrip);
+			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.buildToolStrip);
 			// 
 			// rootTabControl
 			// 
@@ -622,6 +629,35 @@
 			this.findNextButton.Size = new System.Drawing.Size(23, 22);
 			this.findNextButton.ToolTipText = "Find next";
 			// 
+			// openFileDialog
+			// 
+			this.openFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog_FileOk);
+			// 
+			// buildToolStrip
+			// 
+			this.buildToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+			this.buildToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.compileButton,
+            this.configSelect});
+			this.buildToolStrip.Location = new System.Drawing.Point(399, 24);
+			this.buildToolStrip.Name = "buildToolStrip";
+			this.buildToolStrip.Size = new System.Drawing.Size(112, 25);
+			this.buildToolStrip.TabIndex = 3;
+			// 
+			// compileButton
+			// 
+			this.compileButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.compileButton.Image = global::SLDE.Properties.Resources.startwithoutdebugging_6556;
+			this.compileButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.compileButton.Name = "compileButton";
+			this.compileButton.Size = new System.Drawing.Size(23, 22);
+			this.compileButton.ToolTipText = "Compile";
+			// 
+			// configSelect
+			// 
+			this.configSelect.Name = "configSelect";
+			this.configSelect.Size = new System.Drawing.Size(75, 25);
+			// 
 			// languageMenu
 			// 
 			this.languageMenu.Name = "languageMenu";
@@ -652,6 +688,8 @@
 			this.tabContextMenu.ResumeLayout(false);
 			this.editToolStrip.ResumeLayout(false);
 			this.editToolStrip.PerformLayout();
+			this.buildToolStrip.ResumeLayout(false);
+			this.buildToolStrip.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -719,6 +757,9 @@
 		private System.Windows.Forms.ToolStripButton findNextButton;
 		private LanguageMenu languageMenu;
 		private System.Windows.Forms.OpenFileDialog openFileDialog;
+		private System.Windows.Forms.ToolStrip buildToolStrip;
+		private System.Windows.Forms.ToolStripButton compileButton;
+		private System.Windows.Forms.ToolStripComboBox configSelect;
 	}
 }
 
