@@ -36,14 +36,14 @@
 			this.statusStrip = new System.Windows.Forms.StatusStrip();
 			this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.menuStrip = new System.Windows.Forms.MenuStrip();
-			this.file = new System.Windows.Forms.ToolStripMenuItem();
+			this.fileMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.pOPULATEMEToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveAllToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-			this.edit = new System.Windows.Forms.ToolStripMenuItem();
+			this.editMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -54,8 +54,8 @@
 			this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.findInFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.replaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.view = new System.Windows.Forms.ToolStripMenuItem();
-			this.tools = new System.Windows.Forms.ToolStripMenuItem();
+			this.viewMenu = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolsMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.windowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.thing1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.thing2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -75,22 +75,23 @@
 			this.LeftToolStripPanel = new System.Windows.Forms.ToolStripPanel();
 			this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
 			this.toolStripContainer = new System.Windows.Forms.ToolStripContainer();
+			this.rootTabControl = new System.Windows.Forms.TabControl();
 			this.tabContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.close = new System.Windows.Forms.ToolStripMenuItem();
 			this.closePane = new System.Windows.Forms.ToolStripMenuItem();
 			this.closeAllButThis = new System.Windows.Forms.ToolStripMenuItem();
 			this.splitPane = new System.Windows.Forms.ToolStripMenuItem();
 			this.moveTab = new System.Windows.Forms.ToolStripMenuItem();
-			this.rootTabControl = new System.Windows.Forms.TabControl();
-			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.editToolStrip = new System.Windows.Forms.ToolStrip();
 			this.cutButton = new System.Windows.Forms.ToolStripButton();
 			this.copyButton = new System.Windows.Forms.ToolStripButton();
 			this.pasteButton = new System.Windows.Forms.ToolStripButton();
 			this.quickFindButton = new System.Windows.Forms.ToolStripButton();
 			this.findInFilesButton = new System.Windows.Forms.ToolStripButton();
-			this.findNextButton = new System.Windows.Forms.ToolStripButton();
 			this.findPreviousButton = new System.Windows.Forms.ToolStripButton();
+			this.findNextButton = new System.Windows.Forms.ToolStripButton();
+			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+			this.languageMenu = new SLDE.LanguageMenu();
 			separator2 = new System.Windows.Forms.ToolStripSeparator();
 			separator3 = new System.Windows.Forms.ToolStripSeparator();
 			separator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -120,6 +121,11 @@
 			separator1.Name = "separator1";
 			separator1.Size = new System.Drawing.Size(158, 6);
 			// 
+			// separator4
+			// 
+			separator4.Name = "separator4";
+			separator4.Size = new System.Drawing.Size(6, 25);
+			// 
 			// statusStrip
 			// 
 			this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -139,10 +145,11 @@
 			// 
 			this.menuStrip.Dock = System.Windows.Forms.DockStyle.None;
 			this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.file,
-            this.edit,
-            this.view,
-            this.tools,
+            this.fileMenu,
+            this.editMenu,
+            this.viewMenu,
+            this.languageMenu,
+            this.toolsMenu,
             this.windowToolStripMenuItem});
 			this.menuStrip.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip.Name = "menuStrip";
@@ -151,17 +158,17 @@
 			this.menuStrip.Text = "menuStrip1";
 			this.menuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
 			// 
-			// file
+			// fileMenu
 			// 
-			this.file.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			this.fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newToolStripMenuItem,
             this.openToolStripMenuItem,
             this.saveToolStripMenuItem,
             this.saveAllToolStripMenuItem,
             this.saveAllToolStripMenuItem1});
-			this.file.Name = "file";
-			this.file.Size = new System.Drawing.Size(37, 20);
-			this.file.Text = "File";
+			this.fileMenu.Name = "fileMenu";
+			this.fileMenu.Size = new System.Drawing.Size(37, 20);
+			this.fileMenu.Text = "File";
 			// 
 			// newToolStripMenuItem
 			// 
@@ -192,6 +199,7 @@
 			this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
 			this.saveToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
 			this.saveToolStripMenuItem.Text = "Save";
+			this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveFile_Click);
 			// 
 			// saveAllToolStripMenuItem
 			// 
@@ -208,9 +216,9 @@
 			this.saveAllToolStripMenuItem1.Size = new System.Drawing.Size(185, 22);
 			this.saveAllToolStripMenuItem1.Text = "Save all";
 			// 
-			// edit
+			// editMenu
 			// 
-			this.edit.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			this.editMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.undoToolStripMenuItem,
             this.redoToolStripMenuItem,
             this.toolStripSeparator1,
@@ -221,9 +229,9 @@
             this.findToolStripMenuItem,
             this.findInFilesToolStripMenuItem,
             this.replaceToolStripMenuItem});
-			this.edit.Name = "edit";
-			this.edit.Size = new System.Drawing.Size(39, 20);
-			this.edit.Text = "Edit";
+			this.editMenu.Name = "editMenu";
+			this.editMenu.Size = new System.Drawing.Size(39, 20);
+			this.editMenu.Text = "Edit";
 			// 
 			// undoToolStripMenuItem
 			// 
@@ -283,17 +291,17 @@
 			this.replaceToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
 			this.replaceToolStripMenuItem.Text = "Replace";
 			// 
-			// view
+			// viewMenu
 			// 
-			this.view.Name = "view";
-			this.view.Size = new System.Drawing.Size(44, 20);
-			this.view.Text = "View";
+			this.viewMenu.Name = "viewMenu";
+			this.viewMenu.Size = new System.Drawing.Size(44, 20);
+			this.viewMenu.Text = "View";
 			// 
-			// tools
+			// toolsMenu
 			// 
-			this.tools.Name = "tools";
-			this.tools.Size = new System.Drawing.Size(47, 20);
-			this.tools.Text = "Tools";
+			this.toolsMenu.Name = "toolsMenu";
+			this.toolsMenu.Size = new System.Drawing.Size(47, 20);
+			this.toolsMenu.Text = "Tools";
 			// 
 			// windowToolStripMenuItem
 			// 
@@ -461,7 +469,7 @@
 			// toolStripContainer.ContentPanel
 			// 
 			this.toolStripContainer.ContentPanel.Controls.Add(this.rootTabControl);
-			this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(807, 648);
+			this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(807, 623);
 			this.toolStripContainer.Location = new System.Drawing.Point(0, -1);
 			this.toolStripContainer.Name = "toolStripContainer";
 			this.toolStripContainer.Size = new System.Drawing.Size(807, 697);
@@ -473,6 +481,21 @@
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.menuStrip);
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.controlToolStrip);
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.editToolStrip);
+			// 
+			// rootTabControl
+			// 
+			this.rootTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.rootTabControl.ContextMenuStrip = this.tabContextMenu;
+			this.rootTabControl.HotTrack = true;
+			this.rootTabControl.Location = new System.Drawing.Point(0, 3);
+			this.rootTabControl.Name = "rootTabControl";
+			this.rootTabControl.SelectedIndex = 0;
+			this.rootTabControl.Size = new System.Drawing.Size(807, 620);
+			this.rootTabControl.TabIndex = 0;
+			this.rootTabControl.SelectedIndexChanged += new System.EventHandler(this.tab_SelectedIndexChange);
+			this.rootTabControl.Enter += new System.EventHandler(this.tab_GotFocus);
 			// 
 			// tabContextMenu
 			// 
@@ -520,21 +543,6 @@
 			this.moveTab.Text = "Move tab";
 			this.moveTab.Click += new System.EventHandler(this.moveTab_Click);
 			// 
-			// rootTabControl
-			// 
-			this.rootTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.rootTabControl.ContextMenuStrip = this.tabContextMenu;
-			this.rootTabControl.HotTrack = true;
-			this.rootTabControl.Location = new System.Drawing.Point(0, 3);
-			this.rootTabControl.Name = "rootTabControl";
-			this.rootTabControl.SelectedIndex = 0;
-			this.rootTabControl.Size = new System.Drawing.Size(807, 645);
-			this.rootTabControl.TabIndex = 0;
-			this.rootTabControl.SelectedIndexChanged += new System.EventHandler(this.tab_SelectedIndexChange);
-			this.rootTabControl.Enter += new System.EventHandler(this.tab_GotFocus);
-			// 
 			// editToolStrip
 			// 
 			this.editToolStrip.Dock = System.Windows.Forms.DockStyle.None;
@@ -547,7 +555,7 @@
             this.findInFilesButton,
             this.findPreviousButton,
             this.findNextButton});
-			this.editToolStrip.Location = new System.Drawing.Point(220, 24);
+			this.editToolStrip.Location = new System.Drawing.Point(3, 49);
 			this.editToolStrip.Name = "editToolStrip";
 			this.editToolStrip.Size = new System.Drawing.Size(179, 25);
 			this.editToolStrip.TabIndex = 2;
@@ -579,11 +587,6 @@
 			this.pasteButton.Size = new System.Drawing.Size(23, 22);
 			this.pasteButton.ToolTipText = "Paste";
 			// 
-			// separator4
-			// 
-			separator4.Name = "separator4";
-			separator4.Size = new System.Drawing.Size(6, 25);
-			// 
 			// quickFindButton
 			// 
 			this.quickFindButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -602,6 +605,15 @@
 			this.findInFilesButton.Size = new System.Drawing.Size(23, 22);
 			this.findInFilesButton.ToolTipText = "Find in files";
 			// 
+			// findPreviousButton
+			// 
+			this.findPreviousButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.findPreviousButton.Image = global::SLDE.Properties.Resources.FindPrevious_13244;
+			this.findPreviousButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.findPreviousButton.Name = "findPreviousButton";
+			this.findPreviousButton.Size = new System.Drawing.Size(23, 22);
+			this.findPreviousButton.ToolTipText = "Find previous";
+			// 
 			// findNextButton
 			// 
 			this.findNextButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -611,14 +623,11 @@
 			this.findNextButton.Size = new System.Drawing.Size(23, 22);
 			this.findNextButton.ToolTipText = "Find next";
 			// 
-			// findPreviousButton
+			// languageMenu
 			// 
-			this.findPreviousButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.findPreviousButton.Image = global::SLDE.Properties.Resources.FindPrevious_13244;
-			this.findPreviousButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.findPreviousButton.Name = "findPreviousButton";
-			this.findPreviousButton.Size = new System.Drawing.Size(23, 22);
-			this.findPreviousButton.ToolTipText = "Find previous";
+			this.languageMenu.Name = "languageMenu";
+			this.languageMenu.Size = new System.Drawing.Size(71, 20);
+			this.languageMenu.Text = "Language";
 			// 
 			// MainIDE
 			// 
@@ -653,10 +662,10 @@
 
 		private System.Windows.Forms.StatusStrip statusStrip;
 		private System.Windows.Forms.MenuStrip menuStrip;
-		private System.Windows.Forms.ToolStripMenuItem file;
-		private System.Windows.Forms.ToolStripMenuItem edit;
-		private System.Windows.Forms.ToolStripMenuItem view;
-		private System.Windows.Forms.ToolStripMenuItem tools;
+		private System.Windows.Forms.ToolStripMenuItem fileMenu;
+		private System.Windows.Forms.ToolStripMenuItem editMenu;
+		private System.Windows.Forms.ToolStripMenuItem viewMenu;
+		private System.Windows.Forms.ToolStripMenuItem toolsMenu;
 		private System.Windows.Forms.ToolStrip controlToolStrip;
 		private System.Windows.Forms.ToolStripContainer toolStripContainer;
 		private System.Windows.Forms.ToolStripPanel BottomToolStripPanel;
@@ -709,6 +718,7 @@
 		private System.Windows.Forms.ToolStripButton findInFilesButton;
 		private System.Windows.Forms.ToolStripButton findPreviousButton;
 		private System.Windows.Forms.ToolStripButton findNextButton;
+		private LanguageMenu languageMenu;
 	}
 }
 
