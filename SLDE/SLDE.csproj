@@ -45,6 +45,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomTab.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomTab.Designer.cs">
+      <DependentUpon>CustomTab.cs</DependentUpon>
+    </Compile>
     <Compile Include="EditorTab.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -66,6 +72,9 @@
     <Compile Include="ShaderAnalyzer\HLSL\Profile.cs" />
     <Compile Include="ShaderAnalyzer\IAssembly.cs" />
     <Compile Include="Utility.cs" />
+    <EmbeddedResource Include="CustomTab.resx">
+      <DependentUpon>CustomTab.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainIDE.resx">
       <DependentUpon>MainIDE.cs</DependentUpon>
     </EmbeddedResource>
@@ -90,6 +99,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ColorTabControl\ColorTabControl.csproj">
+      <Project>{F81B818D-5933-4527-9E81-6423D693A80A}</Project>
+      <Name>ColorTabControl</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DigitalRune.Windows.TextEditor\DigitalRune.Windows.TextEditor.csproj">
       <Project>{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}</Project>
       <Name>DigitalRune.Windows.TextEditor</Name>

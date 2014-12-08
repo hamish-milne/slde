@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using DigitalRune.Windows.TextEditor;
+using DigitalRune.Windows.TextEditor.Formatting;
 using DigitalRune.Windows.TextEditor.Document;
 using System.IO;
 
@@ -135,10 +136,24 @@ namespace SLDE
 			set
 			{
 				language = value;
-				if (value == null || value.HighlightingStrategy == null)
+				if(value == null)
+					return;
+				if (value.HighlightingStrategy == null)
 					TextEditor.SetHighlighting("Default");
 				else
 					TextEditor.Document.HighlightingStrategy = value.HighlightingStrategy;
+				if (value.FormattingStrategy == null)
+					TextEditor.Document.FormattingStrategy = new DefaultFormattingStrategy();
+				else
+					TextEditor.Document.FormattingStrategy = value.FormattingStrategy;
+				if (value.FoldingStrategy == null)
+					TextEditor.Document.FoldingManager.FoldingStrategy = null;
+				else
+				{
+					TextEditor.Document.FoldingManager.FoldingStrategy = value.FoldingStrategy;
+					TextEditor.Document.FoldingManager.UpdateFolds();
+				}
+
 			}
 		}
 
@@ -162,6 +177,7 @@ namespace SLDE
 			textEditor.Parent = this;
 			textEditor.FillParent();
 			textEditor.Anchor = Utility.AllAnchors;
+			textEditor.EnableFolding = true;
 			textEditor.Enter += textEditor_Enter;
 			this.ParentChanged += EditorTab_ParentChanged;
 			newFilesNumber++;

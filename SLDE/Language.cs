@@ -7,104 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
+using DigitalRune.Windows.TextEditor.Formatting;
 using DigitalRune.Windows.TextEditor.Highlighting;
 using DigitalRune.Windows.TextEditor.Folding;
 using DigitalRune.Windows.TextEditor.Completion;
 
 namespace SLDE
 {
-	[AttributeUsage(AttributeTargets.Class)]
-	public class LanguageAttribute : Attribute
-	{
-	}
-
-	public class LanguageSelectEventArgs : EventArgs
-	{
-		public Language Language;
-		public LanguageSelectEventArgs(Language language)
-		{
-			Language = language;
-		}
-	}
-
-	public delegate void LanguageSelectEventHandler(object sender, LanguageSelectEventArgs e);
-
-	[ToolStripItemDesignerAvailability(ToolStripItemDesignerAvailability.MenuStrip)]
-	public class LanguageMenu : ToolStripMenuItem
-	{
-		public LanguageMenu() : base()
-		{
-			Language.AllLanguages.CollectionChanged += AllLanguages_CollectionChanged;
-		}
-
-		protected override void Dispose(bool disposing)
-		{
-			Language.AllLanguages.CollectionChanged -= AllLanguages_CollectionChanged;
-			base.Dispose(disposing);
-		}
-
-		public event LanguageSelectEventHandler OnSelectLanguage;
-
-		public void RefreshLanguages()
-		{
-			for (int i = DropDownItems.Count - 1; i >= 0; i--)
-				if (DropDownItems[i] is Language)
-					DropDownItems.RemoveAt(i);
-			for(int i = 0; i < Language.AllLanguages.Count; i++)
-			{
-				var l = Language.AllLanguages[i];
-				if (l == null)
-					continue;
-				l.Click += language_Click;
-				DropDownItems.Add(l);
-			}
-			for(int i = 0; i < DropDownItems.Count; i++)
-			{
-				var l = DropDownItems[i] as Language;
-				if(l != null)
-				{
-					SelectLanguage(l);
-					break;
-				}
-			}
-		}
-
-		public void SelectLanguage(Language language, bool visualOnly = false)
-		{
-			if (language == null)
-				throw new ArgumentNullException("language");
-			for(int i = 0; i < DropDownItems.Count; i++)
-			{
-				var l = DropDownItems[i] as Language;
-				if(l != null)
-					l.Checked = false;
-			}
-			language.Checked = true;
-			if (OnSelectLanguage != null && !visualOnly)
-				OnSelectLanguage(this, new LanguageSelectEventArgs(language));
-		}
-
-		void AllLanguages_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-		{
-			RefreshLanguages();
-		}
-
-		private void language_Click(object sender, EventArgs e)
-		{
-			SelectLanguage(sender as Language);
-		}
-	}
-
-	public class CompilerResult
-	{
-
-	}
-
-	public interface ICompiler
-	{
-		CompilerResult Compile(IDictionary<string, Stream> projectFiles, string mainFile);
-	}
-
 	[ToolStripItemDesignerAvailability(ToolStripItemDesignerAvailability.MenuStrip)]
 	public class Language : ToolStripMenuItem
 	{
@@ -171,6 +80,7 @@ namespace SLDE
 		
 		public virtual IList<string> Extensions { get; protected set; }
 		public virtual IHighlightingStrategy HighlightingStrategy { get; set; }
+		public virtual IFormattingStrategy FormattingStrategy { get; set; }
 		public virtual IFoldingStrategy FoldingStrategy { get; set; }
 		public virtual ICompletionDataProvider CompletionData { get; set; }
 		public virtual ICompiler Compiler { get; set; }
@@ -202,6 +112,107 @@ namespace SLDE
 		}
 	}
 
+	[AttributeUsage(AttributeTargets.Class)]
+	public class LanguageAttribute : Attribute
+	{
+	}
+
+	public class LanguageSelectEventArgs : EventArgs
+	{
+		public Language Language;
+		public LanguageSelectEventArgs(Language language)
+		{
+			Language = language;
+		}
+	}
+
+	public delegate void LanguageSelectEventHandler(object sender, LanguageSelectEventArgs e);
+
+	[ToolStripItemDesignerAvailability(ToolStripItemDesignerAvailability.MenuStrip)]
+	public class LanguageMenu : ToolStripMenuItem
+	{
+		public LanguageMenu()
+			: base()
+		{
+			Language.AllLanguages.CollectionChanged += AllLanguages_CollectionChanged;
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			Language.AllLanguages.CollectionChanged -= AllLanguages_CollectionChanged;
+			base.Dispose(disposing);
+		}
+
+		public event LanguageSelectEventHandler OnSelectLanguage;
+
+		public void RefreshLanguages()
+		{
+			for (int i = DropDownItems.Count - 1; i >= 0; i--)
+				if (DropDownItems[i] is Language)
+					DropDownItems.RemoveAt(i);
+			for (int i = 0; i < Language.AllLanguages.Count; i++)
+			{
+				var l = Language.AllLanguages[i];
+				if (l == null)
+					continue;
+				l.Click += language_Click;
+				DropDownItems.Add(l);
+			}
+			for (int i = 0; i < DropDownItems.Count; i++)
+			{
+				var l = DropDownItems[i] as Language;
+				if (l != null)
+				{
+					SelectLanguage(l);
+					break;
+				}
+			}
+		}
+
+		public void SelectLanguage(Language language, bool visualOnly = false)
+		{
+			if (language == null)
+				throw new ArgumentNullException("language");
+			for (int i = 0; i < DropDownItems.Count; i++)
+			{
+				var l = DropDownItems[i] as Language;
+				if (l != null)
+					l.Checked = false;
+			}
+			language.Checked = true;
+			if (OnSelectLanguage != null && !visualOnly)
+				OnSelectLanguage(this, new LanguageSelectEventArgs(language));
+		}
+
+		void AllLanguages_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			RefreshLanguages();
+		}
+
+		private void language_Click(object sender, EventArgs e)
+		{
+			SelectLanguage(sender as Language);
+		}
+	}
+
+	public class CompilerResult
+	{
+
+	}
+
+	public interface ICompilerInput
+	{
+		IDictionary<string, Stream> ProjectFiles { get; }
+		string MainFile { get; }
+		ICollection<string> Defines { get; }
+		ICollection<string> Flags { get; }
+	}
+
+	public interface ICompiler
+	{
+		CompilerResult Compile(ICompilerInput input);
+	}
+
 	[Language]
 	public class NoLanguage : Language
 	{
@@ -225,6 +236,8 @@ namespace SLDE
 		{
 			Extensions = new string[] { ".fx", ".fxh", ".hlsl", ".compute", ".cginc" };
 			HighlightingStrategy = HighlightingStrategyFactory.CreateHighlightingStrategy(Name);
+			FoldingStrategy = new HlslFoldingStrategy();
+			FormattingStrategy = new HlslFormattingStrategy();
 		}
 	}
 

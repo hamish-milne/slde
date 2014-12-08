@@ -59,15 +59,17 @@ namespace SLDE
 			if (!openedFiles)
 			{
 				CreateEditorTab(rootTabControl);
-				CreateEditorTab(rootTabControl);
-				CreateEditorTab(rootTabControl);
 			}
 
 		}
 
-		public TabControl GetActivePane()
+		public virtual TabControl ActivePane
 		{
-			return (TabControl)EditorTab.ActiveEditorTab.Parent;
+			get
+			{
+				var tab = EditorTab.ActiveEditorTab;
+				return tab == null ? rootTabControl : (TabControl)tab.Parent;
+			}
 		}
 
 
@@ -86,7 +88,7 @@ namespace SLDE
 
 		public void OpenFile(string file)
 		{
-			CreateEditorTab(file, GetActivePane());
+			CreateEditorTab(file, ActivePane);
 		}
 
 		protected virtual SplitContainer CreateSplitContainer()
@@ -241,6 +243,21 @@ namespace SLDE
 			var names = dialog.FileNames;
 			for (int i = 0; i < names.Length; i++)
 				TryOpenFile(names[i]);
+		}
+
+		private void undo_Click(object sender, EventArgs e)
+		{
+			return;
+		}
+
+		private void rootTabControl_DrawItem(object sender, DrawItemEventArgs e)
+		{
+			Console.WriteLine(e.Bounds);
+		}
+
+		private void newButton_Click(object sender, EventArgs e)
+		{
+			CreateEditorTab(ActivePane);
 		}
 	}
 }
