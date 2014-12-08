@@ -195,22 +195,32 @@ namespace SLDE
 		}
 	}
 
-	public class CompilerResult
+	public struct PropertyName
 	{
+		public string Name;
+		public Type Type;
 
+		public PropertyName(string name, Type type)
+		{
+			Name = name;
+			Type = type;
+		}
 	}
 
 	public interface ICompilerInput
 	{
 		IDictionary<string, Stream> ProjectFiles { get; }
 		string MainFile { get; }
-		ICollection<string> Defines { get; }
-		ICollection<string> Flags { get; }
+		IDictionary<string, string> Defines { get; }
+		IList<string> IncludePaths { get; }
+		IDictionary<string, int> Properties { get; }
+		IList<PropertyName> PropertyNames { get; }
 	}
 
 	public interface ICompiler
 	{
-		CompilerResult Compile(ICompilerInput input);
+		ICompilerInput Input { get; }
+		ShaderAnalyzer.IAssembly Compile(ICompilerInput input);
 	}
 
 	[Language]

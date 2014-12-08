@@ -16,6 +16,15 @@ namespace SLDE
 			InitializeComponent();
 		}
 
+		protected override CreateParams CreateParams
+		{
+			get
+			{
+				var cp = base.CreateParams;
+				cp.ExStyle |= 0x2000000;
+				return cp;
+			}
+		}
 		
 	}
 }

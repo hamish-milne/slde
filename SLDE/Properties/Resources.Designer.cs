@@ -303,6 +303,16 @@ namespace SLDE.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap StatusAnnotations_Critical_16xEXSM_color {
+            get {
+                object obj = ResourceManager.GetObject("StatusAnnotations_Critical_16xEXSM_color", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap StatusAnnotations_Critical_16xLG {
             get {
                 object obj = ResourceManager.GetObject("StatusAnnotations_Critical_16xLG", resourceCulture);
@@ -316,6 +326,26 @@ namespace SLDE.Properties {
         internal static System.Drawing.Bitmap StatusAnnotations_Critical_16xLG_color {
             get {
                 object obj = ResourceManager.GetObject("StatusAnnotations_Critical_16xLG_color", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap StatusAnnotations_Critical_16xSM {
+            get {
+                object obj = ResourceManager.GetObject("StatusAnnotations_Critical_16xSM", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap StatusAnnotations_Critical_16xSM_color {
+            get {
+                object obj = ResourceManager.GetObject("StatusAnnotations_Critical_16xSM_color", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -376,6 +406,16 @@ namespace SLDE.Properties {
         internal static System.Drawing.Bitmap Structure_507 {
             get {
                 object obj = ResourceManager.GetObject("Structure_507", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Symbols_Critical_16xSM {
+            get {
+                object obj = ResourceManager.GetObject("Symbols_Critical_16xSM", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

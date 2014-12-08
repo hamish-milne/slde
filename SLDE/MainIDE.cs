@@ -16,6 +16,7 @@ namespace SLDE
 			var ret = new EditorTab();
 			ret.OnActive += ret_OnActive;
 			parent.TabPages.Add(ret);
+			ret.ImageIndex = 1;
 			ret.MakeActive();
 			return ret;
 		}
@@ -40,6 +41,7 @@ namespace SLDE
 			var ret = new EditorTab(fileName);
 			ret.OnActive += ret_OnActive;
 			parent.TabPages.Add(ret);
+			ret.ImageIndex = 1;
 			ret.MakeActive();
 			return ret;
 		}
@@ -101,7 +103,10 @@ namespace SLDE
 
 		protected virtual TabControl CreateTabControl()
 		{
-			var ret = new TabControl();
+			var ret = new CustomTab();
+			ret.ImageList = imageList;
+			ret.MouseMove += TabControl_MouseMove;
+			ret.MouseClick += TabControl_MouseClick;
 			ret.Anchor = Utility.AllAnchors;
 			ret.ContextMenuStrip = tabContextMenu;
 			CreateEditorTab(ret);
@@ -258,6 +263,62 @@ namespace SLDE
 		private void newButton_Click(object sender, EventArgs e)
 		{
 			CreateEditorTab(ActivePane);
+		}
+
+		private void TabControl_MouseMove(object sender, MouseEventArgs e)
+		{
+			var tabs = sender as TabControl;
+			if (tabs == null)
+				return;
+			for(int i = 0; i < tabs.TabCount; i++)
+			{
+				var rect = tabs.GetTabRect(i);
+				rect = new Rectangle(rect.X + tabs.Margin.Left, rect.Y + tabs.Margin.Top, tabs.ImageList.ImageSize.Width, tabs.ImageList.ImageSize.Height);
+				int newIndex = rect.Contains(e.Location) ? 0 : 1;
+				var tab = tabs.TabPages[i];
+				if (tab.ImageIndex != newIndex)
+					tab.ImageIndex = newIndex;
+			}
+		}
+
+		private void TabControl_MouseLeave(object sender, EventArgs e)
+		{
+			var tabs = sender as TabControl;
+			if (tabs == null)
+				return;
+			for (int i = 0; i < tabs.TabCount; i++)
+			{
+				var tab = tabs.TabPages[i];
+				if (tab.ImageIndex != 1)
+					tab.ImageIndex = 1;
+			}
+		}
+
+		private void TabControl_MouseClick(object sender, MouseEventArgs e)
+		{
+			var tabs = sender as TabControl;
+			if (tabs == null)
+				return;
+			if(e.Button == MouseButtons.Left)
+			{
+				for (int i = 0; i < tabs.TabCount; i++)
+				{
+					var tab = tabs.TabPages[i];
+					if (tab.ImageIndex == 0)
+						CloseTab(tab);
+				}
+			} else if(e.Button == MouseButtons.Right)
+			{
+				for (int i = 0; i < tabs.TabCount; ++i)
+				{
+					if (tabs.GetTabRect(i).Contains(e.Location))
+					{
+						tabs.SelectedIndex = i;
+						tabContextMenu.Show(tabs, e.Location);
+						break;
+					}
+				}
+			}
 		}
 	}
 }

@@ -30,7 +30,7 @@ namespace SLDE.ShaderAnalyzer.HLSL {
         /// <param name="path">The path to the shader. Used in line references</param>
         /// <param name="lineOffset">The line where the hlsl code starts at in the source file. Used in line references</param>
         public void UpdateShader(string shader, string path, int lineOffset = 0) {
-            options.includePaths.Add(Path.GetDirectoryName(path));
+            options.IncludePaths.Add(Path.GetDirectoryName(path));
 
             if (entryFilePath == null) {
                 entryFilePath = Path.GetTempFileName();
@@ -40,7 +40,7 @@ namespace SLDE.ShaderAnalyzer.HLSL {
             string processed = ProcessShader(shader, path, lineOffset); 
             File.WriteAllText(entryFilePath, processed);
 
-            options.includePaths.RemoveAt(options.includePaths.Count - 1);
+            options.IncludePaths.RemoveAt(options.IncludePaths.Count - 1);
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace SLDE.ShaderAnalyzer.HLSL {
                 return path;
             }
 
-            foreach (string includePath in options.includePaths) {
+            foreach (string includePath in options.IncludePaths) {
                 string combined = Path.Combine(includePath, path);
                 if (File.Exists(combined)) {
                     return Path.GetFullPath(path);

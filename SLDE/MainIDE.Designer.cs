@@ -33,6 +33,7 @@
 			System.Windows.Forms.ToolStripSeparator separator3;
 			System.Windows.Forms.ToolStripSeparator separator1;
 			System.Windows.Forms.ToolStripSeparator separator4;
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainIDE));
 			this.statusStrip = new System.Windows.Forms.StatusStrip();
 			this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.menuStrip = new System.Windows.Forms.MenuStrip();
@@ -62,6 +63,7 @@
 			this.controlToolStrip = new System.Windows.Forms.ToolStrip();
 			this.backButton = new System.Windows.Forms.ToolStripButton();
 			this.forwardButton = new System.Windows.Forms.ToolStripButton();
+			this.newButton = new System.Windows.Forms.ToolStripButton();
 			this.openFileButton = new System.Windows.Forms.ToolStripButton();
 			this.saveFileButton = new System.Windows.Forms.ToolStripButton();
 			this.saveAllButton = new System.Windows.Forms.ToolStripButton();
@@ -73,12 +75,7 @@
 			this.LeftToolStripPanel = new System.Windows.Forms.ToolStripPanel();
 			this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
 			this.toolStripContainer = new System.Windows.Forms.ToolStripContainer();
-			this.tabContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.close = new System.Windows.Forms.ToolStripMenuItem();
-			this.closePane = new System.Windows.Forms.ToolStripMenuItem();
-			this.closeAllButThis = new System.Windows.Forms.ToolStripMenuItem();
-			this.splitPane = new System.Windows.Forms.ToolStripMenuItem();
-			this.moveTab = new System.Windows.Forms.ToolStripMenuItem();
+			this.imageList = new System.Windows.Forms.ImageList(this.components);
 			this.editToolStrip = new System.Windows.Forms.ToolStrip();
 			this.cutButton = new System.Windows.Forms.ToolStripButton();
 			this.copyButton = new System.Windows.Forms.ToolStripButton();
@@ -90,11 +87,16 @@
 			this.buildToolStrip = new System.Windows.Forms.ToolStrip();
 			this.compileButton = new System.Windows.Forms.ToolStripButton();
 			this.configSelect = new System.Windows.Forms.ToolStripComboBox();
+			this.tabContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.close = new System.Windows.Forms.ToolStripMenuItem();
+			this.closePane = new System.Windows.Forms.ToolStripMenuItem();
+			this.closeAllButThis = new System.Windows.Forms.ToolStripMenuItem();
+			this.splitPane = new System.Windows.Forms.ToolStripMenuItem();
+			this.moveTab = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-			this.rootTabControl = new System.Windows.Forms.TabControl();
+			this.rootTabControl = new SLDE.CustomTab();
 			this.languageMenu = new SLDE.LanguageMenu();
-			this.newButton = new System.Windows.Forms.ToolStripButton();
 			separator2 = new System.Windows.Forms.ToolStripSeparator();
 			separator3 = new System.Windows.Forms.ToolStripSeparator();
 			separator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -105,9 +107,9 @@
 			this.toolStripContainer.ContentPanel.SuspendLayout();
 			this.toolStripContainer.TopToolStripPanel.SuspendLayout();
 			this.toolStripContainer.SuspendLayout();
-			this.tabContextMenu.SuspendLayout();
 			this.editToolStrip.SuspendLayout();
 			this.buildToolStrip.SuspendLayout();
+			this.tabContextMenu.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// separator2
@@ -345,7 +347,7 @@
             this.redoButton});
 			this.controlToolStrip.Location = new System.Drawing.Point(3, 24);
 			this.controlToolStrip.Name = "controlToolStrip";
-			this.controlToolStrip.Size = new System.Drawing.Size(239, 25);
+			this.controlToolStrip.Size = new System.Drawing.Size(208, 25);
 			this.controlToolStrip.TabIndex = 0;
 			// 
 			// backButton
@@ -365,6 +367,16 @@
 			this.forwardButton.Name = "forwardButton";
 			this.forwardButton.Size = new System.Drawing.Size(23, 22);
 			this.forwardButton.ToolTipText = "Forward";
+			// 
+			// newButton
+			// 
+			this.newButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.newButton.Image = global::SLDE.Properties.Resources.NewFile_6276;
+			this.newButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.newButton.Name = "newButton";
+			this.newButton.Size = new System.Drawing.Size(23, 22);
+			this.newButton.ToolTipText = "New";
+			this.newButton.Click += new System.EventHandler(this.newButton_Click);
 			// 
 			// openFileButton
 			// 
@@ -473,51 +485,11 @@
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.editToolStrip);
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.buildToolStrip);
 			// 
-			// tabContextMenu
+			// imageList
 			// 
-			this.tabContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.close,
-            this.closePane,
-            this.closeAllButThis,
-            separator1,
-            this.splitPane,
-            this.moveTab});
-			this.tabContextMenu.Name = "tabContextMenu";
-			this.tabContextMenu.Size = new System.Drawing.Size(162, 120);
-			// 
-			// close
-			// 
-			this.close.Name = "close";
-			this.close.Size = new System.Drawing.Size(161, 22);
-			this.close.Text = "Close tab";
-			this.close.Click += new System.EventHandler(this.close_Click);
-			// 
-			// closePane
-			// 
-			this.closePane.Name = "closePane";
-			this.closePane.Size = new System.Drawing.Size(161, 22);
-			this.closePane.Text = "Close pane";
-			this.closePane.Click += new System.EventHandler(this.closePane_Click);
-			// 
-			// closeAllButThis
-			// 
-			this.closeAllButThis.Name = "closeAllButThis";
-			this.closeAllButThis.Size = new System.Drawing.Size(161, 22);
-			this.closeAllButThis.Text = "Close all but this";
-			// 
-			// splitPane
-			// 
-			this.splitPane.Name = "splitPane";
-			this.splitPane.Size = new System.Drawing.Size(161, 22);
-			this.splitPane.Text = "Split pane";
-			this.splitPane.Click += new System.EventHandler(this.splitPane_Click);
-			// 
-			// moveTab
-			// 
-			this.moveTab.Name = "moveTab";
-			this.moveTab.Size = new System.Drawing.Size(161, 22);
-			this.moveTab.Text = "Move tab";
-			this.moveTab.Click += new System.EventHandler(this.moveTab_Click);
+			this.imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList.ImageStream")));
+			this.imageList.TransparentColor = System.Drawing.Color.Transparent;
+			this.imageList.Images.SetKeyName(0, "StatusAnnotations_Critical_16xSM_color.png");
 			// 
 			// editToolStrip
 			// 
@@ -531,7 +503,7 @@
             this.findInFilesButton,
             this.findPreviousButton,
             this.findNextButton});
-			this.editToolStrip.Location = new System.Drawing.Point(242, 24);
+			this.editToolStrip.Location = new System.Drawing.Point(211, 24);
 			this.editToolStrip.Name = "editToolStrip";
 			this.editToolStrip.Size = new System.Drawing.Size(179, 25);
 			this.editToolStrip.TabIndex = 2;
@@ -605,9 +577,9 @@
 			this.buildToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.compileButton,
             this.configSelect});
-			this.buildToolStrip.Location = new System.Drawing.Point(421, 24);
+			this.buildToolStrip.Location = new System.Drawing.Point(390, 24);
 			this.buildToolStrip.Name = "buildToolStrip";
-			this.buildToolStrip.Size = new System.Drawing.Size(112, 25);
+			this.buildToolStrip.Size = new System.Drawing.Size(143, 25);
 			this.buildToolStrip.TabIndex = 3;
 			// 
 			// compileButton
@@ -624,6 +596,52 @@
 			this.configSelect.Name = "configSelect";
 			this.configSelect.Size = new System.Drawing.Size(75, 25);
 			// 
+			// tabContextMenu
+			// 
+			this.tabContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.close,
+            this.closePane,
+            this.closeAllButThis,
+            separator1,
+            this.splitPane,
+            this.moveTab});
+			this.tabContextMenu.Name = "tabContextMenu";
+			this.tabContextMenu.Size = new System.Drawing.Size(162, 120);
+			// 
+			// close
+			// 
+			this.close.Name = "close";
+			this.close.Size = new System.Drawing.Size(161, 22);
+			this.close.Text = "Close tab";
+			this.close.Click += new System.EventHandler(this.close_Click);
+			// 
+			// closePane
+			// 
+			this.closePane.Name = "closePane";
+			this.closePane.Size = new System.Drawing.Size(161, 22);
+			this.closePane.Text = "Close pane";
+			this.closePane.Click += new System.EventHandler(this.closePane_Click);
+			// 
+			// closeAllButThis
+			// 
+			this.closeAllButThis.Name = "closeAllButThis";
+			this.closeAllButThis.Size = new System.Drawing.Size(161, 22);
+			this.closeAllButThis.Text = "Close all but this";
+			// 
+			// splitPane
+			// 
+			this.splitPane.Name = "splitPane";
+			this.splitPane.Size = new System.Drawing.Size(161, 22);
+			this.splitPane.Text = "Split pane";
+			this.splitPane.Click += new System.EventHandler(this.splitPane_Click);
+			// 
+			// moveTab
+			// 
+			this.moveTab.Name = "moveTab";
+			this.moveTab.Size = new System.Drawing.Size(161, 22);
+			this.moveTab.Text = "Move tab";
+			this.moveTab.Click += new System.EventHandler(this.moveTab_Click);
+			// 
 			// openFileDialog
 			// 
 			this.openFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog_FileOk);
@@ -633,30 +651,23 @@
 			this.rootTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.rootTabControl.ContextMenuStrip = this.tabContextMenu;
 			this.rootTabControl.HotTrack = true;
+			this.rootTabControl.ImageList = this.imageList;
 			this.rootTabControl.Location = new System.Drawing.Point(0, 3);
 			this.rootTabControl.Name = "rootTabControl";
 			this.rootTabControl.SelectedIndex = 0;
 			this.rootTabControl.Size = new System.Drawing.Size(792, 297);
 			this.rootTabControl.TabIndex = 0;
 			this.rootTabControl.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.rootTabControl_DrawItem);
+			this.rootTabControl.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TabControl_MouseClick);
+			this.rootTabControl.MouseLeave += new System.EventHandler(this.TabControl_MouseLeave);
+			this.rootTabControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TabControl_MouseMove);
 			// 
 			// languageMenu
 			// 
 			this.languageMenu.Name = "languageMenu";
 			this.languageMenu.Size = new System.Drawing.Size(71, 20);
 			this.languageMenu.Text = "Language";
-			// 
-			// newButton
-			// 
-			this.newButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.newButton.Image = global::SLDE.Properties.Resources.NewFile_6276;
-			this.newButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.newButton.Name = "newButton";
-			this.newButton.Size = new System.Drawing.Size(23, 22);
-			this.newButton.ToolTipText = "New";
-			this.newButton.Click += new System.EventHandler(this.newButton_Click);
 			// 
 			// MainIDE
 			// 
@@ -679,11 +690,11 @@
 			this.toolStripContainer.TopToolStripPanel.PerformLayout();
 			this.toolStripContainer.ResumeLayout(false);
 			this.toolStripContainer.PerformLayout();
-			this.tabContextMenu.ResumeLayout(false);
 			this.editToolStrip.ResumeLayout(false);
 			this.editToolStrip.PerformLayout();
 			this.buildToolStrip.ResumeLayout(false);
 			this.buildToolStrip.PerformLayout();
+			this.tabContextMenu.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -751,8 +762,9 @@
 		private System.Windows.Forms.ToolStrip buildToolStrip;
 		private System.Windows.Forms.ToolStripButton compileButton;
 		private System.Windows.Forms.ToolStripComboBox configSelect;
-		private System.Windows.Forms.TabControl rootTabControl;
+		private SLDE.CustomTab rootTabControl;
 		private System.Windows.Forms.ToolStripButton newButton;
+		private System.Windows.Forms.ImageList imageList;
 	}
 }
 

@@ -58,13 +58,17 @@ namespace SLDE
 					int totalCount = 0;
 					for (int i = 0; i < asm.Length; i++)
 					{
+						var fn = asm[i].FullName;
+						if (fn.StartsWith("System", StringComparison.Ordinal) ||
+							fn.StartsWith("Windows", StringComparison.Ordinal))
+							continue;
 						typeArray[i] = asm[i].GetTypes();
 						totalCount += typeArray[i].Length;
 					}
 					var types = new Type[totalCount];
 					for(int i = 0, j = 0, k = 0; j < typeArray.Length; )
 					{
-						if(i < typeArray[j].Length)
+						if(typeArray[j] != null && i < typeArray[j].Length)
 						{
 							types[k] = typeArray[j][i];
 							i++;
@@ -73,13 +77,36 @@ namespace SLDE
 						else
 						{
 							i = 0;
-							j++;
+							do { j++; }
+							while (j < typeArray.Length && typeArray[j] == null);
 						}
 					}
 					allTypes = new ReadOnlyCollection<Type>(types);
 				}
 				return allTypes;
 			}
+		}
+
+		public static List<T> CreateListOf<T, TAttribute>(Action<Type> onFail) where TAttribute : Attribute
+		{
+			var ret = new List<T>();
+			for(int i = 0; i < AllTypes.Count; i++)
+			{
+				var t = AllTypes[i];
+				if(t.IsSubclassOf(typeof(T)) && t.GetCustomAttributes(typeof(TAttribute), false).Length > 0)
+				{
+					try
+					{
+						ret.Add((T)Activator.CreateInstance(t));
+					}
+					catch
+					{
+						if (onFail != null)
+							onFail(t);
+					}
+				}
+			}
+			return ret;
 		}
 
 		public static void ShowError(string text)

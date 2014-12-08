@@ -49,7 +49,7 @@ namespace SLDE.ShaderAnalyzer.HLSL {
             args.Append("/Zi "); // Enables debug information
             args.Append("/nologo ");
 
-            foreach (KeyValuePair<string, string> entry in options.defines) {
+            foreach (KeyValuePair<string, string> entry in options.Defines) {
                 args.AppendFormat("/D \"{0} = {1}\" ", entry.Key, entry.Value);
             }
 

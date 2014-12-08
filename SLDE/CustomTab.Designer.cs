@@ -32,7 +32,6 @@
 			// 
 			// CustomTab
 			// 
-			this.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
 			this.ResumeLayout(false);
 
 		}
