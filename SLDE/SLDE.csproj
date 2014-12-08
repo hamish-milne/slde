@@ -72,6 +72,12 @@
     <Compile Include="ShaderAnalyzer\HLSL\Profile.cs" />
     <Compile Include="ShaderAnalyzer\IAssembly.cs" />
     <Compile Include="Utility.cs" />
+    <Compile Include="WindowManager.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WindowManager.Designer.cs">
+      <DependentUpon>WindowManager.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="CustomTab.resx">
       <DependentUpon>CustomTab.cs</DependentUpon>
     </EmbeddedResource>
