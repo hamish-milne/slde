@@ -15,7 +15,12 @@ namespace SLDE
 
 		public static EditorTab ActiveEditorTab
 		{
-			get { return activeTab; }
+			get
+			{
+				if (activeTab != null && activeTab.Parent == null)
+					activeTab = null;
+				return activeTab;
+			}
 			protected set
 			{
 				if(value != activeTab)
@@ -42,9 +47,21 @@ namespace SLDE
 			if (String.IsNullOrEmpty(FileName) && newFileID >= newFilesNumber)
 				newFilesNumber--;
 			var tabs = Parent as TabControl;
-			if (tabs != null && tabs.SelectedTab == this && tabs.SelectedIndex > 0)
-				tabs.SelectedIndex--;
-			base.Dispose(disposing);
+			if (tabs != null)
+			{
+				int newIndex;
+				if (tabs.SelectedIndex == 0)
+					newIndex = 0;
+				else if (tabs.SelectedIndex == tabs.TabCount - 1)
+					newIndex = tabs.TabCount - 2;
+				else
+					newIndex = tabs.SelectedIndex;
+				base.Dispose(disposing);
+				tabs.SelectedIndex = newIndex;
+			} else
+			{
+				base.Dispose(disposing);
+			}
 		}
 
 		public virtual TextEditorControl TextEditor

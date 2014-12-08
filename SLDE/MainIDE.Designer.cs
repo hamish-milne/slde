@@ -56,6 +56,7 @@
 			this.findInFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.replaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.viewMenu = new System.Windows.Forms.ToolStripMenuItem();
+			this.languageMenu = new SLDE.LanguageMenu();
 			this.toolsMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.windowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.thing1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -75,6 +76,7 @@
 			this.LeftToolStripPanel = new System.Windows.Forms.ToolStripPanel();
 			this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
 			this.toolStripContainer = new System.Windows.Forms.ToolStripContainer();
+			this.rootTabControl = new SLDE.CustomTab();
 			this.imageList = new System.Windows.Forms.ImageList(this.components);
 			this.editToolStrip = new System.Windows.Forms.ToolStrip();
 			this.cutButton = new System.Windows.Forms.ToolStripButton();
@@ -95,8 +97,6 @@
 			this.moveTab = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-			this.rootTabControl = new SLDE.CustomTab();
-			this.languageMenu = new SLDE.LanguageMenu();
 			separator2 = new System.Windows.Forms.ToolStripSeparator();
 			separator3 = new System.Windows.Forms.ToolStripSeparator();
 			separator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -304,6 +304,12 @@
 			this.viewMenu.Size = new System.Drawing.Size(44, 20);
 			this.viewMenu.Text = "View";
 			// 
+			// languageMenu
+			// 
+			this.languageMenu.Name = "languageMenu";
+			this.languageMenu.Size = new System.Drawing.Size(71, 20);
+			this.languageMenu.Text = "Language";
+			// 
 			// toolsMenu
 			// 
 			this.toolsMenu.Name = "toolsMenu";
@@ -471,7 +477,7 @@
 			// toolStripContainer.ContentPanel
 			// 
 			this.toolStripContainer.ContentPanel.Controls.Add(this.rootTabControl);
-			this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(792, 300);
+			this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(792, 250);
 			this.toolStripContainer.Location = new System.Drawing.Point(0, -1);
 			this.toolStripContainer.Name = "toolStripContainer";
 			this.toolStripContainer.Size = new System.Drawing.Size(792, 349);
@@ -484,6 +490,24 @@
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.controlToolStrip);
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.editToolStrip);
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.buildToolStrip);
+			// 
+			// rootTabControl
+			// 
+			this.rootTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.rootTabControl.HotTrack = true;
+			this.rootTabControl.ImageList = this.imageList;
+			this.rootTabControl.Location = new System.Drawing.Point(0, 3);
+			this.rootTabControl.Name = "rootTabControl";
+			this.rootTabControl.SelectedIndex = 0;
+			this.rootTabControl.Size = new System.Drawing.Size(792, 247);
+			this.rootTabControl.TabIndex = 0;
+			this.rootTabControl.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.rootTabControl_DrawItem);
+			this.rootTabControl.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TabControl_MouseClick);
+			this.rootTabControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TabControl_MouseDown);
+			this.rootTabControl.MouseLeave += new System.EventHandler(this.TabControl_MouseLeave);
+			this.rootTabControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TabControl_MouseMove);
 			// 
 			// imageList
 			// 
@@ -503,7 +527,7 @@
             this.findInFilesButton,
             this.findPreviousButton,
             this.findNextButton});
-			this.editToolStrip.Location = new System.Drawing.Point(211, 24);
+			this.editToolStrip.Location = new System.Drawing.Point(3, 49);
 			this.editToolStrip.Name = "editToolStrip";
 			this.editToolStrip.Size = new System.Drawing.Size(179, 25);
 			this.editToolStrip.TabIndex = 2;
@@ -577,9 +601,9 @@
 			this.buildToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.compileButton,
             this.configSelect});
-			this.buildToolStrip.Location = new System.Drawing.Point(390, 24);
+			this.buildToolStrip.Location = new System.Drawing.Point(38, 74);
 			this.buildToolStrip.Name = "buildToolStrip";
-			this.buildToolStrip.Size = new System.Drawing.Size(143, 25);
+			this.buildToolStrip.Size = new System.Drawing.Size(112, 25);
 			this.buildToolStrip.TabIndex = 3;
 			// 
 			// compileButton
@@ -645,29 +669,6 @@
 			// openFileDialog
 			// 
 			this.openFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog_FileOk);
-			// 
-			// rootTabControl
-			// 
-			this.rootTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.rootTabControl.HotTrack = true;
-			this.rootTabControl.ImageList = this.imageList;
-			this.rootTabControl.Location = new System.Drawing.Point(0, 3);
-			this.rootTabControl.Name = "rootTabControl";
-			this.rootTabControl.SelectedIndex = 0;
-			this.rootTabControl.Size = new System.Drawing.Size(792, 297);
-			this.rootTabControl.TabIndex = 0;
-			this.rootTabControl.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.rootTabControl_DrawItem);
-			this.rootTabControl.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TabControl_MouseClick);
-			this.rootTabControl.MouseLeave += new System.EventHandler(this.TabControl_MouseLeave);
-			this.rootTabControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TabControl_MouseMove);
-			// 
-			// languageMenu
-			// 
-			this.languageMenu.Name = "languageMenu";
-			this.languageMenu.Size = new System.Drawing.Size(71, 20);
-			this.languageMenu.Text = "Language";
 			// 
 			// MainIDE
 			// 

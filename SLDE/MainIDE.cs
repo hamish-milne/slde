@@ -108,7 +108,6 @@ namespace SLDE
 			ret.MouseMove += TabControl_MouseMove;
 			ret.MouseClick += TabControl_MouseClick;
 			ret.Anchor = Utility.AllAnchors;
-			ret.ContextMenuStrip = tabContextMenu;
 			CreateEditorTab(ret);
 			ret.HotTrack = true;
 			return ret;
@@ -153,11 +152,18 @@ namespace SLDE
 				return;
 			var splitPane = content.Parent as SplitterPanel;
 			if (splitPane == null)
+			{
+				var tabs = content as TabControl;
+				if (tabs != null)
+					tabs.TabPages[0].Dispose();
 				return;
+			}
 			var container = (SplitContainer)splitPane.Parent;
 			var otherPane = splitPane == container.Panel1 ? container.Panel2 : container.Panel1;
 			if (otherPane.Controls.Count < 1)
 				return;
+			if(content == rootTabControl)
+				rootTabControl = (CustomTab)otherPane.Controls[0];
 			content = otherPane.Controls[0];
 			content.Parent = container.Parent;
 			content.FillParent();
@@ -319,6 +325,11 @@ namespace SLDE
 					}
 				}
 			}
+		}
+
+		private void TabControl_MouseDown(object sender, MouseEventArgs e)
+		{
+
 		}
 	}
 }
