@@ -10,10 +10,10 @@ namespace SLDE
 {
 	public class EditorTab : TabPage
 	{
-		static EditorTab activeTab;
+		static EditorTab activeTab, lastActiveTab;
 		static int newFilesNumber;
 
-		public static EditorTab ActiveEditorTab
+		public static EditorTab ActiveTab
 		{
 			get
 			{
@@ -30,8 +30,15 @@ namespace SLDE
 					if (value != null && value.OnActive != null)
 						value.OnActive(value, null);
 					activeTab = value;
+					if (value != null)
+						lastActiveTab = value;
 				}
 			}
+		}
+
+		public static EditorTab LastActiveTab
+		{
+			get { return lastActiveTab; }
 		}
 
 		TextEditorControl textEditor;
@@ -200,11 +207,13 @@ namespace SLDE
 			newFilesNumber++;
 			newFileID = newFilesNumber;
 			this.Text = "New file " + newFilesNumber;
+			if (lastActiveTab == null)
+				lastActiveTab = this;
 		}
 
 		void textEditor_Enter(object sender, EventArgs e)
 		{
-			ActiveEditorTab = this;
+			ActiveTab = this;
 		}
 
 		void EditorTab_ParentChanged(object sender, EventArgs e)
@@ -229,7 +238,7 @@ namespace SLDE
 				return;
 			var editorTab = tabs.SelectedTab as EditorTab;
 			if (editorTab != null)
-				ActiveEditorTab = editorTab;
+				ActiveTab = editorTab;
 		}
 
 		public EditorTab(string fileName) : this()

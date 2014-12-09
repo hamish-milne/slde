@@ -162,7 +162,6 @@
 			this.menuStrip.Size = new System.Drawing.Size(792, 24);
 			this.menuStrip.TabIndex = 1;
 			this.menuStrip.Text = "menuStrip1";
-			this.menuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
 			// 
 			// fileMenu
 			// 
@@ -640,7 +639,6 @@
 			this.moveTab.Name = "moveTab";
 			this.moveTab.Size = new System.Drawing.Size(161, 22);
 			this.moveTab.Text = "Move tab";
-			this.moveTab.Click += new System.EventHandler(this.moveTab_Click);
 			// 
 			// openFileDialog
 			// 
@@ -660,11 +658,6 @@
 			this.rootTabControl.SelectedIndex = 0;
 			this.rootTabControl.Size = new System.Drawing.Size(792, 247);
 			this.rootTabControl.TabIndex = 0;
-			this.rootTabControl.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.rootTabControl_DrawItem);
-			this.rootTabControl.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TabControl_MouseClick);
-			this.rootTabControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TabControl_MouseDown);
-			this.rootTabControl.MouseLeave += new System.EventHandler(this.TabControl_MouseLeave);
-			this.rootTabControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TabControl_MouseMove);
 			// 
 			// languageMenu
 			// 

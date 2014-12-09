@@ -31,7 +31,7 @@ namespace SLDE
 
 		void languageMenu_OnSelectLanguage(object sender, LanguageSelectEventArgs e)
 		{
-			var tab = EditorTab.ActiveEditorTab;
+			var tab = EditorTab.ActiveTab;
 			if (tab != null)
 				tab.Language = e.Language;
 		}
@@ -69,7 +69,7 @@ namespace SLDE
 		{
 			get
 			{
-				var tab = EditorTab.ActiveEditorTab;
+				var tab = EditorTab.ActiveTab;
 				return tab == null ? rootTabControl : (TabControl)tab.Parent;
 			}
 		}
@@ -105,19 +105,10 @@ namespace SLDE
 		{
 			var ret = new CustomTab();
 			ret.ImageList = imageList;
-			ret.MouseMove += TabControl_MouseMove;
-			ret.MouseClick += TabControl_MouseClick;
-			ret.Anchor = Utility.AllAnchors;
-			ret.ContextMenuStrip = rootTabControl.ContextMenuStrip;
+			ret.ContextMenuStrip = tabContextMenu;
 			ret.MainWindow = true;
 			CreateEditorTab(ret);
-			ret.HotTrack = true;
 			return ret;
-		}
-
-		private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-		{
-
 		}
 
 		private void close_Click(object sender, EventArgs e)
@@ -168,29 +159,9 @@ namespace SLDE
 				newTabs.SelectedTab.Focus();
 		}
 
-		TabPage movingTab;
-
-		private void moveTab_Click(object sender, EventArgs e)
-		{
-			var tabs = sender.GetSourceControl() as TabControl;
-			if(tabs == null)
-				return;
-			if(movingTab == null)
-			{
-				movingTab = tabs.TabPages[tabs.SelectedIndex];
-				statusLabel.Text = "Moving tab";
-			}
-			else
-			{
-				//MoveTab(movingTab, tabs);
-				movingTab = null;
-				statusLabel.Text = "Ready";
-			}
-		}
-
 		private void saveFile_Click(object sender, EventArgs e)
 		{
-			var tab = EditorTab.ActiveEditorTab;
+			var tab = EditorTab.ActiveTab;
 			if (tab != null)
 			{
 				saveFileDialog.Filter = Language.GetFilter();
@@ -218,43 +189,10 @@ namespace SLDE
 			return;
 		}
 
-		private void rootTabControl_DrawItem(object sender, DrawItemEventArgs e)
-		{
-			Console.WriteLine(e.Bounds);
-		}
-
 		private void newButton_Click(object sender, EventArgs e)
 		{
 			CreateEditorTab(ActivePane);
 		}
 
-		private void TabControl_MouseMove(object sender, MouseEventArgs e)
-		{
-			var tabs = sender as TabControl;
-			if (tabs == null)
-				return;
-			
-		}
-
-		private void TabControl_MouseLeave(object sender, EventArgs e)
-		{
-			var tabs = sender as TabControl;
-			if (tabs == null)
-				return;
-			
-		}
-
-		private void TabControl_MouseClick(object sender, MouseEventArgs e)
-		{
-			var tabs = sender as TabControl;
-			if (tabs == null)
-				return;
-			
-		}
-
-		private void TabControl_MouseDown(object sender, MouseEventArgs e)
-		{
-
-		}
 	}
 }

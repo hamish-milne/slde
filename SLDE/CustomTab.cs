@@ -70,9 +70,9 @@ namespace SLDE
 			{
 				dragTabs.Parent = dragTabForm;
 				dragTabs.Size = dragTabForm.ClientSize;
-				dragTabs.Anchor = Utility.AllAnchors;
 				dragTabForm.Size = this.Size;
 				dragTabs.ContextMenuStrip = ContextMenuStrip;
+				dragTabs.ImageList = ImageList;
 				dragTabForm.Show();
 			}
 			
