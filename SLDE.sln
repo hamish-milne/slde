@@ -7,6 +7,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalRune.Windows.TextEditor", "DigitalRune.Windows.TextEditor\DigitalRune.Windows.TextEditor.csproj", "{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLDE", "SLDE\SLDE.csproj", "{1418DA6E-3577-4570-928B-4E58CA48C152}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F81B818D-5933-4527-9E81-6423D693A80A} = {F81B818D-5933-4527-9E81-6423D693A80A}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestShaderAnalyzer", "TestShaderAnalyzer\TestShaderAnalyzer.csproj", "{3AD3ECAB-3DF5-4CE4-9F8F-801C72E7D0DB}"
 EndProject

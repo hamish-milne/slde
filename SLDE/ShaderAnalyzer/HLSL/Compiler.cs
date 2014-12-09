@@ -38,7 +38,7 @@ namespace SLDE.ShaderAnalyzer.HLSL {
         }
 
         public Assembly AsAssembly() {
-            return new Assembly(outputLines, errorLines);
+            return new Assembly(outputLines.ToArray(), errorLines.ToArray());
         }
 
         private String BuildArguments(string shaderPath, string entryPoint, Profile target, CompileOptions options) {
