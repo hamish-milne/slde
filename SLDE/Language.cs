@@ -207,22 +207,6 @@ namespace SLDE
 		}
 	}
 
-	public interface ICompilerInput
-	{
-		IDictionary<string, Stream> ProjectFiles { get; }
-		string MainFile { get; }
-		IDictionary<string, string> Defines { get; }
-		IList<string> IncludePaths { get; }
-		IDictionary<string, int> Properties { get; }
-		IList<PropertyName> PropertyNames { get; }
-	}
-
-	public interface ICompiler
-	{
-		ICompilerInput Input { get; }
-		ShaderAnalyzer.IAssembly Compile(ICompilerInput input);
-	}
-
 	[Language]
 	public class NoLanguage : Language
 	{

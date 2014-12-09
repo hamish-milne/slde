@@ -8,9 +8,9 @@ using System.Windows.Forms;
 
 namespace SLDE
 {
-	public interface ICloseable
+	public interface ITabNameOverride
 	{
-		void Close();
+		string TabName { get; }
 	}
 
 	public static class Utility
@@ -48,6 +48,7 @@ namespace SLDE
 		{
 			content.Location = new Point();
 			var form = content.Parent as Form;
+			content.Anchor = Utility.AllAnchors;
 			content.Size = form == null ? content.Parent.Size : form.ClientSize;
 		}
 
@@ -118,21 +119,6 @@ namespace SLDE
 		public static void ShowError(string text)
 		{
 			MessageBox.Show(text, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-		}
-
-		public static void Call(this EventHandler handler, object sender, EventArgs e)
-		{
-			if (handler != null)
-				handler(sender, e);
-		}
-
-		public static void Close(this IDisposable obj)
-		{
-			var iface = obj as ICloseable;
-			if (iface == null)
-				obj.Dispose();
-			else
-				iface.Close();
 		}
 
 	}

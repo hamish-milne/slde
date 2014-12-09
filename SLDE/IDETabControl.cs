@@ -180,8 +180,6 @@ namespace SLDE
 		{
 			base.OnMouseMove(e);
 
-			Console.WriteLine(TabCount < 1 ? (object)this : (object)TabPages[0]);
-
 			if(ImageList != null)
 				for (int i = 0; i < TabCount; i++)
 				{

@@ -2,10 +2,6 @@
 {
 	partial class IDETab
 	{
-		/// <summary>
-		/// Required designer variable.
-		/// </summary>
-		private System.ComponentModel.IContainer components = null;
 
 		#region Component Designer generated code
 
@@ -15,7 +11,13 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			components = new System.ComponentModel.Container();
+			this.SuspendLayout();
+			// 
+			// IDETab
+			// 
+			this.ParentChanged += new System.EventHandler(this.IDETab_ParentChanged);
+			this.ResumeLayout(false);
+
 		}
 
 		#endregion

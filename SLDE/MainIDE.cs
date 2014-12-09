@@ -11,9 +11,10 @@ namespace SLDE
 {
 	public partial class MainIDE : Form
 	{
-		private EditorTab CreateEditorTab(TabControl parent)
+		private IDETab<Editor> CreateEditorTab(TabControl parent)
 		{
-			var ret = new EditorTab();
+			var ret = new IDETab<Editor>();
+			ret_OnActive(ret, null);
 			ret.OnActive += ret_OnActive;
 			parent.TabPages.Add(ret);
 			ret.ImageIndex = 1;
@@ -24,25 +25,23 @@ namespace SLDE
 		void ret_OnActive(object sender, EventArgs e)
 		{
 			Console.WriteLine("OnActive " + sender);
-			var tab = (EditorTab)sender;
-			languageMenu.SelectLanguage(tab.Language, true);
+			var tab = (IDETab<Editor>)sender;
+			languageMenu.SelectLanguage(tab.Control.Language, true);
 
 		}
 
 		void languageMenu_OnSelectLanguage(object sender, LanguageSelectEventArgs e)
 		{
-			var tab = EditorTab.ActiveTab;
+			var tab = IDETab<Editor>.ActiveTab;
 			if (tab != null)
-				tab.Language = e.Language;
+				tab.Control.Language = e.Language;
 		}
 
-		private EditorTab CreateEditorTab(string fileName, TabControl parent)
+		private IDETab<Editor> CreateEditorTab(string fileName, TabControl parent)
 		{
-			var ret = new EditorTab(fileName);
-			ret.OnActive += ret_OnActive;
-			parent.TabPages.Add(ret);
-			ret.ImageIndex = 1;
-			ret.MakeActive();
+			var ret = CreateEditorTab(parent);
+			ret.Control.FileName = fileName;
+			ret.Control.TryOpen();
 			return ret;
 		}
 
@@ -65,18 +64,6 @@ namespace SLDE
 
 		}
 
-		public virtual TabControl ActivePane
-		{
-			get
-			{
-				var tab = EditorTab.ActiveTab;
-				return tab == null ? 
-					(TabControl)toolStripContainer.ContentPanel.Controls[0]
-					: (TabControl)tab.Parent;
-			}
-		}
-
-
 		public bool TryOpenFile(string file)
 		{
 			try
@@ -92,7 +79,17 @@ namespace SLDE
 
 		public void OpenFile(string file)
 		{
-			CreateEditorTab(file, ActivePane);
+			CreateEditorTab(file, IDETab.ActivePane);
+			var tab = new IDETab<ProjectView>();
+			rootTabControl.TabPages.Add(tab);
+			tab.Control.OpenFile += Control_OpenFile;
+			tab.Control.Root = System.IO.Path.GetDirectoryName(file);
+			tab.Control.UpdateTree();
+		}
+
+		void Control_OpenFile(object sender, OpenFileEventArgs e)
+		{
+			TryOpenFile(e.File);
 		}
 
 		protected virtual SplitContainer CreateSplitContainer()
@@ -155,19 +152,19 @@ namespace SLDE
 			var newTabs = CreateTabControl();
 			newTabs.Parent = newContainer.Panel2;
 			newTabs.FillParent();
-			if (newTabs.SelectedTab is EditorTab)
-				((EditorTab)newTabs.SelectedTab).TextEditor.Focus();
+			if (newTabs.SelectedTab is IDETab<Editor>)
+				((IDETab<Editor>)newTabs.SelectedTab).Control.Focus();
 			else
 				newTabs.SelectedTab.Focus();
 		}
 
 		private void saveFile_Click(object sender, EventArgs e)
 		{
-			var tab = EditorTab.ActiveTab;
+			var tab = IDETab<Editor>.ActiveTab;
 			if (tab != null)
 			{
 				saveFileDialog.Filter = Language.GetFilter();
-				tab.Save(saveFileDialog);
+				tab.Control.Save(saveFileDialog);
 			}
 
 		}
@@ -193,7 +190,7 @@ namespace SLDE
 
 		private void newButton_Click(object sender, EventArgs e)
 		{
-			CreateEditorTab(ActivePane);
+			CreateEditorTab(IDETab.ActivePane);
 		}
 
 	}

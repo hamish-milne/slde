@@ -23,11 +23,11 @@ namespace SLDE.ShaderAnalyzer.HLSL {
         Level3,
     }
 
-    public class CompileOptions : SLDE.ICompilerInput {
+    public class CompileOptions {
         Dictionary<string, string> defines = new Dictionary<string, string>();
         List<string> includePaths = new List<string>();
 
-        //public FlowControlFlag flowControl = FlowControlFlag.NotSet;
+        public FlowControlFlag flowControl = FlowControlFlag.NotSet;
         public MatrixPackingFlag matrixPacking = MatrixPackingFlag.NotSet;
         public OptimizationFlag optimization = OptimizationFlag.Level3;
         public bool compatibilityMode = false;
@@ -54,41 +54,10 @@ namespace SLDE.ShaderAnalyzer.HLSL {
 			get { return properties; }
 		}
 
-		// Might think of a nicer way to do this
-		public FlowControlFlag flowControl
-		{
-			get
-			{
-				int ret;
-				if (!Properties.TryGetValue(propertyNames[0].Name, out ret))
-					return FlowControlFlag.NotSet;
-				return (FlowControlFlag)ret;
-			}
-			set
-			{
-				Properties[propertyNames[0].Name] = (int)value;
-			}
-		}
-
 		// Files provided as streams to support compiling while not saved (for real-time analysis/errors)
 		public IDictionary<string, System.IO.Stream> ProjectFiles
 		{
 			get { return null; }
-		}
-
-		// Display names will be auto-generated with function somewhere
-		static PropertyName[] propertyNames = new PropertyName[]
-		{
-			new PropertyName("flowControl", typeof(FlowControlFlag)),
-			new PropertyName("matrixPacking", typeof(MatrixPackingFlag)),
-			new PropertyName("optimization", typeof(OptimizationFlag)),
-			new PropertyName("compatabilityMode", typeof(bool)),
-			new PropertyName("strictMode", typeof(bool))
-		};
-
-		public IList<PropertyName> PropertyNames
-		{
-			get { return propertyNames; }
 		}
     }
 }
