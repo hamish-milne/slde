@@ -651,6 +651,7 @@
 			this.rootTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.rootTabControl.ContextMenuStrip = this.tabContextMenu;
 			this.rootTabControl.HotTrack = true;
 			this.rootTabControl.ImageList = this.imageList;
 			this.rootTabControl.Location = new System.Drawing.Point(0, 3);

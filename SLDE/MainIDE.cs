@@ -108,6 +108,8 @@ namespace SLDE
 			ret.MouseMove += TabControl_MouseMove;
 			ret.MouseClick += TabControl_MouseClick;
 			ret.Anchor = Utility.AllAnchors;
+			ret.ContextMenuStrip = rootTabControl.ContextMenuStrip;
+			ret.MainWindow = true;
 			CreateEditorTab(ret);
 			ret.HotTrack = true;
 			return ret;
@@ -120,59 +122,14 @@ namespace SLDE
 
 		private void close_Click(object sender, EventArgs e)
 		{
-			var tab = sender.GetSourceControl() as TabControl;
+			/*var tab = sender.GetSourceControl() as TabControl;
 			if (tab != null)
-				CloseTab(tab.TabPages[tab.SelectedIndex]);
-		}
-
-		void CloseTab(TabPage tab)
-		{
-			if (tab == null)
-				return;
-			var tabs = (TabControl)tab.Parent;
-			if (tabs.TabPages.Count <= 1)
-				ClosePane(tabs);
-			else
-				tab.Dispose();
-		}
-
-		void MoveTab(TabPage tab, TabControl newLocation)
-		{
-			if (tab == null || newLocation == null)
-				return;
-			var otherTabs = (TabControl)tab.Parent;
-			newLocation.TabPages.Insert(newLocation.SelectedIndex + 1, tab);
-			if (otherTabs.TabPages.Count == 0)
-				ClosePane(otherTabs);
-		}
-
-		void ClosePane(Control content)
-		{
-			if (content == null)
-				return;
-			var splitPane = content.Parent as SplitterPanel;
-			if (splitPane == null)
-			{
-				var tabs = content as TabControl;
-				if (tabs != null)
-					tabs.TabPages[0].Dispose();
-				return;
-			}
-			var container = (SplitContainer)splitPane.Parent;
-			var otherPane = splitPane == container.Panel1 ? container.Panel2 : container.Panel1;
-			if (otherPane.Controls.Count < 1)
-				return;
-			if(content == rootTabControl)
-				rootTabControl = (CustomTab)otherPane.Controls[0];
-			content = otherPane.Controls[0];
-			content.Parent = container.Parent;
-			content.FillParent();
-			container.Dispose();
+				CloseTab(tab.TabPages[tab.SelectedIndex]);*/
 		}
 
 		private void closePane_Click(object sender, EventArgs e)
 		{
-			ClosePane(sender.GetSourceControl());
+			//ClosePane(sender.GetSourceControl());
 		}
 
 		private void splitContainer_DoubleClick(object sender, EventArgs e)
@@ -225,7 +182,7 @@ namespace SLDE
 			}
 			else
 			{
-				MoveTab(movingTab, tabs);
+				//MoveTab(movingTab, tabs);
 				movingTab = null;
 				statusLabel.Text = "Ready";
 			}
@@ -276,15 +233,7 @@ namespace SLDE
 			var tabs = sender as TabControl;
 			if (tabs == null)
 				return;
-			for(int i = 0; i < tabs.TabCount; i++)
-			{
-				var rect = tabs.GetTabRect(i);
-				rect = new Rectangle(rect.X + tabs.Margin.Left, rect.Y + tabs.Margin.Top, tabs.ImageList.ImageSize.Width, tabs.ImageList.ImageSize.Height);
-				int newIndex = rect.Contains(e.Location) ? 0 : 1;
-				var tab = tabs.TabPages[i];
-				if (tab.ImageIndex != newIndex)
-					tab.ImageIndex = newIndex;
-			}
+			
 		}
 
 		private void TabControl_MouseLeave(object sender, EventArgs e)
@@ -292,12 +241,7 @@ namespace SLDE
 			var tabs = sender as TabControl;
 			if (tabs == null)
 				return;
-			for (int i = 0; i < tabs.TabCount; i++)
-			{
-				var tab = tabs.TabPages[i];
-				if (tab.ImageIndex != 1)
-					tab.ImageIndex = 1;
-			}
+			
 		}
 
 		private void TabControl_MouseClick(object sender, MouseEventArgs e)
@@ -305,26 +249,7 @@ namespace SLDE
 			var tabs = sender as TabControl;
 			if (tabs == null)
 				return;
-			if(e.Button == MouseButtons.Left)
-			{
-				for (int i = 0; i < tabs.TabCount; i++)
-				{
-					var tab = tabs.TabPages[i];
-					if (tab.ImageIndex == 0)
-						CloseTab(tab);
-				}
-			} else if(e.Button == MouseButtons.Right)
-			{
-				for (int i = 0; i < tabs.TabCount; ++i)
-				{
-					if (tabs.GetTabRect(i).Contains(e.Location))
-					{
-						tabs.SelectedIndex = i;
-						tabContextMenu.Show(tabs, e.Location);
-						break;
-					}
-				}
-			}
+			
 		}
 
 		private void TabControl_MouseDown(object sender, MouseEventArgs e)

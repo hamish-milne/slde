@@ -8,6 +8,11 @@ using System.Windows.Forms;
 
 namespace SLDE
 {
+	public interface ICloseable
+	{
+		void Close();
+	}
+
 	public static class Utility
 	{
 		public const AnchorStyles AllAnchors =
@@ -118,6 +123,15 @@ namespace SLDE
 		{
 			if (handler != null)
 				handler(sender, e);
+		}
+
+		public static void Close(this IDisposable obj)
+		{
+			var iface = obj as ICloseable;
+			if (iface == null)
+				obj.Dispose();
+			else
+				iface.Close();
 		}
 
 	}
