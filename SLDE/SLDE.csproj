@@ -71,6 +71,7 @@
     <Compile Include="ShaderAnalyzer\HLSL\CompileOptions.cs" />
     <Compile Include="ShaderAnalyzer\HLSL\Profile.cs" />
     <Compile Include="ShaderAnalyzer\IAssembly.cs" />
+    <Compile Include="ShaderAnalyzer\AssemblyTypes.cs" />
     <Compile Include="Utility.cs" />
     <EmbeddedResource Include="CustomTab.resx">
       <DependentUpon>CustomTab.cs</DependentUpon>
@@ -211,10 +212,18 @@
     <None Include="Resources\Undo_16x.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="fxc\d3dcompiler_47.dll" />
-    <Content Include="fxc\d3dcsxd_47.dll" />
-    <Content Include="fxc\d3dcsx_47.dll" />
-    <Content Include="fxc\fxc.exe" />
+    <Content Include="fxc\d3dcompiler_47.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="fxc\d3dcsxd_47.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="fxc\d3dcsx_47.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="fxc\fxc.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\StatusAnnotations_Critical_16xEXSM_color.png" />
     <Content Include="Resources\StatusAnnotations_Critical_16xSM.png" />
     <Content Include="Resources\StatusAnnotations_Critical_16xSM_color.png" />
