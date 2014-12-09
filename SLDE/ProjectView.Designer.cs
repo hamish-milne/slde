@@ -47,6 +47,8 @@
 			this.treeView.SelectedImageIndex = 0;
 			this.treeView.Size = new System.Drawing.Size(150, 150);
 			this.treeView.TabIndex = 0;
+			this.treeView.AfterCollapse += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterCollapse);
+			this.treeView.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView_BeforeExpand);
 			this.treeView.DoubleClick += new System.EventHandler(this.treeView_DoubleClick);
 			// 
 			// imageList
@@ -62,6 +64,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.Controls.Add(this.treeView);
 			this.Name = "ProjectView";
+			this.ParentChanged += new System.EventHandler(this.ProjectView_ParentChanged);
 			this.ResumeLayout(false);
 
 		}

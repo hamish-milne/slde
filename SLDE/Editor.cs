@@ -14,13 +14,12 @@ using DigitalRune.Windows.TextEditor.Document;
 
 namespace SLDE
 {
-	public partial class Editor : DigitalRune.Windows.TextEditor.TextEditorControl, ITabNameOverride
+	public partial class Editor : DigitalRune.Windows.TextEditor.TextEditorControl
 	{
 		static int newFilesNumber;
 		static int newFileID;
-
-		bool changed;
 		string tabName;
+		bool changed;
 
 		public Editor() : base()
 		{
@@ -29,7 +28,7 @@ namespace SLDE
 			DocumentChanged += OnTextChange;
 			newFilesNumber++;
 			newFileID = newFilesNumber;
-			tabName = "New file " + newFilesNumber;
+			TabName = "New file " + newFilesNumber;
 		}
 
 		protected override void Dispose(bool disposing)
@@ -47,7 +46,7 @@ namespace SLDE
 				if (String.IsNullOrEmpty(base.FileName))
 					newFilesNumber--;
 				base.FileName = value;
-				tabName = Path.GetFileName(value);
+				TabName = Path.GetFileName(value);
 				Changed = Changed;
 				if (String.IsNullOrEmpty(value))
 					newFilesNumber++;
@@ -60,17 +59,30 @@ namespace SLDE
 			set
 			{
 				changed = value;
-				var lastChar = String.IsNullOrEmpty(tabName) ? '\0' : tabName[tabName.Length - 1];
+				var lastChar = String.IsNullOrEmpty(TabName) ? '\0' : TabName[TabName.Length - 1];
 				if (value && lastChar != '*')
-					tabName += "*";
+					TabName += "*";
 				else if (!value && lastChar == '*')
-					tabName = tabName.Substring(0, tabName.Length - 1);
+					TabName = TabName.Substring(0, TabName.Length - 1);
 			}
 		}
 
 		public string TabName
 		{
-			get { return tabName; }
+			get
+			{
+				var tab = Parent as TabPage;
+				if (tab == null)
+					return tabName;
+				return tab.Text;
+			}
+			set
+			{
+				var tab = Parent as TabPage;
+				if (tab != null)
+					tab.Text = value;
+				tabName = value;
+			}
 		}
 
 		public virtual void TrySave()
@@ -165,6 +177,13 @@ namespace SLDE
 			dialog.FileOk -= SaveCallback;
 			FileName = dialog.FileName;
 			TrySave();
+		}
+
+		private void Editor_ParentChanged(object sender, EventArgs e)
+		{
+			var tab = Parent as TabPage;
+			if (tab != null)
+				tab.Text = tabName;
 		}
 	}
 }

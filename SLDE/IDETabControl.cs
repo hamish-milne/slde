@@ -15,6 +15,13 @@ namespace SLDE
 	[ToolboxItem(true)]
 	public partial class IDETabControl : TabControl
 	{
+		static List<IDETabControl> allControls = new List<IDETabControl>();
+
+		public static IList<IDETabControl> AllControls
+		{
+			get { return allControls; }
+		}
+
 		Form dragForm;
 		bool dragging = false;
 		bool justMoved = false;
@@ -26,11 +33,7 @@ namespace SLDE
 		public IDETabControl()
 		{
 			InitializeComponent();
-		}
-
-		public TabControl CreateTabControl()
-		{
-			return new IDETabControl();
+			allControls.Add(this);
 		}
 
 		[Browsable(true)]
@@ -55,6 +58,12 @@ namespace SLDE
 					return i;
 			}
 			return -1;
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			allControls.Remove(this);
+			base.Dispose(disposing);
 		}
 
 		protected virtual void DragOutTab(TabPage tab, MouseEventArgs e)

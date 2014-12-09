@@ -79,6 +79,12 @@
       <DependentUpon>ProjectView.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="ShaderAnalyzer\AssemblyTypes.cs" />
     <Compile Include="ShaderAnalyzer\HLSL\Compiler.cs" />
     <Compile Include="ShaderAnalyzer\HLSL\Analyzer.cs" />
     <Compile Include="ShaderAnalyzer\HLSL\Assembly.cs" />
@@ -92,12 +98,6 @@
       <DependentUpon>Editor.cs</DependentUpon>
     </Compile>
     <Compile Include="Utility.cs" />
-    <Compile Include="WindowManager.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="WindowManager.Designer.cs">
-      <DependentUpon>WindowManager.cs</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="Editor.resx">
       <DependentUpon>Editor.cs</DependentUpon>
     </EmbeddedResource>
@@ -115,14 +115,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -134,10 +129,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ColorTabControl\ColorTabControl.csproj">
-      <Project>{F81B818D-5933-4527-9E81-6423D693A80A}</Project>
-      <Name>ColorTabControl</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DigitalRune.Windows.TextEditor\DigitalRune.Windows.TextEditor.csproj">
       <Project>{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}</Project>
       <Name>DigitalRune.Windows.TextEditor</Name>

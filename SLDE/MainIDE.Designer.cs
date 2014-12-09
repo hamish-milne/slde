@@ -75,6 +75,12 @@
 			this.LeftToolStripPanel = new System.Windows.Forms.ToolStripPanel();
 			this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
 			this.toolStripContainer = new System.Windows.Forms.ToolStripContainer();
+			this.tabContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.close = new System.Windows.Forms.ToolStripMenuItem();
+			this.closePane = new System.Windows.Forms.ToolStripMenuItem();
+			this.closeAllButThis = new System.Windows.Forms.ToolStripMenuItem();
+			this.splitPane = new System.Windows.Forms.ToolStripMenuItem();
+			this.moveTab = new System.Windows.Forms.ToolStripMenuItem();
 			this.imageList = new System.Windows.Forms.ImageList(this.components);
 			this.editToolStrip = new System.Windows.Forms.ToolStrip();
 			this.cutButton = new System.Windows.Forms.ToolStripButton();
@@ -87,12 +93,6 @@
 			this.buildToolStrip = new System.Windows.Forms.ToolStrip();
 			this.compileButton = new System.Windows.Forms.ToolStripButton();
 			this.configSelect = new System.Windows.Forms.ToolStripComboBox();
-			this.tabContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.close = new System.Windows.Forms.ToolStripMenuItem();
-			this.closePane = new System.Windows.Forms.ToolStripMenuItem();
-			this.closeAllButThis = new System.Windows.Forms.ToolStripMenuItem();
-			this.splitPane = new System.Windows.Forms.ToolStripMenuItem();
-			this.moveTab = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.rootTabControl = new SLDE.IDETabControl();
@@ -107,9 +107,9 @@
 			this.toolStripContainer.ContentPanel.SuspendLayout();
 			this.toolStripContainer.TopToolStripPanel.SuspendLayout();
 			this.toolStripContainer.SuspendLayout();
+			this.tabContextMenu.SuspendLayout();
 			this.editToolStrip.SuspendLayout();
 			this.buildToolStrip.SuspendLayout();
-			this.tabContextMenu.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// separator2
@@ -484,11 +484,57 @@
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.editToolStrip);
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.buildToolStrip);
 			// 
+			// tabContextMenu
+			// 
+			this.tabContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.close,
+            this.closePane,
+            this.closeAllButThis,
+            separator1,
+            this.splitPane,
+            this.moveTab});
+			this.tabContextMenu.Name = "tabContextMenu";
+			this.tabContextMenu.Size = new System.Drawing.Size(162, 120);
+			// 
+			// close
+			// 
+			this.close.Name = "close";
+			this.close.Size = new System.Drawing.Size(161, 22);
+			this.close.Text = "Close tab";
+			this.close.Click += new System.EventHandler(this.close_Click);
+			// 
+			// closePane
+			// 
+			this.closePane.Name = "closePane";
+			this.closePane.Size = new System.Drawing.Size(161, 22);
+			this.closePane.Text = "Close pane";
+			this.closePane.Click += new System.EventHandler(this.closePane_Click);
+			// 
+			// closeAllButThis
+			// 
+			this.closeAllButThis.Name = "closeAllButThis";
+			this.closeAllButThis.Size = new System.Drawing.Size(161, 22);
+			this.closeAllButThis.Text = "Close all but this";
+			// 
+			// splitPane
+			// 
+			this.splitPane.Name = "splitPane";
+			this.splitPane.Size = new System.Drawing.Size(161, 22);
+			this.splitPane.Text = "Split pane";
+			this.splitPane.Click += new System.EventHandler(this.splitPane_Click);
+			// 
+			// moveTab
+			// 
+			this.moveTab.Name = "moveTab";
+			this.moveTab.Size = new System.Drawing.Size(161, 22);
+			this.moveTab.Text = "Move tab";
+			// 
 			// imageList
 			// 
 			this.imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList.ImageStream")));
 			this.imageList.TransparentColor = System.Drawing.Color.Transparent;
 			this.imageList.Images.SetKeyName(0, "StatusAnnotations_Critical_16xSM_color.png");
+			this.imageList.Images.SetKeyName(1, "StatusAnnotations_Critical_16xSM.png");
 			// 
 			// editToolStrip
 			// 
@@ -595,51 +641,6 @@
 			this.configSelect.Name = "configSelect";
 			this.configSelect.Size = new System.Drawing.Size(75, 25);
 			// 
-			// tabContextMenu
-			// 
-			this.tabContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.close,
-            this.closePane,
-            this.closeAllButThis,
-            separator1,
-            this.splitPane,
-            this.moveTab});
-			this.tabContextMenu.Name = "tabContextMenu";
-			this.tabContextMenu.Size = new System.Drawing.Size(162, 120);
-			// 
-			// close
-			// 
-			this.close.Name = "close";
-			this.close.Size = new System.Drawing.Size(161, 22);
-			this.close.Text = "Close tab";
-			this.close.Click += new System.EventHandler(this.close_Click);
-			// 
-			// closePane
-			// 
-			this.closePane.Name = "closePane";
-			this.closePane.Size = new System.Drawing.Size(161, 22);
-			this.closePane.Text = "Close pane";
-			this.closePane.Click += new System.EventHandler(this.closePane_Click);
-			// 
-			// closeAllButThis
-			// 
-			this.closeAllButThis.Name = "closeAllButThis";
-			this.closeAllButThis.Size = new System.Drawing.Size(161, 22);
-			this.closeAllButThis.Text = "Close all but this";
-			// 
-			// splitPane
-			// 
-			this.splitPane.Name = "splitPane";
-			this.splitPane.Size = new System.Drawing.Size(161, 22);
-			this.splitPane.Text = "Split pane";
-			this.splitPane.Click += new System.EventHandler(this.splitPane_Click);
-			// 
-			// moveTab
-			// 
-			this.moveTab.Name = "moveTab";
-			this.moveTab.Size = new System.Drawing.Size(161, 22);
-			this.moveTab.Text = "Move tab";
-			// 
 			// openFileDialog
 			// 
 			this.openFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog_FileOk);
@@ -686,11 +687,11 @@
 			this.toolStripContainer.TopToolStripPanel.PerformLayout();
 			this.toolStripContainer.ResumeLayout(false);
 			this.toolStripContainer.PerformLayout();
+			this.tabContextMenu.ResumeLayout(false);
 			this.editToolStrip.ResumeLayout(false);
 			this.editToolStrip.PerformLayout();
 			this.buildToolStrip.ResumeLayout(false);
 			this.buildToolStrip.PerformLayout();
-			this.tabContextMenu.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

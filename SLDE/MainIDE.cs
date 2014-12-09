@@ -11,6 +11,17 @@ namespace SLDE
 {
 	public partial class MainIDE : Form
 	{
+		TabControl ActivePane
+		{
+			get
+			{
+				TabControl ret = IDETab.ActivePane;
+				if (ret == null && IDETabControl.AllControls.Count > 0)
+					ret = IDETabControl.AllControls[0];
+				return ret;
+			}
+		}
+
 		private IDETab<Editor> CreateEditorTab(TabControl parent)
 		{
 			var ret = new IDETab<Editor>();
@@ -19,6 +30,7 @@ namespace SLDE
 			parent.TabPages.Add(ret);
 			ret.ImageIndex = 1;
 			ret.MakeActive();
+			//ret.Refresh();
 			return ret;
 		}
 
@@ -64,7 +76,7 @@ namespace SLDE
 
 		}
 
-		public bool TryOpenFile(string file)
+		bool TryOpenFile(string file)
 		{
 			try
 			{
@@ -77,14 +89,13 @@ namespace SLDE
 			}
 		}
 
-		public void OpenFile(string file)
+		void OpenFile(string file)
 		{
-			CreateEditorTab(file, IDETab.ActivePane);
+			CreateEditorTab(file, ActivePane);
 			var tab = new IDETab<ProjectView>();
 			rootTabControl.TabPages.Add(tab);
 			tab.Control.OpenFile += Control_OpenFile;
 			tab.Control.Root = System.IO.Path.GetDirectoryName(file);
-			tab.Control.UpdateTree();
 		}
 
 		void Control_OpenFile(object sender, OpenFileEventArgs e)
@@ -185,12 +196,13 @@ namespace SLDE
 
 		private void undo_Click(object sender, EventArgs e)
 		{
-			return;
+			IDETab<ProjectView>.ActiveTab.Refresh();
+			IDETab.ActiveTab.Refresh();
 		}
 
 		private void newButton_Click(object sender, EventArgs e)
 		{
-			CreateEditorTab(IDETab.ActivePane);
+			CreateEditorTab(ActivePane);
 		}
 
 	}

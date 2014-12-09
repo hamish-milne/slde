@@ -8,7 +8,14 @@ namespace SLDE
 {
 	public class IDETab<T> : IDETab where T : Control, new()
 	{
-		public static IDETab<T> activeTab;
+		static List<IDETab<T>> allTabs = new List<IDETab<T>>();
+
+		new public static IList<IDETab<T>> AllTabs
+		{
+			get { return allTabs; }
+		}
+
+		static IDETab<T> activeTab;
 
 		new public static IDETab<T> ActiveTab
 		{
@@ -40,19 +47,6 @@ namespace SLDE
 			get { return control; }
 		}
 
-		public override string Text
-		{
-			get
-			{
-				var ovr = control as ITabNameOverride;
-				return ovr == null ? base.Text : ovr.TabName;
-			}
-			set
-			{
-				base.Text = value;
-			}
-		}
-
 		public override void MakeActive()
 		{
 			base.MakeActive();
@@ -68,11 +62,18 @@ namespace SLDE
 			control.Enter += control_Enter;
 			if (ActiveTab == null)
 				ActiveTab = this;
+			allTabs.Add(this);
 		}
 
 		void control_Enter(object sender, EventArgs e)
 		{
 			SetActiveTab();
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			allTabs.Remove(this);
+			base.Dispose(disposing);
 		}
 	}
 }

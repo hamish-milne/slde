@@ -17,9 +17,13 @@ namespace SLDE
 			InitializeComponent();
 		}
 
+		public string TabName
+		{
+			get { return "Project"; }
+		}
+
 		string root;
 
-		[Browsable(true)]
 		public string Root
 		{
 			get
@@ -28,8 +32,22 @@ namespace SLDE
 			}
 			set
 			{
-				root = value;
-				Update();
+				try
+				{
+					if (!Directory.Exists(value))
+						throw new Exception("Directory \"" + value + "\" does not exist");
+					treeView.Nodes.Clear();
+					if (!String.IsNullOrEmpty(value))
+					{
+						var newNode = new FileNode(Path.GetFileName(value), value);
+						newNode.Nodes.Add(new TreeNode());
+						treeView.Nodes.Add(newNode);
+					}
+					root = value;
+				} catch(Exception e)
+				{
+					Utility.ShowError(e.Message);
+				}
 			}
 		}
 
@@ -41,40 +59,6 @@ namespace SLDE
 				OpenFile(this, new OpenFileEventArgs(path));
 		}
 
-		public virtual void UpdateTree()
-		{
-			treeView.Nodes.Clear();
-			if(String.IsNullOrEmpty(Root))
-				return;
-			try
-			{
-				if(!Directory.Exists(Root))
-					throw new Exception("Directory \"" + Root + "\" does not exist");
-				var node = new TreeNode(Path.GetFileName(Root));
-				treeView.Nodes.Add(node);
-				AddRecursive(node, Root);
-			} catch(Exception e)
-			{
-				Utility.ShowError(e.Message);
-				root = "";
-			}
-		}
-
-		protected void AddRecursive(TreeNode node, string directory)
-		{
-			var files = Directory.GetFileSystemEntries(directory);
-			for (int i = 0; i < files.Length; i++)
-			{
-				var f = files[i];
-				var newNode = new TreeNode(Path.GetFileName(f));
-				if (Directory.Exists(f))
-					AddRecursive(newNode, f);
-				else
-					newNode.ImageIndex = GetImageIndex(f);
-				node.Nodes.Add(newNode);
-			}
-		}
-
 		protected int GetImageIndex(string file)
 		{
 			return 1;
@@ -82,18 +66,75 @@ namespace SLDE
 
 		private void treeView_DoubleClick(object sender, EventArgs e)
 		{
-			var tree = (TreeView)sender;
-			if(tree.SelectedNode.ImageIndex != 0)
+			var node = ((TreeView)sender).SelectedNode as FileNode;
+			if(node != null && node.IsFile)
+				OnOpenFile(node.FileName);
+		}
+
+		private void treeView_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+		{
+			var node = e.Node as FileNode;
+			if(node != null && !node.IsFile)
 			{
-				var node = tree.SelectedNode;
-				string path = "";
-				do
+				e.Node.Nodes.Clear();
+				try
 				{
-					path = "/" + node.Text + path;
-					node = node.Parent as TreeNode;
-				} while (node != null);
-				OnOpenFile(Path.GetDirectoryName(Root) + "/" + path);
+					var files = Directory.GetFileSystemEntries(node.FileName);
+					for(int i = 0; i < files.Length; i++)
+					{
+						var f = files[i];
+						var newNode = new FileNode(Path.GetFileName(f), f);
+						if (Directory.Exists(f))
+							newNode.Nodes.Add(new TreeNode());
+						else
+							newNode.ImageIndex = GetImageIndex(f);
+						e.Node.Nodes.Add(newNode);
+					}
+				} catch(Exception ex)
+				{
+					Utility.ShowError(ex.Message);
+					e.Cancel = true;
+				}
 			}
+		}
+
+		private void treeView_AfterCollapse(object sender, TreeViewEventArgs e)
+		{
+			var node = e.Node as FileNode;
+			if (node != null)
+			{
+				e.Node.Nodes.Clear();
+				e.Node.Nodes.Add(new TreeNode());
+			}
+		}
+
+		private void ProjectView_ParentChanged(object sender, EventArgs e)
+		{
+			var tab = Parent as TabPage;
+			if(tab != null)
+				tab.Text = TabName;
+		}
+	}
+
+	public class FileNode : TreeNode
+	{
+		string fileName;
+
+		public virtual string FileName
+		{
+			get { return fileName; }
+			set { fileName = value; }
+		}
+
+		public virtual bool IsFile
+		{
+			get { return ImageIndex > 0; }
+		}
+
+		public FileNode(string text, string fileName)
+			: base(text)
+		{
+			FileName = fileName;
 		}
 	}
 

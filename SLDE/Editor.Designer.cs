@@ -19,7 +19,8 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.Name = "Editor";
 			this.ShowHRuler = true;
-			this.ShowInvalidLines = true;
+			this.Size = new System.Drawing.Size(200, 200);
+			this.ParentChanged += new System.EventHandler(this.Editor_ParentChanged);
 			this.ResumeLayout(false);
 
 		}

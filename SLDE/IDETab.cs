@@ -16,6 +16,11 @@ namespace SLDE
 	{
 		static List<IDETab> allTabs = new List<IDETab>();
 
+		public static IList<IDETab> AllTabs
+		{
+			get { return allTabs; }
+		}
+
 		static IDETab activeTab;
 		public static IDETab ActiveTab
 		{
