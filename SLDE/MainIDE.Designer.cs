@@ -95,7 +95,7 @@
 			this.moveTab = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-			this.rootTabControl = new SLDE.CustomTab();
+			this.rootTabControl = new SLDE.IDETabControl();
 			this.languageMenu = new SLDE.LanguageMenu();
 			separator2 = new System.Windows.Forms.ToolStripSeparator();
 			separator3 = new System.Windows.Forms.ToolStripSeparator();
@@ -758,7 +758,7 @@
 		private System.Windows.Forms.ToolStrip buildToolStrip;
 		private System.Windows.Forms.ToolStripButton compileButton;
 		private System.Windows.Forms.ToolStripComboBox configSelect;
-		private SLDE.CustomTab rootTabControl;
+		private SLDE.IDETabControl rootTabControl;
 		private System.Windows.Forms.ToolStripButton newButton;
 		private System.Windows.Forms.ImageList imageList;
 	}

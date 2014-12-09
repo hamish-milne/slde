@@ -70,7 +70,9 @@ namespace SLDE
 			get
 			{
 				var tab = EditorTab.ActiveTab;
-				return tab == null ? rootTabControl : (TabControl)tab.Parent;
+				return tab == null ? 
+					(TabControl)toolStripContainer.ContentPanel.Controls[0]
+					: (TabControl)tab.Parent;
 			}
 		}
 
@@ -103,7 +105,7 @@ namespace SLDE
 
 		protected virtual TabControl CreateTabControl()
 		{
-			var ret = new CustomTab();
+			var ret = new IDETabControl();
 			ret.ImageList = imageList;
 			ret.ContextMenuStrip = tabContextMenu;
 			ret.MainWindow = true;

@@ -1,6 +1,6 @@
 ﻿namespace SLDE
 {
-	partial class CustomTab
+	partial class IDETab
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -15,16 +15,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.SuspendLayout();
-			// 
-			// CustomTab
-			// 
-			this.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.HotTrack = true;
-			this.ResumeLayout(false);
-
+			components = new System.ComponentModel.Container();
 		}
 
 		#endregion

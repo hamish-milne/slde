@@ -9,9 +9,11 @@ using System.Drawing;
 
 namespace SLDE
 {
-
+	/// <summary>
+	/// An improved TabControl that handles dragging and has a close button
+	/// </summary>
 	[ToolboxItem(true)]
-	public partial class CustomTab : TabControl
+	public partial class IDETabControl : TabControl
 	{
 		Form dragForm;
 		bool dragging = false;
@@ -21,14 +23,14 @@ namespace SLDE
 		Point dragPoint;
 		ContextMenuStrip contextMenu;
 
-		public CustomTab()
+		public IDETabControl()
 		{
 			InitializeComponent();
 		}
 
 		public TabControl CreateTabControl()
 		{
-			return new CustomTab();
+			return new IDETabControl();
 		}
 
 		[Browsable(true)]
@@ -65,7 +67,7 @@ namespace SLDE
 			var dragTabForm = useThisForm ? (Form)Parent : new Form();
 			
 			// Create a new tab control, or if we're using this form, use the current tab control
-			var dragTabs = useThisForm ? this : new CustomTab();
+			var dragTabs = useThisForm ? this : new IDETabControl();
 			if(!useThisForm)
 			{
 				dragTabs.Parent = dragTabForm;
@@ -96,9 +98,8 @@ namespace SLDE
 				dragTabs.Focus();
 			}
 
-			// For some reason, for the main window we need to use its events to control
-			// the tab movement. For other windows it doesn't seem to matter
-			var tabToSet = mainWindow ? this : dragTabs;
+			// For some reason, newly created forms won't respond to mouse events
+			var tabToSet = !useThisForm ? this : dragTabs;
 			tabToSet.dragForm = dragTabForm;
 			tabToSet.dragPoint = dragTabs.PointToClient(mousePoint);
 
@@ -178,6 +179,8 @@ namespace SLDE
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			base.OnMouseMove(e);
+
+			Console.WriteLine(TabCount < 1 ? (object)this : (object)TabPages[0]);
 
 			if(ImageList != null)
 				for (int i = 0; i < TabCount; i++)

@@ -8,7 +8,7 @@ using System.IO;
 
 namespace SLDE
 {
-	public class EditorTab : TabPage
+	public class EditorTab : IDETab
 	{
 		static EditorTab activeTab, lastActiveTab;
 		static int newFilesNumber;
@@ -53,22 +53,9 @@ namespace SLDE
 		{
 			if (String.IsNullOrEmpty(FileName) && newFileID >= newFilesNumber)
 				newFilesNumber--;
-			var tabs = Parent as TabControl;
-			if (tabs != null)
-			{
-				int newIndex;
-				if (tabs.SelectedIndex == 0)
-					newIndex = 0;
-				else if (tabs.SelectedIndex == tabs.TabCount - 1)
-					newIndex = tabs.TabCount - 2;
-				else
-					newIndex = tabs.SelectedIndex;
-				base.Dispose(disposing);
-				tabs.SelectedIndex = newIndex;
-			} else
-			{
-				base.Dispose(disposing);
-			}
+			if (activeTab == this)
+				activeTab = null;
+			base.Dispose(disposing);
 		}
 
 		public virtual TextEditorControl TextEditor

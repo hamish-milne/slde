@@ -45,11 +45,17 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomTab.cs">
+    <Compile Include="IDETab.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="CustomTab.Designer.cs">
-      <DependentUpon>CustomTab.cs</DependentUpon>
+    <Compile Include="IDETab.Designer.cs">
+      <DependentUpon>IDETab.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IDETabControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="IDETabControl.Designer.cs">
+      <DependentUpon>IDETabControl.cs</DependentUpon>
     </Compile>
     <Compile Include="EditorTab.cs">
       <SubType>Component</SubType>
@@ -57,6 +63,7 @@
     <Compile Include="Language.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Locale.cs" />
     <Compile Include="MainIDE.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -78,8 +85,8 @@
     <Compile Include="WindowManager.Designer.cs">
       <DependentUpon>WindowManager.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="CustomTab.resx">
-      <DependentUpon>CustomTab.cs</DependentUpon>
+    <EmbeddedResource Include="IDETabControl.resx">
+      <DependentUpon>IDETabControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainIDE.resx">
       <DependentUpon>MainIDE.cs</DependentUpon>
