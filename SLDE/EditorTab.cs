@@ -8,12 +8,12 @@ using System.IO;
 
 namespace SLDE
 {
-	public class EditorTab : TabPage
+	public class EditorTab : IDETab
 	{
-		static EditorTab activeTab;
+		static EditorTab activeTab, lastActiveTab;
 		static int newFilesNumber;
 
-		public static EditorTab ActiveEditorTab
+		public static EditorTab ActiveTab
 		{
 			get
 			{
@@ -30,8 +30,15 @@ namespace SLDE
 					if (value != null && value.OnActive != null)
 						value.OnActive(value, null);
 					activeTab = value;
+					if (value != null)
+						lastActiveTab = value;
 				}
 			}
+		}
+
+		public static EditorTab LastActiveTab
+		{
+			get { return lastActiveTab; }
 		}
 
 		TextEditorControl textEditor;
@@ -46,22 +53,9 @@ namespace SLDE
 		{
 			if (String.IsNullOrEmpty(FileName) && newFileID >= newFilesNumber)
 				newFilesNumber--;
-			var tabs = Parent as TabControl;
-			if (tabs != null)
-			{
-				int newIndex;
-				if (tabs.SelectedIndex == 0)
-					newIndex = 0;
-				else if (tabs.SelectedIndex == tabs.TabCount - 1)
-					newIndex = tabs.TabCount - 2;
-				else
-					newIndex = tabs.SelectedIndex;
-				base.Dispose(disposing);
-				tabs.SelectedIndex = newIndex;
-			} else
-			{
-				base.Dispose(disposing);
-			}
+			if (activeTab == this)
+				activeTab = null;
+			base.Dispose(disposing);
 		}
 
 		public virtual TextEditorControl TextEditor
@@ -200,11 +194,13 @@ namespace SLDE
 			newFilesNumber++;
 			newFileID = newFilesNumber;
 			this.Text = "New file " + newFilesNumber;
+			if (lastActiveTab == null)
+				lastActiveTab = this;
 		}
 
 		void textEditor_Enter(object sender, EventArgs e)
 		{
-			ActiveEditorTab = this;
+			ActiveTab = this;
 		}
 
 		void EditorTab_ParentChanged(object sender, EventArgs e)
@@ -229,7 +225,7 @@ namespace SLDE
 				return;
 			var editorTab = tabs.SelectedTab as EditorTab;
 			if (editorTab != null)
-				ActiveEditorTab = editorTab;
+				ActiveTab = editorTab;
 		}
 
 		public EditorTab(string fileName) : this()

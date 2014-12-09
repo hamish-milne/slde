@@ -8,6 +8,11 @@ using System.Windows.Forms;
 
 namespace SLDE
 {
+	public interface ICloseable
+	{
+		void Close();
+	}
+
 	public static class Utility
 	{
 		public const AnchorStyles AllAnchors =
@@ -42,7 +47,8 @@ namespace SLDE
 		public static void FillParent(this Control content)
 		{
 			content.Location = new Point();
-			content.Size = content.Parent.Size;
+			var form = content.Parent as Form;
+			content.Size = form == null ? content.Parent.Size : form.ClientSize;
 		}
 
 		static ReadOnlyCollection<Type> allTypes;
@@ -118,6 +124,15 @@ namespace SLDE
 		{
 			if (handler != null)
 				handler(sender, e);
+		}
+
+		public static void Close(this IDisposable obj)
+		{
+			var iface = obj as ICloseable;
+			if (iface == null)
+				obj.Dispose();
+			else
+				iface.Close();
 		}
 
 	}
