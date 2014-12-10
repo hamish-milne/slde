@@ -30,13 +30,12 @@ namespace SLDE
 			parent.TabPages.Add(ret);
 			ret.ImageIndex = 1;
 			ret.MakeActive();
-			//ret.Refresh();
+			ret.Refresh();
 			return ret;
 		}
 
 		void ret_OnActive(object sender, EventArgs e)
 		{
-			Console.WriteLine("OnActive " + sender);
 			var tab = (IDETab<Editor>)sender;
 			languageMenu.SelectLanguage(tab.Control.Language, true);
 
@@ -62,6 +61,7 @@ namespace SLDE
 			InitializeComponent();
 			Language.FindAllLanguages();
 			languageMenu.OnSelectLanguage += languageMenu_OnSelectLanguage;
+			viewMenu.UpdateWindows();
 		}
 
 		public MainIDE(string[] arguments) : this()
@@ -177,7 +177,6 @@ namespace SLDE
 				saveFileDialog.Filter = Language.GetFilter();
 				tab.Control.Save(saveFileDialog);
 			}
-
 		}
 
 		private void openFile_Click(object sender, EventArgs e)
@@ -196,13 +195,26 @@ namespace SLDE
 
 		private void undo_Click(object sender, EventArgs e)
 		{
-			IDETab<ProjectView>.ActiveTab.Refresh();
-			IDETab.ActiveTab.Refresh();
+			var tab = IDETab<Editor>.ActiveTab;
+			if (tab != null)
+				tab.Control.Undo();
+		}
+
+		private void redo_Click(object sender, EventArgs e)
+		{
+			var tab = IDETab<Editor>.ActiveTab;
+			if (tab != null)
+				tab.Control.Redo();
 		}
 
 		private void newButton_Click(object sender, EventArgs e)
 		{
 			CreateEditorTab(ActivePane);
+		}
+
+		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Dispose();
 		}
 
 	}

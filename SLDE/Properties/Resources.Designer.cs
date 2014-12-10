@@ -73,6 +73,16 @@ namespace SLDE.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Close_16xLG {
+            get {
+                object obj = ResourceManager.GetObject("Close_16xLG", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Copy_6524 {
             get {
                 object obj = ResourceManager.GetObject("Copy_6524", resourceCulture);
@@ -243,6 +253,36 @@ namespace SLDE.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Print_11009 {
+            get {
+                object obj = ResourceManager.GetObject("Print_11009", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap PrintPreviewControl_698 {
+            get {
+                object obj = ResourceManager.GetObject("PrintPreviewControl_698", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap PrintSetup_11011 {
+            get {
+                object obj = ResourceManager.GetObject("PrintSetup_11011", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap PropertyIcon {
             get {
                 object obj = ResourceManager.GetObject("PropertyIcon", resourceCulture);
@@ -283,9 +323,39 @@ namespace SLDE.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Select {
+            get {
+                object obj = ResourceManager.GetObject("Select", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap snippet_16xMD {
             get {
                 object obj = ResourceManager.GetObject("snippet_16xMD", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SplitScreenHorizontally_12972 {
+            get {
+                object obj = ResourceManager.GetObject("SplitScreenHorizontally_12972", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SplitScreenVertically_12973 {
+            get {
+                object obj = ResourceManager.GetObject("SplitScreenVertically_12973", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

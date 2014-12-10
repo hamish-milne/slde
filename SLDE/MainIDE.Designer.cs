@@ -34,41 +34,20 @@
 			System.Windows.Forms.ToolStripSeparator separator1;
 			System.Windows.Forms.ToolStripSeparator separator4;
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainIDE));
+			System.Windows.Forms.ToolStripSeparator separator6;
 			this.statusStrip = new System.Windows.Forms.StatusStrip();
 			this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.menuStrip = new System.Windows.Forms.MenuStrip();
 			this.fileMenu = new System.Windows.Forms.ToolStripMenuItem();
-			this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.pOPULATEMEToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-			this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.saveAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.saveAllToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.saveAsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.editMenu = new System.Windows.Forms.ToolStripMenuItem();
-			this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-			this.cutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-			this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.findInFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.replaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.viewMenu = new System.Windows.Forms.ToolStripMenuItem();
+			this.separator8 = new System.Windows.Forms.ToolStripSeparator();
+			this.separator9 = new System.Windows.Forms.ToolStripSeparator();
+			this.replaceMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.viewMenu = new SLDE.ViewMenu();
 			this.toolsMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.windowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.thing1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.thing2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.controlToolStrip = new System.Windows.Forms.ToolStrip();
-			this.backButton = new System.Windows.Forms.ToolStripButton();
-			this.forwardButton = new System.Windows.Forms.ToolStripButton();
-			this.newButton = new System.Windows.Forms.ToolStripButton();
-			this.openFileButton = new System.Windows.Forms.ToolStripButton();
-			this.saveFileButton = new System.Windows.Forms.ToolStripButton();
-			this.saveAllButton = new System.Windows.Forms.ToolStripButton();
-			this.undoButton = new System.Windows.Forms.ToolStripButton();
-			this.redoButton = new System.Windows.Forms.ToolStripButton();
 			this.BottomToolStripPanel = new System.Windows.Forms.ToolStripPanel();
 			this.TopToolStripPanel = new System.Windows.Forms.ToolStripPanel();
 			this.RightToolStripPanel = new System.Windows.Forms.ToolStripPanel();
@@ -83,6 +62,37 @@
 			this.moveTab = new System.Windows.Forms.ToolStripMenuItem();
 			this.imageList = new System.Windows.Forms.ImageList(this.components);
 			this.editToolStrip = new System.Windows.Forms.ToolStrip();
+			this.buildToolStrip = new System.Windows.Forms.ToolStrip();
+			this.configSelect = new System.Windows.Forms.ToolStripComboBox();
+			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+			this.separator5 = new System.Windows.Forms.ToolStripSeparator();
+			this.exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.rootTabControl = new SLDE.IDETabControl();
+			this.languageMenu = new SLDE.LanguageMenu();
+			this.printMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.printPreviewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.separator7 = new System.Windows.Forms.ToolStripSeparator();
+			this.pageSetupMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.newMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.openMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.saveAllMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.undoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.redoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.cutMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.copyMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.pasteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.findMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.findInFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.backButton = new System.Windows.Forms.ToolStripButton();
+			this.forwardButton = new System.Windows.Forms.ToolStripButton();
+			this.newButton = new System.Windows.Forms.ToolStripButton();
+			this.openFileButton = new System.Windows.Forms.ToolStripButton();
+			this.saveFileButton = new System.Windows.Forms.ToolStripButton();
+			this.saveAllButton = new System.Windows.Forms.ToolStripButton();
+			this.undoButton = new System.Windows.Forms.ToolStripButton();
+			this.redoButton = new System.Windows.Forms.ToolStripButton();
 			this.cutButton = new System.Windows.Forms.ToolStripButton();
 			this.copyButton = new System.Windows.Forms.ToolStripButton();
 			this.pasteButton = new System.Windows.Forms.ToolStripButton();
@@ -90,17 +100,14 @@
 			this.findInFilesButton = new System.Windows.Forms.ToolStripButton();
 			this.findPreviousButton = new System.Windows.Forms.ToolStripButton();
 			this.findNextButton = new System.Windows.Forms.ToolStripButton();
-			this.buildToolStrip = new System.Windows.Forms.ToolStrip();
 			this.compileButton = new System.Windows.Forms.ToolStripButton();
-			this.configSelect = new System.Windows.Forms.ToolStripComboBox();
-			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-			this.rootTabControl = new SLDE.IDETabControl();
-			this.languageMenu = new SLDE.LanguageMenu();
+			this.separator10 = new System.Windows.Forms.ToolStripSeparator();
+			this.selectAllMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			separator2 = new System.Windows.Forms.ToolStripSeparator();
 			separator3 = new System.Windows.Forms.ToolStripSeparator();
 			separator1 = new System.Windows.Forms.ToolStripSeparator();
 			separator4 = new System.Windows.Forms.ToolStripSeparator();
+			separator6 = new System.Windows.Forms.ToolStripSeparator();
 			this.statusStrip.SuspendLayout();
 			this.menuStrip.SuspendLayout();
 			this.controlToolStrip.SuspendLayout();
@@ -166,136 +173,63 @@
 			// fileMenu
 			// 
 			this.fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newToolStripMenuItem,
-            this.openToolStripMenuItem,
+            this.newMenuItem,
+            this.openMenuItem,
+            separator6,
             this.saveToolStripMenuItem,
-            this.saveAllToolStripMenuItem,
-            this.saveAllToolStripMenuItem1});
+            this.saveAsMenuItem,
+            this.saveAllMenuItem,
+            this.separator5,
+            this.printMenuItem,
+            this.printPreviewMenuItem,
+            this.pageSetupMenuItem,
+            this.separator7,
+            this.exitMenuItem});
 			this.fileMenu.Name = "fileMenu";
 			this.fileMenu.Size = new System.Drawing.Size(37, 20);
-			this.fileMenu.Text = "File";
+			this.fileMenu.Text = "&File";
 			// 
-			// newToolStripMenuItem
+			// saveAsMenuItem
 			// 
-			this.newToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.pOPULATEMEToolStripMenuItem1});
-			this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-			this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-			this.newToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-			this.newToolStripMenuItem.Text = "New";
-			// 
-			// pOPULATEMEToolStripMenuItem1
-			// 
-			this.pOPULATEMEToolStripMenuItem1.Name = "pOPULATEMEToolStripMenuItem1";
-			this.pOPULATEMEToolStripMenuItem1.Size = new System.Drawing.Size(151, 22);
-			this.pOPULATEMEToolStripMenuItem1.Text = "POPULATE ME";
-			// 
-			// openToolStripMenuItem
-			// 
-			this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-			this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-			this.openToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-			this.openToolStripMenuItem.Text = "Open";
-			this.openToolStripMenuItem.Click += new System.EventHandler(this.openFile_Click);
-			// 
-			// saveToolStripMenuItem
-			// 
-			this.saveToolStripMenuItem.Image = global::SLDE.Properties.Resources.Save_6530;
-			this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-			this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-			this.saveToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-			this.saveToolStripMenuItem.Text = "Save";
-			this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveFile_Click);
-			// 
-			// saveAllToolStripMenuItem
-			// 
-			this.saveAllToolStripMenuItem.Name = "saveAllToolStripMenuItem";
-			this.saveAllToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-			this.saveAllToolStripMenuItem.Text = "Save as...";
-			// 
-			// saveAllToolStripMenuItem1
-			// 
-			this.saveAllToolStripMenuItem1.Image = global::SLDE.Properties.Resources.Saveall_6518;
-			this.saveAllToolStripMenuItem1.Name = "saveAllToolStripMenuItem1";
-			this.saveAllToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
-            | System.Windows.Forms.Keys.S)));
-			this.saveAllToolStripMenuItem1.Size = new System.Drawing.Size(185, 22);
-			this.saveAllToolStripMenuItem1.Text = "Save all";
+			this.saveAsMenuItem.Name = "saveAsMenuItem";
+			this.saveAsMenuItem.Size = new System.Drawing.Size(187, 22);
+			this.saveAsMenuItem.Text = "Save &As...";
 			// 
 			// editMenu
 			// 
 			this.editMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.undoToolStripMenuItem,
-            this.redoToolStripMenuItem,
-            this.toolStripSeparator1,
-            this.cutToolStripMenuItem,
-            this.copyToolStripMenuItem,
-            this.pasteToolStripMenuItem,
-            this.toolStripSeparator2,
-            this.findToolStripMenuItem,
-            this.findInFilesToolStripMenuItem,
-            this.replaceToolStripMenuItem});
+            this.undoMenuItem,
+            this.redoMenuItem,
+            this.separator8,
+            this.cutMenuItem,
+            this.copyMenuItem,
+            this.pasteMenuItem,
+            this.separator9,
+            this.selectAllMenuItem,
+            this.separator10,
+            this.findMenuItem,
+            this.findInFilesMenuItem,
+            this.replaceMenuItem});
 			this.editMenu.Name = "editMenu";
 			this.editMenu.Size = new System.Drawing.Size(39, 20);
 			this.editMenu.Text = "Edit";
 			// 
-			// undoToolStripMenuItem
+			// separator8
 			// 
-			this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
-			this.undoToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
-			this.undoToolStripMenuItem.Text = "Undo";
+			this.separator8.Name = "separator8";
+			this.separator8.Size = new System.Drawing.Size(203, 6);
 			// 
-			// redoToolStripMenuItem
+			// separator9
 			// 
-			this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
-			this.redoToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
-			this.redoToolStripMenuItem.Text = "Redo";
+			this.separator9.Name = "separator9";
+			this.separator9.Size = new System.Drawing.Size(203, 6);
 			// 
-			// toolStripSeparator1
+			// replaceMenuItem
 			// 
-			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(131, 6);
-			// 
-			// cutToolStripMenuItem
-			// 
-			this.cutToolStripMenuItem.Name = "cutToolStripMenuItem";
-			this.cutToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
-			this.cutToolStripMenuItem.Text = "Cut";
-			// 
-			// copyToolStripMenuItem
-			// 
-			this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-			this.copyToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
-			this.copyToolStripMenuItem.Text = "Copy";
-			// 
-			// pasteToolStripMenuItem
-			// 
-			this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
-			this.pasteToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
-			this.pasteToolStripMenuItem.Text = "Paste";
-			// 
-			// toolStripSeparator2
-			// 
-			this.toolStripSeparator2.Name = "toolStripSeparator2";
-			this.toolStripSeparator2.Size = new System.Drawing.Size(131, 6);
-			// 
-			// findToolStripMenuItem
-			// 
-			this.findToolStripMenuItem.Name = "findToolStripMenuItem";
-			this.findToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
-			this.findToolStripMenuItem.Text = "Quick find";
-			// 
-			// findInFilesToolStripMenuItem
-			// 
-			this.findInFilesToolStripMenuItem.Name = "findInFilesToolStripMenuItem";
-			this.findInFilesToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
-			this.findInFilesToolStripMenuItem.Text = "Find in files";
-			// 
-			// replaceToolStripMenuItem
-			// 
-			this.replaceToolStripMenuItem.Name = "replaceToolStripMenuItem";
-			this.replaceToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
-			this.replaceToolStripMenuItem.Text = "Replace";
+			this.replaceMenuItem.Name = "replaceMenuItem";
+			this.replaceMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H)));
+			this.replaceMenuItem.Size = new System.Drawing.Size(206, 22);
+			this.replaceMenuItem.Text = "R&eplace";
 			// 
 			// viewMenu
 			// 
@@ -311,24 +245,9 @@
 			// 
 			// windowToolStripMenuItem
 			// 
-			this.windowToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.thing1ToolStripMenuItem,
-            this.thing2ToolStripMenuItem});
 			this.windowToolStripMenuItem.Name = "windowToolStripMenuItem";
 			this.windowToolStripMenuItem.Size = new System.Drawing.Size(63, 20);
 			this.windowToolStripMenuItem.Text = "Window";
-			// 
-			// thing1ToolStripMenuItem
-			// 
-			this.thing1ToolStripMenuItem.Name = "thing1ToolStripMenuItem";
-			this.thing1ToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
-			this.thing1ToolStripMenuItem.Text = "Thing1";
-			// 
-			// thing2ToolStripMenuItem
-			// 
-			this.thing2ToolStripMenuItem.Name = "thing2ToolStripMenuItem";
-			this.thing2ToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
-			this.thing2ToolStripMenuItem.Text = "Thing2";
 			// 
 			// controlToolStrip
 			// 
@@ -348,82 +267,6 @@
 			this.controlToolStrip.Name = "controlToolStrip";
 			this.controlToolStrip.Size = new System.Drawing.Size(208, 25);
 			this.controlToolStrip.TabIndex = 0;
-			// 
-			// backButton
-			// 
-			this.backButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.backButton.Image = global::SLDE.Properties.Resources.NavigateBackwards_6270;
-			this.backButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.backButton.Name = "backButton";
-			this.backButton.Size = new System.Drawing.Size(23, 22);
-			this.backButton.ToolTipText = "Back";
-			// 
-			// forwardButton
-			// 
-			this.forwardButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.forwardButton.Image = global::SLDE.Properties.Resources.NavigateForward_6271;
-			this.forwardButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.forwardButton.Name = "forwardButton";
-			this.forwardButton.Size = new System.Drawing.Size(23, 22);
-			this.forwardButton.ToolTipText = "Forward";
-			// 
-			// newButton
-			// 
-			this.newButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.newButton.Image = global::SLDE.Properties.Resources.NewFile_6276;
-			this.newButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.newButton.Name = "newButton";
-			this.newButton.Size = new System.Drawing.Size(23, 22);
-			this.newButton.ToolTipText = "New";
-			this.newButton.Click += new System.EventHandler(this.newButton_Click);
-			// 
-			// openFileButton
-			// 
-			this.openFileButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.openFileButton.Image = global::SLDE.Properties.Resources.Open_6529;
-			this.openFileButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.openFileButton.Name = "openFileButton";
-			this.openFileButton.Size = new System.Drawing.Size(23, 22);
-			this.openFileButton.ToolTipText = "Open";
-			this.openFileButton.Click += new System.EventHandler(this.openFile_Click);
-			// 
-			// saveFileButton
-			// 
-			this.saveFileButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.saveFileButton.Image = global::SLDE.Properties.Resources.Save_6530;
-			this.saveFileButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.saveFileButton.Name = "saveFileButton";
-			this.saveFileButton.Size = new System.Drawing.Size(23, 22);
-			this.saveFileButton.ToolTipText = "Save";
-			this.saveFileButton.Click += new System.EventHandler(this.saveFile_Click);
-			// 
-			// saveAllButton
-			// 
-			this.saveAllButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.saveAllButton.Image = global::SLDE.Properties.Resources.Saveall_6518;
-			this.saveAllButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.saveAllButton.Name = "saveAllButton";
-			this.saveAllButton.Size = new System.Drawing.Size(23, 22);
-			this.saveAllButton.ToolTipText = "Save all";
-			// 
-			// undoButton
-			// 
-			this.undoButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.undoButton.Image = global::SLDE.Properties.Resources.Undo_16x;
-			this.undoButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.undoButton.Name = "undoButton";
-			this.undoButton.Size = new System.Drawing.Size(23, 22);
-			this.undoButton.ToolTipText = "Undo";
-			this.undoButton.Click += new System.EventHandler(this.undo_Click);
-			// 
-			// redoButton
-			// 
-			this.redoButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.redoButton.Image = global::SLDE.Properties.Resources.Redo_16x;
-			this.redoButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.redoButton.Name = "redoButton";
-			this.redoButton.Size = new System.Drawing.Size(23, 22);
-			this.redoButton.ToolTipText = "Redo";
 			// 
 			// BottomToolStripPanel
 			// 
@@ -470,7 +313,7 @@
 			// toolStripContainer.ContentPanel
 			// 
 			this.toolStripContainer.ContentPanel.Controls.Add(this.rootTabControl);
-			this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(792, 250);
+			this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(792, 300);
 			this.toolStripContainer.Location = new System.Drawing.Point(0, -1);
 			this.toolStripContainer.Name = "toolStripContainer";
 			this.toolStripContainer.Size = new System.Drawing.Size(792, 349);
@@ -548,10 +391,268 @@
             this.findInFilesButton,
             this.findPreviousButton,
             this.findNextButton});
-			this.editToolStrip.Location = new System.Drawing.Point(3, 49);
+			this.editToolStrip.Location = new System.Drawing.Point(211, 24);
 			this.editToolStrip.Name = "editToolStrip";
 			this.editToolStrip.Size = new System.Drawing.Size(179, 25);
 			this.editToolStrip.TabIndex = 2;
+			// 
+			// buildToolStrip
+			// 
+			this.buildToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+			this.buildToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.compileButton,
+            this.configSelect});
+			this.buildToolStrip.Location = new System.Drawing.Point(390, 24);
+			this.buildToolStrip.Name = "buildToolStrip";
+			this.buildToolStrip.Size = new System.Drawing.Size(112, 25);
+			this.buildToolStrip.TabIndex = 3;
+			// 
+			// configSelect
+			// 
+			this.configSelect.Name = "configSelect";
+			this.configSelect.Size = new System.Drawing.Size(75, 25);
+			// 
+			// openFileDialog
+			// 
+			this.openFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog_FileOk);
+			// 
+			// separator6
+			// 
+			separator6.Name = "separator6";
+			separator6.Size = new System.Drawing.Size(184, 6);
+			// 
+			// separator5
+			// 
+			this.separator5.Name = "separator5";
+			this.separator5.Size = new System.Drawing.Size(184, 6);
+			// 
+			// exitMenuItem
+			// 
+			this.exitMenuItem.Image = global::SLDE.Properties.Resources.Close_16xLG;
+			this.exitMenuItem.Name = "exitMenuItem";
+			this.exitMenuItem.Size = new System.Drawing.Size(187, 22);
+			this.exitMenuItem.Text = "E&xit";
+			this.exitMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+			// 
+			// rootTabControl
+			// 
+			this.rootTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.rootTabControl.ContextMenuStrip = this.tabContextMenu;
+			this.rootTabControl.HotTrack = true;
+			this.rootTabControl.ImageList = this.imageList;
+			this.rootTabControl.Location = new System.Drawing.Point(0, 3);
+			this.rootTabControl.MainWindow = true;
+			this.rootTabControl.Name = "rootTabControl";
+			this.rootTabControl.SelectedIndex = 0;
+			this.rootTabControl.Size = new System.Drawing.Size(792, 297);
+			this.rootTabControl.TabIndex = 0;
+			// 
+			// languageMenu
+			// 
+			this.languageMenu.Name = "languageMenu";
+			this.languageMenu.Size = new System.Drawing.Size(71, 20);
+			this.languageMenu.Text = "Language";
+			// 
+			// printMenuItem
+			// 
+			this.printMenuItem.Image = global::SLDE.Properties.Resources.Print_11009;
+			this.printMenuItem.Name = "printMenuItem";
+			this.printMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
+			this.printMenuItem.Size = new System.Drawing.Size(187, 22);
+			this.printMenuItem.Text = "&Print";
+			// 
+			// printPreviewMenuItem
+			// 
+			this.printPreviewMenuItem.Image = global::SLDE.Properties.Resources.PrintPreviewControl_698;
+			this.printPreviewMenuItem.Name = "printPreviewMenuItem";
+			this.printPreviewMenuItem.Size = new System.Drawing.Size(187, 22);
+			this.printPreviewMenuItem.Text = "Print Pre&view";
+			// 
+			// separator7
+			// 
+			this.separator7.Name = "separator7";
+			this.separator7.Size = new System.Drawing.Size(184, 6);
+			// 
+			// pageSetupMenuItem
+			// 
+			this.pageSetupMenuItem.Image = global::SLDE.Properties.Resources.PrintSetup_11011;
+			this.pageSetupMenuItem.Name = "pageSetupMenuItem";
+			this.pageSetupMenuItem.Size = new System.Drawing.Size(187, 22);
+			this.pageSetupMenuItem.Text = "Pa&ge Setup";
+			// 
+			// newMenuItem
+			// 
+			this.newMenuItem.Image = global::SLDE.Properties.Resources.NewFile_6276;
+			this.newMenuItem.Name = "newMenuItem";
+			this.newMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+			this.newMenuItem.Size = new System.Drawing.Size(187, 22);
+			this.newMenuItem.Text = "&New";
+			// 
+			// openMenuItem
+			// 
+			this.openMenuItem.Image = global::SLDE.Properties.Resources.Open_6529;
+			this.openMenuItem.Name = "openMenuItem";
+			this.openMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
+			this.openMenuItem.Size = new System.Drawing.Size(187, 22);
+			this.openMenuItem.Text = "&Open";
+			this.openMenuItem.Click += new System.EventHandler(this.openFile_Click);
+			// 
+			// saveToolStripMenuItem
+			// 
+			this.saveToolStripMenuItem.Image = global::SLDE.Properties.Resources.Save_6530;
+			this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+			this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+			this.saveToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+			this.saveToolStripMenuItem.Text = "&Save";
+			this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveFile_Click);
+			// 
+			// saveAllMenuItem
+			// 
+			this.saveAllMenuItem.Image = global::SLDE.Properties.Resources.Saveall_6518;
+			this.saveAllMenuItem.Name = "saveAllMenuItem";
+			this.saveAllMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.S)));
+			this.saveAllMenuItem.Size = new System.Drawing.Size(187, 22);
+			this.saveAllMenuItem.Text = "Save A&ll";
+			// 
+			// undoMenuItem
+			// 
+			this.undoMenuItem.Image = global::SLDE.Properties.Resources.Undo_16x;
+			this.undoMenuItem.Name = "undoMenuItem";
+			this.undoMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
+			this.undoMenuItem.Size = new System.Drawing.Size(206, 22);
+			this.undoMenuItem.Text = "&Undo";
+			this.undoMenuItem.Click += new System.EventHandler(this.undo_Click);
+			// 
+			// redoMenuItem
+			// 
+			this.redoMenuItem.Image = global::SLDE.Properties.Resources.Redo_16x;
+			this.redoMenuItem.Name = "redoMenuItem";
+			this.redoMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.Z)));
+			this.redoMenuItem.Size = new System.Drawing.Size(206, 22);
+			this.redoMenuItem.Text = "&Redo";
+			this.redoMenuItem.Click += new System.EventHandler(this.redo_Click);
+			// 
+			// cutMenuItem
+			// 
+			this.cutMenuItem.Image = global::SLDE.Properties.Resources.Cut_6523;
+			this.cutMenuItem.Name = "cutMenuItem";
+			this.cutMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
+			this.cutMenuItem.Size = new System.Drawing.Size(206, 22);
+			this.cutMenuItem.Text = "Cu&t";
+			// 
+			// copyMenuItem
+			// 
+			this.copyMenuItem.Image = global::SLDE.Properties.Resources.Copy_6524;
+			this.copyMenuItem.Name = "copyMenuItem";
+			this.copyMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
+			this.copyMenuItem.Size = new System.Drawing.Size(206, 22);
+			this.copyMenuItem.Text = "&Copy";
+			// 
+			// pasteMenuItem
+			// 
+			this.pasteMenuItem.Image = global::SLDE.Properties.Resources.Paste_6520;
+			this.pasteMenuItem.Name = "pasteMenuItem";
+			this.pasteMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
+			this.pasteMenuItem.Size = new System.Drawing.Size(206, 22);
+			this.pasteMenuItem.Text = "&Paste";
+			// 
+			// findMenuItem
+			// 
+			this.findMenuItem.Image = global::SLDE.Properties.Resources.Find_5650;
+			this.findMenuItem.Name = "findMenuItem";
+			this.findMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
+			this.findMenuItem.Size = new System.Drawing.Size(206, 22);
+			this.findMenuItem.Text = "&Quick find";
+			// 
+			// findInFilesMenuItem
+			// 
+			this.findInFilesMenuItem.Image = global::SLDE.Properties.Resources.FindinFiles_6299;
+			this.findInFilesMenuItem.Name = "findInFilesMenuItem";
+			this.findInFilesMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.F)));
+			this.findInFilesMenuItem.Size = new System.Drawing.Size(206, 22);
+			this.findInFilesMenuItem.Text = "&Find in files";
+			// 
+			// backButton
+			// 
+			this.backButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.backButton.Image = global::SLDE.Properties.Resources.NavigateBackwards_6270;
+			this.backButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.backButton.Name = "backButton";
+			this.backButton.Size = new System.Drawing.Size(23, 22);
+			this.backButton.ToolTipText = "Back";
+			// 
+			// forwardButton
+			// 
+			this.forwardButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.forwardButton.Image = global::SLDE.Properties.Resources.NavigateForward_6271;
+			this.forwardButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.forwardButton.Name = "forwardButton";
+			this.forwardButton.Size = new System.Drawing.Size(23, 22);
+			this.forwardButton.ToolTipText = "Forward";
+			// 
+			// newButton
+			// 
+			this.newButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.newButton.Image = global::SLDE.Properties.Resources.NewFile_6276;
+			this.newButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.newButton.Name = "newButton";
+			this.newButton.Size = new System.Drawing.Size(23, 22);
+			this.newButton.ToolTipText = "New";
+			this.newButton.Click += new System.EventHandler(this.newButton_Click);
+			// 
+			// openFileButton
+			// 
+			this.openFileButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.openFileButton.Image = global::SLDE.Properties.Resources.Open_6529;
+			this.openFileButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.openFileButton.Name = "openFileButton";
+			this.openFileButton.Size = new System.Drawing.Size(23, 22);
+			this.openFileButton.ToolTipText = "Open";
+			this.openFileButton.Click += new System.EventHandler(this.openFile_Click);
+			// 
+			// saveFileButton
+			// 
+			this.saveFileButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.saveFileButton.Image = global::SLDE.Properties.Resources.Save_6530;
+			this.saveFileButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.saveFileButton.Name = "saveFileButton";
+			this.saveFileButton.Size = new System.Drawing.Size(23, 22);
+			this.saveFileButton.ToolTipText = "Save";
+			this.saveFileButton.Click += new System.EventHandler(this.saveFile_Click);
+			// 
+			// saveAllButton
+			// 
+			this.saveAllButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.saveAllButton.Image = global::SLDE.Properties.Resources.Saveall_6518;
+			this.saveAllButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.saveAllButton.Name = "saveAllButton";
+			this.saveAllButton.Size = new System.Drawing.Size(23, 22);
+			this.saveAllButton.ToolTipText = "Save all";
+			// 
+			// undoButton
+			// 
+			this.undoButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.undoButton.Image = global::SLDE.Properties.Resources.Undo_16x;
+			this.undoButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.undoButton.Name = "undoButton";
+			this.undoButton.Size = new System.Drawing.Size(23, 22);
+			this.undoButton.ToolTipText = "Undo";
+			this.undoButton.Click += new System.EventHandler(this.undo_Click);
+			// 
+			// redoButton
+			// 
+			this.redoButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.redoButton.Image = global::SLDE.Properties.Resources.Redo_16x;
+			this.redoButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.redoButton.Name = "redoButton";
+			this.redoButton.Size = new System.Drawing.Size(23, 22);
+			this.redoButton.ToolTipText = "Redo";
+			this.redoButton.Click += new System.EventHandler(this.redo_Click);
 			// 
 			// cutButton
 			// 
@@ -616,17 +717,6 @@
 			this.findNextButton.Size = new System.Drawing.Size(23, 22);
 			this.findNextButton.ToolTipText = "Find next";
 			// 
-			// buildToolStrip
-			// 
-			this.buildToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-			this.buildToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.compileButton,
-            this.configSelect});
-			this.buildToolStrip.Location = new System.Drawing.Point(38, 74);
-			this.buildToolStrip.Name = "buildToolStrip";
-			this.buildToolStrip.Size = new System.Drawing.Size(112, 25);
-			this.buildToolStrip.TabIndex = 3;
-			// 
 			// compileButton
 			// 
 			this.compileButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -636,35 +726,18 @@
 			this.compileButton.Size = new System.Drawing.Size(23, 22);
 			this.compileButton.ToolTipText = "Compile";
 			// 
-			// configSelect
+			// separator10
 			// 
-			this.configSelect.Name = "configSelect";
-			this.configSelect.Size = new System.Drawing.Size(75, 25);
+			this.separator10.Name = "separator10";
+			this.separator10.Size = new System.Drawing.Size(203, 6);
 			// 
-			// openFileDialog
+			// selectAllMenuItem
 			// 
-			this.openFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog_FileOk);
-			// 
-			// rootTabControl
-			// 
-			this.rootTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.rootTabControl.ContextMenuStrip = this.tabContextMenu;
-			this.rootTabControl.HotTrack = true;
-			this.rootTabControl.ImageList = this.imageList;
-			this.rootTabControl.Location = new System.Drawing.Point(0, 3);
-			this.rootTabControl.MainWindow = true;
-			this.rootTabControl.Name = "rootTabControl";
-			this.rootTabControl.SelectedIndex = 0;
-			this.rootTabControl.Size = new System.Drawing.Size(792, 247);
-			this.rootTabControl.TabIndex = 0;
-			// 
-			// languageMenu
-			// 
-			this.languageMenu.Name = "languageMenu";
-			this.languageMenu.Size = new System.Drawing.Size(71, 20);
-			this.languageMenu.Text = "Language";
+			this.selectAllMenuItem.Image = global::SLDE.Properties.Resources.Select;
+			this.selectAllMenuItem.Name = "selectAllMenuItem";
+			this.selectAllMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
+			this.selectAllMenuItem.Size = new System.Drawing.Size(206, 22);
+			this.selectAllMenuItem.Text = "Select &All";
 			// 
 			// MainIDE
 			// 
@@ -703,7 +776,7 @@
 		private System.Windows.Forms.MenuStrip menuStrip;
 		private System.Windows.Forms.ToolStripMenuItem fileMenu;
 		private System.Windows.Forms.ToolStripMenuItem editMenu;
-		private System.Windows.Forms.ToolStripMenuItem viewMenu;
+		private SLDE.ViewMenu viewMenu;
 		private System.Windows.Forms.ToolStripMenuItem toolsMenu;
 		private System.Windows.Forms.ToolStrip controlToolStrip;
 		private System.Windows.Forms.ToolStripContainer toolStripContainer;
@@ -712,12 +785,10 @@
 		private System.Windows.Forms.ToolStripPanel RightToolStripPanel;
 		private System.Windows.Forms.ToolStripPanel LeftToolStripPanel;
 		private System.Windows.Forms.ToolStripContentPanel ContentPanel;
-		private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem newMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem openMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem windowToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem thing1ToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem thing2ToolStripMenuItem;
 		private System.Windows.Forms.ToolStripButton backButton;
 		private System.Windows.Forms.ToolStripButton forwardButton;
 		private System.Windows.Forms.ToolStripButton openFileButton;
@@ -731,19 +802,18 @@
 		private System.Windows.Forms.ToolStripMenuItem closeAllButThis;
 		private System.Windows.Forms.ToolStripMenuItem splitPane;
 		private System.Windows.Forms.ToolStripMenuItem moveTab;
-		private System.Windows.Forms.ToolStripMenuItem pOPULATEMEToolStripMenuItem1;
-		private System.Windows.Forms.ToolStripMenuItem saveAllToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem saveAllToolStripMenuItem1;
-		private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-		private System.Windows.Forms.ToolStripMenuItem cutToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-		private System.Windows.Forms.ToolStripMenuItem findToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem findInFilesToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem replaceToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem saveAsMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem saveAllMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem undoMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem redoMenuItem;
+		private System.Windows.Forms.ToolStripSeparator separator8;
+		private System.Windows.Forms.ToolStripMenuItem cutMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem copyMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem pasteMenuItem;
+		private System.Windows.Forms.ToolStripSeparator separator9;
+		private System.Windows.Forms.ToolStripMenuItem findMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem findInFilesMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem replaceMenuItem;
 		private System.Windows.Forms.ToolStripStatusLabel statusLabel;
 		private System.Windows.Forms.SaveFileDialog saveFileDialog;
 		private System.Windows.Forms.ToolStrip editToolStrip;
@@ -762,6 +832,14 @@
 		private SLDE.IDETabControl rootTabControl;
 		private System.Windows.Forms.ToolStripButton newButton;
 		private System.Windows.Forms.ImageList imageList;
+		private System.Windows.Forms.ToolStripSeparator separator5;
+		private System.Windows.Forms.ToolStripMenuItem exitMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem printMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem printPreviewMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem pageSetupMenuItem;
+		private System.Windows.Forms.ToolStripSeparator separator7;
+		private System.Windows.Forms.ToolStripSeparator separator10;
+		private System.Windows.Forms.ToolStripMenuItem selectAllMenuItem;
 	}
 }
 

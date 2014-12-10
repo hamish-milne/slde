@@ -98,6 +98,9 @@
       <DependentUpon>Editor.cs</DependentUpon>
     </Compile>
     <Compile Include="Utility.cs" />
+    <Compile Include="Window.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="Editor.resx">
       <DependentUpon>Editor.cs</DependentUpon>
     </EmbeddedResource>
@@ -241,6 +244,13 @@
     <Content Include="fxc\d3dcsxd_47.dll" />
     <Content Include="fxc\d3dcsx_47.dll" />
     <Content Include="fxc\fxc.exe" />
+    <None Include="Resources\Print_11009.png" />
+    <None Include="Resources\PrintPreviewControl_698.png" />
+    <None Include="Resources\PrintSetup_11011.png" />
+    <None Include="Resources\Select.png" />
+    <None Include="Resources\Close_16xLG.png" />
+    <None Include="Resources\SplitScreenHorizontally_12972.png" />
+    <None Include="Resources\SplitScreenVertically_12973.png" />
     <Content Include="Resources\StatusAnnotations_Critical_16xEXSM_color.png" />
     <Content Include="Resources\StatusAnnotations_Critical_16xSM.png" />
     <Content Include="Resources\StatusAnnotations_Critical_16xSM_color.png" />

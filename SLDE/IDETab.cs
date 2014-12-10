@@ -48,7 +48,6 @@ namespace SLDE
 					if (value != null && value.OnActive != null)
 						value.OnActive(value, null);
 					activeTab = value;
-					Console.WriteLine("ActiveTab: " + value);
 				}
 			}
 		}
@@ -64,6 +63,7 @@ namespace SLDE
 			if (ActiveTab == null)
 				ActiveTab = this;
 			allTabs.Add(this);
+			ImageIndex = 1;
 		}
 
 		protected void SetActiveTab()
