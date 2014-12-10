@@ -88,46 +88,47 @@ namespace SLDE
 		public event EventHandler OnInactive;
 		TabControl oldParent;
 
-		protected override void Dispose(bool disposing)
+		public virtual void Remove()
 		{
 			var tabs = Parent as TabControl;
-			if (ActiveTab == this)
-				ActiveTab = null;
-			allTabs.Remove(this);
 			if (tabs != null)
 			{
 				int newIndex;
 				if (tabs.SelectedIndex == 0)
 					newIndex = 0;
-				else if (tabs.SelectedIndex == tabs.TabCount - 1)
+				else if (tabs.SelectedIndex >= tabs.TabCount - 1)
 					newIndex = tabs.TabCount - 2;
 				else
 					newIndex = tabs.SelectedIndex;
-				base.Dispose(disposing);
+				Parent = null;
 				tabs.SelectedIndex = newIndex;
-			}
-			else
-			{
-				base.Dispose(disposing);
 			}
 		}
 
-		void IDETab_ParentChanged(object sender, EventArgs e)
+		protected virtual void IDETab_ParentChanged(object sender, EventArgs e)
 		{
 			if (oldParent != null)
 			{
-				oldParent.SelectedIndexChanged -= oldParent_SelectedIndexChanged;
-				oldParent.GotFocus -= oldParent_SelectedIndexChanged;
+				oldParent.SelectedIndexChanged -= Parent_SelectedIndexChanged;
+				oldParent.GotFocus -= Parent_SelectedIndexChanged;
 			}
-			oldParent = Parent as TabControl;
-			if (oldParent != null)
+			var newParent = Parent as TabControl;
+			if (newParent != null)
 			{
-				oldParent.SelectedIndexChanged += oldParent_SelectedIndexChanged;
-				oldParent.GotFocus += oldParent_SelectedIndexChanged;
+				newParent.SelectedIndexChanged += Parent_SelectedIndexChanged;
+				newParent.GotFocus += Parent_SelectedIndexChanged;
+				if (!allTabs.Contains(this))
+					allTabs.Add(this);
+			} else
+			{
+				allTabs.Remove(this);
+				if (ActiveTab == this)
+					ActiveTab = null;
 			}
+			oldParent = newParent;
 		}
 
-		void oldParent_SelectedIndexChanged(object sender, EventArgs e)
+		void Parent_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			var tabs = sender as TabControl;
 			if (tabs == null)

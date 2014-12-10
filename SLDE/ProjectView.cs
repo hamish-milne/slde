@@ -17,11 +17,6 @@ namespace SLDE
 			InitializeComponent();
 		}
 
-		public string TabName
-		{
-			get { return "Project"; }
-		}
-
 		string root;
 
 		public string Root
@@ -111,8 +106,6 @@ namespace SLDE
 		private void ProjectView_ParentChanged(object sender, EventArgs e)
 		{
 			var tab = Parent as TabPage;
-			if(tab != null)
-				tab.Text = TabName;
 		}
 	}
 

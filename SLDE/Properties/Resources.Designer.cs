@@ -113,6 +113,16 @@ namespace SLDE.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap filter_16xLG {
+            get {
+                object obj = ResourceManager.GetObject("filter_16xLG", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Find_5650 {
             get {
                 object obj = ResourceManager.GetObject("Find_5650", resourceCulture);

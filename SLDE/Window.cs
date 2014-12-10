@@ -10,7 +10,7 @@ namespace SLDE
 	[ToolStripItemDesignerAvailability(ToolStripItemDesignerAvailability.MenuStrip)]
 	public class Window : ToolStripMenuItem
 	{
-		protected TabPage windowTab;
+		protected IDETab windowTab;
 		protected TabControl lastParent;
 
 		public TabPage WindowTab
@@ -29,20 +29,29 @@ namespace SLDE
 				if (lastParent == null)
 					return;
 				windowTab.Parent = lastParent;
+				windowTab.MakeActive();
 				windowTab.Refresh();
 			} else
 			{
 				if (windowTab == null)
 					return;
 				lastParent = windowTab.Parent as TabControl;
-				windowTab.Parent = null;
+				windowTab.Remove();
 			}
 		}
 
-		public Window(string name, TabPage windowTab)
+		public Window(string name, IDETab windowTab)
 		{
 			Text = name;
 			this.windowTab = windowTab;
+			if(windowTab != null)
+				windowTab.ParentChanged += windowTab_ParentChanged;
+		}
+
+		void windowTab_ParentChanged(object sender, EventArgs e)
+		{
+			if (windowTab.Parent == null)
+				Checked = false;
 		}
 	}
 
@@ -60,6 +69,7 @@ namespace SLDE
 
 		public void UpdateWindows()
 		{
+			DropDownItems.Clear();
 			DropDownItems.AddRange(Utility.CreateListOf<Window, WindowAttribute>(OnFailToAdd).ToArray());
 		}
 
@@ -73,7 +83,16 @@ namespace SLDE
 	public class ProjectWindow : Window
 	{
 		public ProjectWindow()
-			: base("Project", new IDETab<ProjectView>())
+			: base("Project", new IDETab<ProjectView>("Project"))
+		{
+		}
+	}
+
+	[Window]
+	public class ErrorWindow : Window
+	{
+		public ErrorWindow()
+			: base("Error list", new IDETab<ErrorList>("Error list"))
 		{
 		}
 	}

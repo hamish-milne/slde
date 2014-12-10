@@ -45,6 +45,17 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ErrorData.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ErrorData.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ErrorList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ErrorList.Designer.cs">
+      <DependentUpon>ErrorList.cs</DependentUpon>
+    </Compile>
     <Compile Include="ICompiler.cs" />
     <Compile Include="IDETab.cs">
       <SubType>Component</SubType>
@@ -104,6 +115,9 @@
     <EmbeddedResource Include="Editor.resx">
       <DependentUpon>Editor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ErrorList.resx">
+      <DependentUpon>ErrorList.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="IDETab.resx">
       <DependentUpon>IDETab.cs</DependentUpon>
     </EmbeddedResource>
@@ -121,6 +135,17 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="ErrorData.xsc">
+      <DependentUpon>ErrorData.xsd</DependentUpon>
+    </None>
+    <None Include="ErrorData.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ErrorData.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="ErrorData.xss">
+      <DependentUpon>ErrorData.xsd</DependentUpon>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -251,6 +276,7 @@
     <None Include="Resources\Close_16xLG.png" />
     <None Include="Resources\SplitScreenHorizontally_12972.png" />
     <None Include="Resources\SplitScreenVertically_12973.png" />
+    <None Include="Resources\filter_16xLG.png" />
     <Content Include="Resources\StatusAnnotations_Critical_16xEXSM_color.png" />
     <Content Include="Resources\StatusAnnotations_Critical_16xSM.png" />
     <Content Include="Resources\StatusAnnotations_Critical_16xSM_color.png" />

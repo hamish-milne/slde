@@ -23,6 +23,7 @@ namespace SLDE
 		}
 
 		Form dragForm;
+		TabPage dragTab;
 		bool dragging = false;
 		bool justMoved = false;
 		bool mainWindow = false;
@@ -81,7 +82,7 @@ namespace SLDE
 			{
 				dragTabs.Parent = dragTabForm;
 				dragTabs.Size = dragTabForm.ClientSize;
-				dragTabForm.Size = this.Size;
+				dragTabForm.ClientSize = this.Size;
 				dragTabs.ContextMenuStrip = ContextMenuStrip;
 				dragTabs.ImageList = ImageList;
 				dragTabForm.Show();
@@ -109,6 +110,7 @@ namespace SLDE
 
 			// For some reason, newly created forms won't respond to mouse events
 			var tabToSet = !useThisForm ? this : dragTabs;
+			tabToSet.dragTab = tab;
 			tabToSet.dragForm = dragTabForm;
 			tabToSet.dragPoint = dragTabs.PointToClient(mousePoint);
 
@@ -160,7 +162,23 @@ namespace SLDE
 		{
 			dragging = false;
 			if(dragForm != null)
-				dragForm.FormBorderStyle = FormBorderStyle.Sizable;
+			{
+				bool hoverTabs = false;
+				var screenPoint = this.PointToScreen(e.Location);
+				for (int i = 0; i < AllControls.Count; i++)
+				{
+					if (AllControls[i].Parent == dragForm)
+						continue;
+					var index = AllControls[i].GetTabUnderPosition(AllControls[i].PointToClient(screenPoint));
+					if(index >= 0)
+					{
+						AllControls[i].TabPages.Insert(index, dragTab);
+						hoverTabs = true;
+					}
+				}
+				if (!hoverTabs)
+					dragForm.FormBorderStyle = FormBorderStyle.Sizable;
+			}
 			dragForm = null;
 			base.OnMouseUp(e);
 		}
@@ -189,6 +207,7 @@ namespace SLDE
 		{
 			base.OnMouseMove(e);
 
+			// Handles the close button
 			if(ImageList != null)
 				for (int i = 0; i < TabCount; i++)
 				{
@@ -249,9 +268,12 @@ namespace SLDE
 			{
 				for (int i = 0; i < TabCount; i++)
 				{
-					var tab = TabPages[i];
-					if (tab.ImageIndex == 0)
-						tab.Dispose();
+					var tab = TabPages[i] as IDETab;
+					if (tab != null && tab.ImageIndex == 0)
+					{
+						tab.ImageIndex = 1;
+						tab.Remove();
+					}
 				}
 			}
 			else if (e.Button == MouseButtons.Right && ContextMenuStrip != null)

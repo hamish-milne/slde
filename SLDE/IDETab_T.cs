@@ -65,15 +65,21 @@ namespace SLDE
 			allTabs.Add(this);
 		}
 
+		public IDETab(string text)
+			: this()
+		{
+			Text = text;
+		}
+
 		void control_Enter(object sender, EventArgs e)
 		{
 			SetActiveTab();
 		}
 
-		protected override void Dispose(bool disposing)
+		public override void Remove()
 		{
 			allTabs.Remove(this);
-			base.Dispose(disposing);
+			base.Remove();
 		}
 	}
 }
