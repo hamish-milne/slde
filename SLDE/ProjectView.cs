@@ -10,11 +10,16 @@ using System.IO;
 
 namespace SLDE
 {
-	public partial class ProjectView : UserControl
+	public partial class ProjectView : UserControl, IClosable
 	{
 		public ProjectView()
 		{
 			InitializeComponent();
+		}
+
+		public virtual bool TryClose()
+		{
+			return true;
 		}
 
 		string root;

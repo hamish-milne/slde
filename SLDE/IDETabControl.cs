@@ -91,11 +91,13 @@ namespace SLDE
 			// This gets the top corner of the dragged tab
 			var top = PointToScreen(GetTabRect(TabPages.IndexOf(tab)).Location);
 
-			// If this isn't the main window, and the parent is a Form (i.e. there are no split panes)
+			// If this isn't the main window, and the parent is a Form
+			// (i.e. there are no split panes)
 			bool useThisForm = !mainWindow && Parent is Form && TabCount == 1;
 			var dragTabForm = useThisForm ? (Form)Parent : new Form();
 			
-			// Create a new tab control, or if we're using this form, use the current tab control
+			// Create a new tab control, or if we're using this form,
+			// use the current tab control
 			var dragTabs = useThisForm ? this : Copy();
 			if(!useThisForm)
 			{
@@ -137,8 +139,30 @@ namespace SLDE
 				Parent.Parent = null;
 		}
 
-		public void Close()
+		List<TabPage> tabsToRemove = new List<TabPage>();
+		bool closing;
+		public bool Close()
 		{
+			if (closing)
+				return true;
+			closing = true;
+			SelectedIndex = 0;
+			tabsToRemove.Clear();
+			for (int i = 0; i < TabCount; i++)
+				tabsToRemove.Add(TabPages[i]);
+			for (int i = 0; i < tabsToRemove.Count; i++)
+			{
+				var tab = tabsToRemove[i] as IDETab;
+				if (tab == null)
+					tabsToRemove[i].Parent = null;
+				else if(!tab.Remove())
+				{
+					tabsToRemove.Clear();
+					closing = false;
+					return false;
+				}
+			}
+			tabsToRemove.Clear();
 			var splitPane = Parent as SplitterPanel;
 			if (splitPane == null)
 			{
@@ -148,36 +172,42 @@ namespace SLDE
 					form.Dispose();
 				} else
 				{
-					Parent = null;
+					if (!MainWindow)
+						Parent = null;
 				}
-				return;
+				closing = false;
+				return true;
 			}
+			closing = false;
 			var container = (SplitContainer)splitPane.Parent;
-			var otherPane = splitPane == container.Panel1 ? container.Panel2 : container.Panel1;
+			var otherPane = splitPane == container.Panel1 ?
+				container.Panel2 : container.Panel1;
 			if (otherPane.Controls.Count < 1)
-				return;
+				return true;
 			var content = otherPane.Controls[0];
 			content.Parent = container.Parent;
 			content.FillParent();
 			container.Parent = null;
+			return true;
+		}
+
+		protected override void OnDoubleClick(EventArgs e)
+		{
+			base.OnDoubleClick(e);
+			Close();
 		}
 
 		protected override void OnControlRemoved(ControlEventArgs e)
 		{
 			base.OnControlRemoved(e);
-
 			if (TabCount <= 1)
-			{
-				// We only want to keep the empty control if it's the last
-				// one in the main window
-				if (!MainWindow || Parent is SplitterPanel)
-					Close();
-			}
+				Close();
 		}
 
 		protected enum TabPosition { None, Tab, Left, Right, Bottom }
 
-		protected TabPosition GetTabHover(Point mouseLocation, out IDETabControl control, out int index, out Rectangle rect)
+		protected TabPosition GetTabHover(Point mouseLocation,
+			out IDETabControl control, out int index, out Rectangle rect)
 		{
 			control = null;
 			index = -1;
@@ -201,9 +231,12 @@ namespace SLDE
 				}
 				index = control.GetTabUnderPosition(clientPoint);
 				var t0 = control.GetTabRect(0);
-				var headerRect = new Rectangle(t0.Location, new Size(control.ClientRectangle.Width, t0.Height));
-				var tabRect = new Rectangle(control.ClientRectangle.X, control.ClientRectangle.Y + headerRect.Height,
-					control.ClientRectangle.Width, control.ClientRectangle.Height - headerRect.Height);
+				var headerRect = new Rectangle(t0.Location,
+					new Size(control.ClientRectangle.Width, t0.Height));
+				var tabRect = new Rectangle(control.ClientRectangle.X,
+					control.ClientRectangle.Y + headerRect.Height,
+					control.ClientRectangle.Width,
+					control.ClientRectangle.Height - headerRect.Height);
 				rect = tabRect;
 				if (index >= 0)
 					return TabPosition.Tab;
@@ -213,13 +246,16 @@ namespace SLDE
 					return TabPosition.Tab;
 				}
 				var newHeight = (tabRect.Height / 2);
-				rect = new Rectangle(new Point(tabRect.X, tabRect.Y + newHeight), new Size(tabRect.Width, newHeight));
+				rect = new Rectangle(new Point(tabRect.X, tabRect.Y + newHeight),
+					new Size(tabRect.Width, newHeight));
 				if (rect.Contains(clientPoint))
 					return TabPosition.Bottom;
-				rect = new Rectangle(tabRect.Location, new Size(tabRect.Width / 2, tabRect.Height));
+				rect = new Rectangle(tabRect.Location,
+					new Size(tabRect.Width / 2, tabRect.Height));
 				if (rect.Contains(clientPoint))
 					return TabPosition.Left;
-				rect = new Rectangle(new Point(rect.X + rect.Width, rect.Y), rect.Size);
+				rect = new Rectangle(new Point(rect.X + rect.Width, rect.Y),
+					rect.Size);
 				if (rect.Contains(clientPoint))
 					return TabPosition.Right;
 			}
@@ -318,13 +354,16 @@ namespace SLDE
 					{
 						var form = control.FindForm();
 						var box = OutlineBox.Get(form);
-						box.Rectangle = new Rectangle(Add(rect.Location, form.PointToClient(control.PointToScreen(default(Point)))), rect.Size);
+						box.Rectangle = new Rectangle(Add(rect.Location,
+							form.PointToClient(control.PointToScreen(default(Point)))),
+							rect.Size);
 						box.BringToFront();
 						box.Visible = true;
 					}
 				}
 				lastPosition = newPosition;
-				if (lastControl != null && control != lastControl && lastControl.FindForm() != null)
+				if (lastControl != null && control != lastControl
+					&& lastControl.FindForm() != null)
 				{
 					OutlineBox.Get(lastControl.FindForm()).Visible = false;
 				}
@@ -337,7 +376,8 @@ namespace SLDE
 				for (int i = 0; i < TabCount; i++)
 				{
 					var rect = GetTabRect(i);
-					rect = new Rectangle(rect.X + Margin.Left, rect.Y + Margin.Top, ImageList.ImageSize.Width, ImageList.ImageSize.Height);
+					rect = new Rectangle(rect.X + Margin.Left, rect.Y + Margin.Top,
+						ImageList.ImageSize.Width, ImageList.ImageSize.Height);
 					int newImage = rect.Contains(e.Location) ? 0 : 1;
 					var tab = TabPages[i];
 					if (tab.ImageIndex != newImage)
@@ -430,5 +470,11 @@ namespace SLDE
 		}
 		
 	}
+
+	public interface IClosable
+	{
+		bool TryClose();
+	}
+
 
 }

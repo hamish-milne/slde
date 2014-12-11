@@ -14,7 +14,7 @@ using DigitalRune.Windows.TextEditor.Document;
 
 namespace SLDE
 {
-	public partial class Editor : DigitalRune.Windows.TextEditor.TextEditorControl
+	public partial class Editor : TextEditorControl, IClosable
 	{
 		static int newFilesNumber;
 		static int newFileID;
@@ -59,7 +59,8 @@ namespace SLDE
 			set
 			{
 				changed = value;
-				var lastChar = String.IsNullOrEmpty(TabName) ? '\0' : TabName[TabName.Length - 1];
+				var lastChar = String.IsNullOrEmpty(TabName) ?
+					'\0' : TabName[TabName.Length - 1];
 				if (value && lastChar != '*')
 					TabName += "*";
 				else if (!value && lastChar == '*')
@@ -85,35 +86,28 @@ namespace SLDE
 			}
 		}
 
-		public virtual void TrySave()
-		{
-			if (FileName != null)
-			{
-				try
-				{
-					SaveFile(FileName);
-					Changed = false;
-				}
-				catch (Exception e)
-				{
-					Utility.ShowError(e.Message);
-				}
-			}
-		}
-
-		public virtual void Save(SaveFileDialog saveFileDialog)
+		public virtual bool Save()
 		{
 			if(!Changed)
-				return;
+				return true;
 			if(String.IsNullOrEmpty(FileName))
 			{
-				saveFileDialog.FileOk += SaveCallback;
-				saveFileDialog.ShowDialog();
+				if (DialogCache.SaveFile.ShowDialog() == DialogResult.OK)
+					FileName = DialogCache.SaveFile.FileName;
+				else
+					return false;
 			}
-			else
+			try
 			{
-				TrySave();
+				SaveFile(FileName);
+				Changed = false;
+				return true;
 			}
+			catch (Exception e)
+			{
+				Utility.ShowError(e.Message);
+			}
+			return false;
 		}
 
 		public virtual void TryOpen()
@@ -171,19 +165,65 @@ namespace SLDE
 			Changed = true;
 		}
 
-		protected void SaveCallback(object sender, EventArgs e)
-		{
-			var dialog = (SaveFileDialog)sender;
-			dialog.FileOk -= SaveCallback;
-			FileName = dialog.FileName;
-			TrySave();
-		}
-
 		private void Editor_ParentChanged(object sender, EventArgs e)
 		{
 			var tab = Parent as TabPage;
 			if (tab != null)
 				tab.Text = tabName;
+		}
+
+		public virtual bool TryClose()
+		{
+			if(Changed)
+			{
+				var result = MessageBox.Show("Save changes to " +
+					TabName.Substring(0, TabName.Length - 1) + "?", "Save",
+					MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+				switch(result)
+				{
+					case DialogResult.Yes:
+						return Save();
+					case DialogResult.No:
+						return true;
+					default:
+						return false;
+				}
+			}
+			return true;
+		}
+	}
+
+	public static class DialogCache
+	{
+		static OpenFileDialog openFile;
+		static SaveFileDialog saveFile;
+
+		public static OpenFileDialog OpenFile
+		{
+			get
+			{
+				if (openFile == null)
+					openFile = new OpenFileDialog();
+				return openFile;
+			}
+			set
+			{
+				openFile = value;
+			}
+		}
+
+		public static SaveFileDialog SaveFile
+		{
+			get
+			{
+				if (saveFile == null)
+					saveFile = new SaveFileDialog();
+				return saveFile;
+			}
+			set
+			{
+				saveFile = value;
+			}
 		}
 	}
 }

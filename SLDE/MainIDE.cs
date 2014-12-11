@@ -59,6 +59,8 @@ namespace SLDE
 		public MainIDE()
 		{
 			InitializeComponent();
+			DialogCache.SaveFile = saveFileDialog;
+			DialogCache.OpenFile = openFileDialog;
 			Language.FindAllLanguages();
 			languageMenu.OnSelectLanguage += languageMenu_OnSelectLanguage;
 			viewMenu.UpdateWindows();
@@ -138,8 +140,8 @@ namespace SLDE
 			var tab = IDETab<Editor>.ActiveTab;
 			if (tab != null)
 			{
-				saveFileDialog.Filter = Language.GetFilter();
-				tab.Control.Save(saveFileDialog);
+				DialogCache.SaveFile.Filter = Language.GetFilter();
+				tab.Control.Save();
 			}
 		}
 

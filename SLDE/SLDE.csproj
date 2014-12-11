@@ -55,7 +55,9 @@
       <DependentUpon>ErrorList.cs</DependentUpon>
     </Compile>
     <Compile Include="ICompiler.cs" />
-    <Compile Include="IDEControl.cs" />
+    <Compile Include="IDEForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="IDETab.cs">
       <SubType>Component</SubType>
     </Compile>

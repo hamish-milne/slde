@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace SLDE
 {
-	public class IDETab<T> : IDETab where T : Control, new()
+	public class IDETab<T> : IDETab where T : Control, IClosable, new()
 	{
 		static List<IDETab<T>> allTabs = new List<IDETab<T>>();
 
@@ -76,10 +76,14 @@ namespace SLDE
 			SetActiveTab();
 		}
 
-		public override void Remove()
+		public override bool Remove()
 		{
-			allTabs.Remove(this);
-			base.Remove();
+			if(control.TryClose())
+			{
+				allTabs.Remove(this);
+				return base.Remove();
+			}
+			return false;
 		}
 	}
 }
