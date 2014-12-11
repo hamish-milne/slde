@@ -103,14 +103,6 @@ namespace SLDE
 			TryOpenFile(e.File);
 		}
 
-		protected virtual SplitContainer CreateSplitContainer()
-		{
-			var ret = new SplitContainer();
-			ret.Anchor = Utility.AllAnchors;
-			ret.DoubleClick += splitContainer_DoubleClick;
-			return ret;
-		}
-
 		protected virtual TabControl CreateTabControl()
 		{
 			var ret = new IDETabControl();
@@ -133,40 +125,12 @@ namespace SLDE
 			//ClosePane(sender.GetSourceControl());
 		}
 
-		private void splitContainer_DoubleClick(object sender, EventArgs e)
-		{
-			var split = sender as SplitContainer;
-			if(split != null)
-				split.Orientation = split.Orientation == Orientation.Horizontal
-					? Orientation.Vertical : Orientation.Horizontal;
-		}
-
 		private void splitPane_Click(object sender, EventArgs e)
 		{
-			var content = sender.GetSourceControl();
+			var content = sender.GetSourceControl() as IDETabControl;
 			if (content == null)
 				return;
-			var parent = content.Parent;
-			if (parent == null)
-				return;
-			var newContainer = CreateSplitContainer();
-			if(parent is SplitterPanel)
-			{
-				var oldOrientation = ((SplitContainer)parent.Parent).Orientation;
-				newContainer.Orientation = oldOrientation == Orientation.Horizontal
-					? Orientation.Vertical : Orientation.Horizontal;
-			}
-			newContainer.Parent = content.Parent;
-			newContainer.FillParent();
-			content.Parent = newContainer.Panel1;
-			content.FillParent();
-			var newTabs = CreateTabControl();
-			newTabs.Parent = newContainer.Panel2;
-			newTabs.FillParent();
-			if (newTabs.SelectedTab is IDETab<Editor>)
-				((IDETab<Editor>)newTabs.SelectedTab).Control.Focus();
-			else
-				newTabs.SelectedTab.Focus();
+			content.Split(true, true);
 		}
 
 		private void saveFile_Click(object sender, EventArgs e)

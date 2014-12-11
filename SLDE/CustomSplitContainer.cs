@@ -10,8 +10,13 @@ namespace SLDE
 	{
 		protected override void OnDoubleClick(EventArgs e)
 		{
-			Orientation = Orientation == Orientation.Horizontal ?
-				Orientation.Vertical : Orientation.Horizontal;
+			base.OnDoubleClick(e);
+
+			var horiz = Orientation == Orientation.Horizontal;
+			var setting = (float)SplitterDistance / (float)(horiz ? Height : Width);
+			Orientation = horiz
+				? Orientation.Vertical : Orientation.Horizontal;
+			SplitterDistance = (int)(setting * (float)(horiz ? Width : Height));
 		}
 	}
 }

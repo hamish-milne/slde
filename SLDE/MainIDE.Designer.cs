@@ -63,8 +63,10 @@
 			this.findMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.findInFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.replaceMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.viewMenu = new SLDE.ViewMenu();
+			this.languageMenu = new SLDE.LanguageMenu();
 			this.toolsMenu = new System.Windows.Forms.ToolStripMenuItem();
-			this.windowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.windowMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.controlToolStrip = new System.Windows.Forms.ToolStrip();
 			this.backButton = new System.Windows.Forms.ToolStripButton();
 			this.forwardButton = new System.Windows.Forms.ToolStripButton();
@@ -80,6 +82,7 @@
 			this.LeftToolStripPanel = new System.Windows.Forms.ToolStripPanel();
 			this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
 			this.toolStripContainer = new System.Windows.Forms.ToolStripContainer();
+			this.rootTabControl = new SLDE.IDETabControl();
 			this.tabContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.close = new System.Windows.Forms.ToolStripMenuItem();
 			this.closePane = new System.Windows.Forms.ToolStripMenuItem();
@@ -100,9 +103,11 @@
 			this.configSelect = new System.Windows.Forms.ToolStripComboBox();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-			this.rootTabControl = new SLDE.IDETabControl();
-			this.viewMenu = new SLDE.ViewMenu();
-			this.languageMenu = new SLDE.LanguageMenu();
+			this.duplicateTabMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.splitVerticalMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.splitHorizontalMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.removeSplitsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.closeAllMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			separator2 = new System.Windows.Forms.ToolStripSeparator();
 			separator3 = new System.Windows.Forms.ToolStripSeparator();
 			separator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -168,7 +173,7 @@
             this.viewMenu,
             this.languageMenu,
             this.toolsMenu,
-            this.windowToolStripMenuItem});
+            this.windowMenu});
 			this.menuStrip.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip.Name = "menuStrip";
 			this.menuStrip.Size = new System.Drawing.Size(792, 24);
@@ -384,17 +389,35 @@
 			this.replaceMenuItem.Size = new System.Drawing.Size(206, 22);
 			this.replaceMenuItem.Text = "R&eplace";
 			// 
+			// viewMenu
+			// 
+			this.viewMenu.Name = "viewMenu";
+			this.viewMenu.Size = new System.Drawing.Size(44, 20);
+			this.viewMenu.Text = "View";
+			// 
+			// languageMenu
+			// 
+			this.languageMenu.Name = "languageMenu";
+			this.languageMenu.Size = new System.Drawing.Size(71, 20);
+			this.languageMenu.Text = "Language";
+			// 
 			// toolsMenu
 			// 
 			this.toolsMenu.Name = "toolsMenu";
 			this.toolsMenu.Size = new System.Drawing.Size(47, 20);
 			this.toolsMenu.Text = "Tools";
 			// 
-			// windowToolStripMenuItem
+			// windowMenu
 			// 
-			this.windowToolStripMenuItem.Name = "windowToolStripMenuItem";
-			this.windowToolStripMenuItem.Size = new System.Drawing.Size(63, 20);
-			this.windowToolStripMenuItem.Text = "Window";
+			this.windowMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.duplicateTabMenuItem,
+            this.splitVerticalMenuItem,
+            this.splitHorizontalMenuItem,
+            this.removeSplitsMenuItem,
+            this.closeAllMenuItem});
+			this.windowMenu.Name = "windowMenu";
+			this.windowMenu.Size = new System.Drawing.Size(63, 20);
+			this.windowMenu.Text = "Window";
 			// 
 			// controlToolStrip
 			// 
@@ -550,6 +573,21 @@
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.controlToolStrip);
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.editToolStrip);
 			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.buildToolStrip);
+			// 
+			// rootTabControl
+			// 
+			this.rootTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.rootTabControl.ContextMenuStrip = this.tabContextMenu;
+			this.rootTabControl.HotTrack = true;
+			this.rootTabControl.ImageList = this.imageList;
+			this.rootTabControl.Location = new System.Drawing.Point(0, 3);
+			this.rootTabControl.MainWindow = true;
+			this.rootTabControl.Name = "rootTabControl";
+			this.rootTabControl.SelectedIndex = 0;
+			this.rootTabControl.Size = new System.Drawing.Size(792, 247);
+			this.rootTabControl.TabIndex = 0;
 			// 
 			// tabContextMenu
 			// 
@@ -712,32 +750,37 @@
 			// 
 			this.openFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog_FileOk);
 			// 
-			// rootTabControl
+			// duplicateTabMenuItem
 			// 
-			this.rootTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.rootTabControl.ContextMenuStrip = this.tabContextMenu;
-			this.rootTabControl.HotTrack = true;
-			this.rootTabControl.ImageList = this.imageList;
-			this.rootTabControl.Location = new System.Drawing.Point(0, 3);
-			this.rootTabControl.MainWindow = true;
-			this.rootTabControl.Name = "rootTabControl";
-			this.rootTabControl.SelectedIndex = 0;
-			this.rootTabControl.Size = new System.Drawing.Size(792, 247);
-			this.rootTabControl.TabIndex = 0;
+			this.duplicateTabMenuItem.Name = "duplicateTabMenuItem";
+			this.duplicateTabMenuItem.Size = new System.Drawing.Size(185, 22);
+			this.duplicateTabMenuItem.Text = "Duplicate tab";
 			// 
-			// viewMenu
+			// splitVerticalMenuItem
 			// 
-			this.viewMenu.Name = "viewMenu";
-			this.viewMenu.Size = new System.Drawing.Size(44, 20);
-			this.viewMenu.Text = "View";
+			this.splitVerticalMenuItem.Image = global::SLDE.Properties.Resources.SplitScreenVertically_12973;
+			this.splitVerticalMenuItem.Name = "splitVerticalMenuItem";
+			this.splitVerticalMenuItem.Size = new System.Drawing.Size(185, 22);
+			this.splitVerticalMenuItem.Text = "Split vertical";
 			// 
-			// languageMenu
+			// splitHorizontalMenuItem
 			// 
-			this.languageMenu.Name = "languageMenu";
-			this.languageMenu.Size = new System.Drawing.Size(71, 20);
-			this.languageMenu.Text = "Language";
+			this.splitHorizontalMenuItem.Image = global::SLDE.Properties.Resources.SplitScreenHorizontally_12972;
+			this.splitHorizontalMenuItem.Name = "splitHorizontalMenuItem";
+			this.splitHorizontalMenuItem.Size = new System.Drawing.Size(185, 22);
+			this.splitHorizontalMenuItem.Text = "Split horizontal";
+			// 
+			// removeSplitsMenuItem
+			// 
+			this.removeSplitsMenuItem.Name = "removeSplitsMenuItem";
+			this.removeSplitsMenuItem.Size = new System.Drawing.Size(185, 22);
+			this.removeSplitsMenuItem.Text = "Collapse to one pane";
+			// 
+			// closeAllMenuItem
+			// 
+			this.closeAllMenuItem.Name = "closeAllMenuItem";
+			this.closeAllMenuItem.Size = new System.Drawing.Size(185, 22);
+			this.closeAllMenuItem.Text = "Close all windows";
 			// 
 			// MainIDE
 			// 
@@ -788,7 +831,7 @@
 		private System.Windows.Forms.ToolStripMenuItem newMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem openMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem windowToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem windowMenu;
 		private System.Windows.Forms.ToolStripButton backButton;
 		private System.Windows.Forms.ToolStripButton forwardButton;
 		private System.Windows.Forms.ToolStripButton openFileButton;
@@ -840,6 +883,11 @@
 		private System.Windows.Forms.ToolStripSeparator separator7;
 		private System.Windows.Forms.ToolStripSeparator separator10;
 		private System.Windows.Forms.ToolStripMenuItem selectAllMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem duplicateTabMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem splitVerticalMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem splitHorizontalMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem removeSplitsMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem closeAllMenuItem;
 	}
 }
 

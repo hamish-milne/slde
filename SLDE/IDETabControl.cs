@@ -228,17 +228,17 @@ namespace SLDE
 			return TabPosition.None;
 		}
 
-		protected virtual IDETabControl Split(bool right, bool vertical)
+		public virtual IDETabControl Split(bool second, bool vertical)
 		{
 			var newContainer = new CustomSplitContainer();
 			newContainer.Orientation = vertical ? Orientation.Vertical :
 				Orientation.Horizontal;
 			newContainer.Parent = Parent;
 			newContainer.FillParent();
-			Parent = right ? newContainer.Panel1 : newContainer.Panel2;
+			Parent = second ? newContainer.Panel1 : newContainer.Panel2;
 			this.FillParent();
 			var newTabs = Copy();
-			newTabs.Parent = right ? newContainer.Panel2 : newContainer.Panel1;
+			newTabs.Parent = second ? newContainer.Panel2 : newContainer.Panel1;
 			newTabs.FillParent();
 			newContainer.SplitterDistance = vertical ? newContainer.Size.Width / 2
 				: newContainer.Size.Height / 2;
@@ -275,6 +275,7 @@ namespace SLDE
 				((TabControl)dragTab.Parent).SelectedTab = dragTab;
 				if (control != null && control.FindForm() != null)
 					OutlineBox.Get(control.FindForm()).Hide();
+				dragTab.Refresh();
 			}
 			dragForm = null;
 			base.OnMouseUp(e);
