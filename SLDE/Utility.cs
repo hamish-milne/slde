@@ -46,6 +46,8 @@ namespace SLDE
 
 		public static void FillParent(this Control content)
 		{
+			if (content.Parent == null)
+				return;
 			content.Location = new Point();
 			var form = content.Parent as Form;
 			content.Anchor = Utility.AllAnchors;

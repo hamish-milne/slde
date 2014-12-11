@@ -195,6 +195,9 @@ namespace SLDE
 
 		private void undo_Click(object sender, EventArgs e)
 		{
+			var button = new Canvas();
+			FindForm().Controls.Add(button);
+			button.BringToFront();
 			var tab = IDETab<Editor>.ActiveTab;
 			if (tab != null)
 				tab.Control.Undo();

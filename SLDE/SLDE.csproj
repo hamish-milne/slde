@@ -45,6 +45,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Canvas.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomSplitContainer.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ErrorData.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
