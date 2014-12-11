@@ -30,6 +30,8 @@ namespace SLDE
 		int lastDragIndex = -1;
 		Point dragPoint;
 		ContextMenuStrip contextMenu;
+		TabPosition lastPosition;
+		IDETabControl lastControl;
 
 		public IDETabControl()
 		{
@@ -131,7 +133,7 @@ namespace SLDE
 			tabToSet.dragPoint = dragTabs.PointToClient(mousePoint);
 
 			dragTabForm.FormBorderStyle = FormBorderStyle.None;
-			if (!mainWindow && !useThisForm && TabCount < 1 && Parent != null)
+			if (!mainWindow && !useThisForm && TabCount < 1 && Parent.Parent is Form)
 				Parent.Parent = null;
 		}
 
@@ -187,10 +189,29 @@ namespace SLDE
 				if (control.Parent == dragForm)
 					continue;
 				var clientPoint = control.PointToClient(screenPoint);
+				if(control.TabCount < 1)
+				{
+					rect = control.ClientRectangle;
+					if(rect.Contains(clientPoint))
+					{
+						index = 0;
+						return TabPosition.Tab;
+					}
+					continue;
+				}
 				index = control.GetTabUnderPosition(clientPoint);
+				var t0 = control.GetTabRect(0);
+				var headerRect = new Rectangle(t0.Location, new Size(control.ClientRectangle.Width, t0.Height));
+				var tabRect = new Rectangle(control.ClientRectangle.X, control.ClientRectangle.Y + headerRect.Height,
+					control.ClientRectangle.Width, control.ClientRectangle.Height - headerRect.Height);
+				rect = tabRect;
 				if (index >= 0)
 					return TabPosition.Tab;
-				var tabRect = control.ClientRectangle;
+				if(headerRect.Contains(clientPoint))
+				{
+					index = control.TabCount;
+					return TabPosition.Tab;
+				}
 				var newHeight = (tabRect.Height / 2);
 				rect = new Rectangle(new Point(tabRect.X, tabRect.Y + newHeight), new Size(tabRect.Width, newHeight));
 				if (rect.Contains(clientPoint))
@@ -202,6 +223,8 @@ namespace SLDE
 				if (rect.Contains(clientPoint))
 					return TabPosition.Right;
 			}
+			control = null;
+			index = -1;
 			return TabPosition.None;
 		}
 
@@ -249,6 +272,9 @@ namespace SLDE
 						break;
 				}
 				dragTab.Focus();
+				((TabControl)dragTab.Parent).SelectedTab = dragTab;
+				if (control != null && control.FindForm() != null)
+					OutlineBox.Get(control.FindForm()).Hide();
 			}
 			dragForm = null;
 			base.OnMouseUp(e);
@@ -281,15 +307,29 @@ namespace SLDE
 			if(dragForm != null)
 			{
 				dragForm.Location = Subtract(PointToScreen(e.Location), dragPoint);
-				IDETabControl control;
 				int index;
 				Rectangle rect;
-				if (GetTabHover(e.Location, out control, out index, out rect) != TabPosition.None)
+				IDETabControl control;
+				var newPosition = GetTabHover(e.Location, out control, out index, out rect);
+				if (newPosition != TabPosition.None)
 				{
-					//control.canvas.Enabled = true;
-					//control.canvas.Rectangle = rect;
+					if(newPosition != lastPosition)
+					{
+						var form = control.FindForm();
+						var box = OutlineBox.Get(form);
+						box.Hide();
+						box.Location = Add(rect.Location, form.PointToClient(control.PointToScreen(default(Point))));
+						box.Size = rect.Size;
+						box.BringToFront();
+						box.Show();
+					}
 				}
-
+				lastPosition = newPosition;
+				if (lastControl != null && control != lastControl && lastControl.FindForm() != null)
+				{
+					OutlineBox.Get(lastControl.FindForm()).Hide();
+				}
+				lastControl = control;
 				return;
 			}
 
