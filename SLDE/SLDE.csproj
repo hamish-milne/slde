@@ -55,6 +55,7 @@
       <DependentUpon>ErrorList.cs</DependentUpon>
     </Compile>
     <Compile Include="ICompiler.cs" />
+    <Compile Include="IDEControl.cs" />
     <Compile Include="IDETab.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -81,10 +82,7 @@
       <DependentUpon>MainIDE.cs</DependentUpon>
     </Compile>
     <Compile Include="OutlineBox.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="OutlineBox.Designer.cs">
-      <DependentUpon>OutlineBox.cs</DependentUpon>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="ProjectView.cs">
@@ -130,9 +128,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MainIDE.resx">
       <DependentUpon>MainIDE.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OutlineBox.resx">
-      <DependentUpon>OutlineBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectView.resx">
       <DependentUpon>ProjectView.cs</DependentUpon>

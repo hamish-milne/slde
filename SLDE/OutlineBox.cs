@@ -9,26 +9,121 @@ using System.Windows.Forms;
 
 namespace SLDE
 {
-	public partial class OutlineBox : UserControl
+	public class OutlineBox : Component
 	{
+		Control top, bottom, left, right;
+		Color color = Color.LightBlue;
+		Rectangle rectangle;
+		int thickness = 5;
+		bool visible;
+
+		[Browsable(true)]
+		public virtual Color Color
+		{
+			get { return color; }
+			set
+			{
+				color = value;
+				top.BackColor = value;
+				bottom.BackColor = value;
+				left.BackColor = value;
+				right.BackColor = value;
+			}
+		}
+
+		[Browsable(true)]
+		public virtual Rectangle Rectangle
+		{
+			get { return rectangle; }
+			set
+			{
+				rectangle = value;
+				Refresh();
+			}
+		}
+
+		[Browsable(true)]
+		public virtual int Thickness
+		{
+			get { return thickness; }
+			set
+			{
+				thickness = value;
+				Refresh();
+			}
+		}
+
+		[Browsable(true)]
+		public virtual bool Visible
+		{
+			get { return visible; }
+			set
+			{
+				if(visible != value)
+				{
+					top.Visible = value;
+					bottom.Visible = value;
+					left.Visible = value;
+					right.Visible = value;
+					visible = value;
+				}
+			}
+		}
+
+		public virtual void BringToFront()
+		{
+			top.BringToFront();
+			bottom.BringToFront();
+			left.BringToFront();
+			right.BringToFront();
+		}
+
+		public virtual void Refresh()
+		{
+			top.Location = rectangle.Location;
+			top.Size = new Size(rectangle.Width, thickness);
+			left.Location = rectangle.Location;
+			left.Size = new Size(thickness, rectangle.Height);
+			right.Location = new Point(rectangle.X + rectangle.Width - thickness,
+				rectangle.Y);
+			right.Size = left.Size;
+			bottom.Location = new Point(rectangle.X,
+				rectangle.Y + rectangle.Height - thickness);
+			bottom.Size = top.Size;
+		}
+
+		public OutlineBox(Form form)
+		{
+			if (form == null)
+				throw new ArgumentNullException("form");
+			form.Controls.Add(top = new Control());
+			form.Controls.Add(bottom = new Control());
+			form.Controls.Add(left = new Control());
+			form.Controls.Add(right = new Control());
+			Color = Color;
+		}
+
+		static Dictionary<Form, OutlineBox> cache
+			= new Dictionary<Form, OutlineBox>();
+
 		public static OutlineBox Get(Form form)
 		{
 			if (form == null)
-				return null;
-			for (int i = 0; i < form.Controls.Count; i++)
+				throw new ArgumentNullException("form");
+			OutlineBox box;
+			if(!cache.TryGetValue(form, out box))
 			{
-				var box = form.Controls[i] as OutlineBox;
-				if (box != null)
-					return box;
+				box = new OutlineBox(form);
+				cache.Add(form, box);
+				form.Disposed += form_Disposed;
 			}
-			var newBox = new OutlineBox();
-			form.Controls.Add(newBox);
-			return newBox;
+			return box;
 		}
 
-		public OutlineBox()
+		static void form_Disposed(object sender, EventArgs e)
 		{
-			InitializeComponent();
+			cache.Remove((Form)sender);
 		}
+
 	}
 }

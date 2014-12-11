@@ -274,7 +274,7 @@ namespace SLDE
 				dragTab.Focus();
 				((TabControl)dragTab.Parent).SelectedTab = dragTab;
 				if (control != null && control.FindForm() != null)
-					OutlineBox.Get(control.FindForm()).Hide();
+					OutlineBox.Get(control.FindForm()).Visible = false;
 				dragTab.Refresh();
 			}
 			dragForm = null;
@@ -318,17 +318,15 @@ namespace SLDE
 					{
 						var form = control.FindForm();
 						var box = OutlineBox.Get(form);
-						box.Hide();
-						box.Location = Add(rect.Location, form.PointToClient(control.PointToScreen(default(Point))));
-						box.Size = rect.Size;
+						box.Rectangle = new Rectangle(Add(rect.Location, form.PointToClient(control.PointToScreen(default(Point)))), rect.Size);
 						box.BringToFront();
-						box.Show();
+						box.Visible = true;
 					}
 				}
 				lastPosition = newPosition;
 				if (lastControl != null && control != lastControl && lastControl.FindForm() != null)
 				{
-					OutlineBox.Get(lastControl.FindForm()).Hide();
+					OutlineBox.Get(lastControl.FindForm()).Visible = false;
 				}
 				lastControl = control;
 				return;
