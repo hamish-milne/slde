@@ -76,12 +76,12 @@ namespace SLDE
 			SetActiveTab();
 		}
 
-		public override bool Remove()
+		public override bool Destroy()
 		{
 			if(control.TryClose())
 			{
 				allTabs.Remove(this);
-				return base.Remove();
+				return base.Destroy();
 			}
 			return false;
 		}

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace SLDE
 {
-	public partial class MainIDE : Form
+	public partial class MainIDE : IDEForm
 	{
 		TabControl ActivePane
 		{

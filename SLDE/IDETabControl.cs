@@ -94,7 +94,7 @@ namespace SLDE
 			// If this isn't the main window, and the parent is a Form
 			// (i.e. there are no split panes)
 			bool useThisForm = !mainWindow && Parent is Form && TabCount == 1;
-			var dragTabForm = useThisForm ? (Form)Parent : new Form();
+			var dragTabForm = useThisForm ? (Form)Parent : new IDEForm();
 			
 			// Create a new tab control, or if we're using this form,
 			// use the current tab control
@@ -139,30 +139,38 @@ namespace SLDE
 				Parent.Parent = null;
 		}
 
+		public bool Closing
+		{
+			get { return closing; }
+		}
+
 		List<TabPage> tabsToRemove = new List<TabPage>();
 		bool closing;
-		public bool Close()
+		public bool Close(bool destroyTabs = true)
 		{
-			if (closing)
-				return true;
-			closing = true;
-			SelectedIndex = 0;
-			tabsToRemove.Clear();
-			for (int i = 0; i < TabCount; i++)
-				tabsToRemove.Add(TabPages[i]);
-			for (int i = 0; i < tabsToRemove.Count; i++)
+			if (destroyTabs)
 			{
-				var tab = tabsToRemove[i] as IDETab;
-				if (tab == null)
-					tabsToRemove[i].Parent = null;
-				else if(!tab.Remove())
+				if (closing)
+					return true;
+				closing = true;
+				SelectedIndex = 0;
+				tabsToRemove.Clear();
+				for (int i = 0; i < TabCount; i++)
+					tabsToRemove.Add(TabPages[i]);
+				for (int i = 0; i < tabsToRemove.Count; i++)
 				{
-					tabsToRemove.Clear();
-					closing = false;
-					return false;
+					var tab = tabsToRemove[i] as IDETab;
+					if (tab == null)
+						tabsToRemove[i].Parent = null;
+					else if (!tab.Destroy())
+					{
+						tabsToRemove.Clear();
+						closing = false;
+						return false;
+					}
 				}
+				tabsToRemove.Clear();
 			}
-			tabsToRemove.Clear();
 			var splitPane = Parent as SplitterPanel;
 			if (splitPane == null)
 			{
@@ -201,7 +209,7 @@ namespace SLDE
 		{
 			base.OnControlRemoved(e);
 			if (TabCount <= 1)
-				Close();
+				Close(false);
 		}
 
 		protected enum TabPosition { None, Tab, Left, Right, Bottom }

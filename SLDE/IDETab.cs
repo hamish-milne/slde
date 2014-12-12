@@ -88,7 +88,7 @@ namespace SLDE
 		public event EventHandler OnInactive;
 		TabControl oldParent;
 
-		public virtual bool Remove()
+		public virtual void Remove()
 		{
 			var tabs = Parent as TabControl;
 			if (tabs != null)
@@ -103,6 +103,11 @@ namespace SLDE
 				Parent = null;
 				tabs.SelectedIndex = newIndex;
 			}
+		}
+
+		public virtual bool Destroy()
+		{
+			Remove();
 			return true;
 		}
 
