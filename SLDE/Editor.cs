@@ -14,45 +14,51 @@ using DigitalRune.Windows.TextEditor.Document;
 
 namespace SLDE
 {
+	/// <summary>
+	/// Extensions to the TextEditorControl
+	/// </summary>
 	public partial class Editor : TextEditorControl, IClosable
 	{
-		static int newFilesNumber;
-		static int newFileID;
+		int newFileNumber;
 		string tabName;
 		bool changed;
 
+		/// <summary>
+		/// Creates a new instance
+		/// </summary>
 		public Editor() : base()
 		{
 			InitializeComponent();
 
 			DocumentChanged += OnTextChange;
-			newFilesNumber++;
-			newFileID = newFilesNumber;
-			TabName = "New file " + newFilesNumber;
+			for (int i = 0; i < IDETab<Editor>.AllTabs.Count; i++)
+			{
+				var num = IDETab<Editor>.AllTabs[i].Control.newFileNumber;
+				if(num > newFileNumber)
+					newFileNumber = num;
+			}
+			newFileNumber++;
+			TabName = "New file " + newFileNumber;
 		}
 
-		protected override void Dispose(bool disposing)
-		{
-			if (String.IsNullOrEmpty(FileName) && newFileID >= newFilesNumber)
-				newFilesNumber--;
-			base.Dispose(disposing);
-		}
-
+		/// <summary>
+		/// The current file name
+		/// </summary>
 		new public string FileName
 		{
 			get { return base.FileName; }
 			set
 			{
-				if (String.IsNullOrEmpty(base.FileName))
-					newFilesNumber--;
 				base.FileName = value;
 				TabName = Path.GetFileName(value);
 				Changed = Changed;
-				if (String.IsNullOrEmpty(value))
-					newFilesNumber++;
+				newFileNumber = 0;
 			}
 		}
 
+		/// <summary>
+		/// Indicates whether the document has been modified since the last save
+		/// </summary>
 		public virtual bool Changed
 		{
 			get { return changed; }
@@ -68,6 +74,9 @@ namespace SLDE
 			}
 		}
 
+		/// <summary>
+		/// The text on the parent tab
+		/// </summary>
 		public string TabName
 		{
 			get
@@ -86,6 +95,10 @@ namespace SLDE
 			}
 		}
 
+		/// <summary>
+		/// Saves the document, performing any necessary GUI actions
+		/// </summary>
+		/// <returns><c>true</c> on success, <c>false</c> on cancel or failure</returns>
 		public virtual bool Save()
 		{
 			if(!Changed)
@@ -110,6 +123,9 @@ namespace SLDE
 			return false;
 		}
 
+		/// <summary>
+		/// Tries to open the file referenced by FileName, showing an error on failure
+		/// </summary>
 		public virtual void TryOpen()
 		{
 			if(FileName != null)
@@ -128,6 +144,9 @@ namespace SLDE
 
 		Language language;
 
+		/// <summary>
+		/// The current code language
+		/// </summary>
 		public virtual Language Language
 		{
 			get
@@ -172,6 +191,10 @@ namespace SLDE
 				tab.Text = tabName;
 		}
 
+		/// <summary>
+		/// Tries to close this tab, prompting the user to save any changes
+		/// </summary>
+		/// <returns><c>true</c> on success, <c>false</c> on failure or cancel</returns>
 		public virtual bool TryClose()
 		{
 			if(Changed)
@@ -193,11 +216,17 @@ namespace SLDE
 		}
 	}
 
+	/// <summary>
+	/// Stores references to common dialog boxes
+	/// </summary>
 	public static class DialogCache
 	{
 		static OpenFileDialog openFile;
 		static SaveFileDialog saveFile;
 
+		/// <summary>
+		/// An open file dialog box
+		/// </summary>
 		public static OpenFileDialog OpenFile
 		{
 			get
@@ -212,6 +241,9 @@ namespace SLDE
 			}
 		}
 
+		/// <summary>
+		/// A save file dialog box
+		/// </summary>
 		public static SaveFileDialog SaveFile
 		{
 			get

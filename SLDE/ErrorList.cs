@@ -9,13 +9,23 @@ using System.Windows.Forms;
 
 namespace SLDE
 {
+	/// <summary>
+	/// The error list window
+	/// </summary>
 	public partial class ErrorList : UserControl, IClosable
 	{
+		/// <summary>
+		/// Creates a new instance
+		/// </summary>
 		public ErrorList()
 		{
 			InitializeComponent();
 		}
 
+		/// <summary>
+		/// Closes the tab
+		/// </summary>
+		/// <returns><c>true</c></returns>
 		public virtual bool TryClose()
 		{
 			return true;

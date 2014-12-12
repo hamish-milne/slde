@@ -17,6 +17,9 @@ namespace SLDE
 	{
 		static List<IDETabControl> allControls = new List<IDETabControl>();
 
+		/// <summary>
+		/// Lists all the existing tab controls
+		/// </summary>
 		public static IList<IDETabControl> AllControls
 		{
 			get { return allControls; }
@@ -33,12 +36,19 @@ namespace SLDE
 		TabPosition lastPosition;
 		IDETabControl lastControl;
 
+		/// <summary>
+		/// Creates a new instance
+		/// </summary>
 		public IDETabControl()
 		{
 			InitializeComponent();
 			allControls.Add(this);
 		}
 
+		/// <summary>
+		/// Whether the control is in the main window.
+		/// If it is, the root pane won't be closed when all its tabs are removed
+		/// </summary>
 		[Browsable(true)]
 		public virtual bool MainWindow
 		{
@@ -46,6 +56,9 @@ namespace SLDE
 			set { mainWindow = value; }
 		}
 
+		/// <summary>
+		/// The context menu
+		/// </summary>
 		[Browsable(true)]
 		new public virtual ContextMenuStrip ContextMenuStrip
 		{
@@ -53,12 +66,23 @@ namespace SLDE
 			set { contextMenu = value; }
 		}
 
+		/// <summary>
+		/// Gets the tab (in the header) under the given client position
+		/// </summary>
+		/// <param name="p">The point to check</param>
+		/// <returns>The tab index, or -1 if none was found</returns>
 		public int GetTabUnderPosition(Point p)
 		{
 			Rectangle rect;
 			return GetTabUnderPosition(p, out rect);
 		}
 
+		/// <summary>
+		/// Gets the tab (in the header) under the given client position
+		/// </summary>
+		/// <param name="p">The point to check</param>
+		/// <param name="rect">The rectangle for the tab</param>
+		/// <returns>The tab index, or -1 if none was found</returns>
 		public int GetTabUnderPosition(Point p, out Rectangle rect)
 		{
 			rect = default(Rectangle);
@@ -71,12 +95,20 @@ namespace SLDE
 			return -1;
 		}
 
+		/// <summary>
+		/// Removes this instance from AllControls before disposing
+		/// </summary>
+		/// <param name="disposing"></param>
 		protected override void Dispose(bool disposing)
 		{
 			allControls.Remove(this);
 			base.Dispose(disposing);
 		}
 
+		/// <summary>
+		/// Creates a new instance, copying over relevant properties
+		/// </summary>
+		/// <returns>The created instance</returns>
 		protected virtual IDETabControl Copy()
 		{
 			var tabs = new IDETabControl();
@@ -86,6 +118,11 @@ namespace SLDE
 			return tabs;
 		}
 
+		/// <summary>
+		/// Called when a tab is dragged out of its container
+		/// </summary>
+		/// <param name="tab">The tab in question</param>
+		/// <param name="e">The EventArgs of the recent mouse event</param>
 		protected virtual void DragOutTab(TabPage tab, MouseEventArgs e)
 		{
 			// This gets the top corner of the dragged tab
@@ -139,6 +176,9 @@ namespace SLDE
 				Parent.Parent = null;
 		}
 
+		/// <summary>
+		/// Gets whether the container is closing
+		/// </summary>
 		public bool Closing
 		{
 			get { return closing; }
@@ -146,6 +186,13 @@ namespace SLDE
 
 		List<TabPage> tabsToRemove = new List<TabPage>();
 		bool closing;
+
+		/// <summary>
+		/// Closes the container, removing its tabs and adjusting the layout
+		/// </summary>
+		/// <param name="destroyTabs">If <c>true</c>, destroy the tabs
+		/// rather than just removing them</param>
+		/// <returns><c>true</c> on success, <c>false</c> on failure</returns>
 		public bool Close(bool destroyTabs = true)
 		{
 			if (destroyTabs)
@@ -199,12 +246,6 @@ namespace SLDE
 			return true;
 		}
 
-		protected override void OnDoubleClick(EventArgs e)
-		{
-			base.OnDoubleClick(e);
-			Close();
-		}
-
 		protected override void OnControlRemoved(ControlEventArgs e)
 		{
 			base.OnControlRemoved(e);
@@ -212,8 +253,19 @@ namespace SLDE
 				Close(false);
 		}
 
+		/// <summary>
+		/// The proposed position of a dragged tab
+		/// </summary>
 		protected enum TabPosition { None, Tab, Left, Right, Bottom }
 
+		/// <summary>
+		/// Gets data about where a tab is hovered over
+		/// </summary>
+		/// <param name="mouseLocation">The client mouse location</param>
+		/// <param name="control">The tab control at that location</param>
+		/// <param name="index">The index of the tab</param>
+		/// <param name="rect">The rectangle to show the guide over</param>
+		/// <returns></returns>
 		protected TabPosition GetTabHover(Point mouseLocation,
 			out IDETabControl control, out int index, out Rectangle rect)
 		{
@@ -272,6 +324,14 @@ namespace SLDE
 			return TabPosition.None;
 		}
 
+		/// <summary>
+		/// Splits this container in the layout
+		/// </summary>
+		/// <param name="second">If <c>true</c>, the new container
+		/// is Panel2. Otherwise it's Panel1</param>
+		/// <param name="vertical">If <c>true</c>, split vertically.
+		/// Otherwise split horizontally</param>
+		/// <returns>The newly created control</returns>
 		public virtual IDETabControl Split(bool second, bool vertical)
 		{
 			var newContainer = new CustomSplitContainer();
@@ -351,6 +411,7 @@ namespace SLDE
 
 			if(dragForm != null)
 			{
+				// Handles dragging a tab outside of this control
 				dragForm.Location = Subtract(PointToScreen(e.Location), dragPoint);
 				int index;
 				Rectangle rect;
@@ -360,6 +421,7 @@ namespace SLDE
 				{
 					if(newPosition != lastPosition)
 					{
+						// Draws the guideline at the proposed position
 						var form = control.FindForm();
 						var box = OutlineBox.Get(form);
 						box.Rectangle = new Rectangle(Add(rect.Location,
@@ -393,6 +455,7 @@ namespace SLDE
 				}
 			if(!dragging)
 				return;
+			// Handles dragging tabs along the header:
 			int newIndex = GetTabUnderPosition(e.Location);
 			if(newIndex < 0)
 			{
@@ -433,18 +496,20 @@ namespace SLDE
 
 			if (e.Button == MouseButtons.Left)
 			{
+				// The close button action
 				for (int i = 0; i < TabCount; i++)
 				{
 					var tab = TabPages[i] as IDETab;
 					if (tab != null && tab.ImageIndex == 0)
 					{
 						tab.ImageIndex = 1;
-						tab.Remove();
+						tab.Destroy();
 					}
 				}
 			}
 			else if (e.Button == MouseButtons.Right && ContextMenuStrip != null)
 			{
+				// Shows the context menu
 				for (int i = 0; i < TabCount; ++i)
 				{
 					if (GetTabRect(i).Contains(e.Location))
@@ -457,6 +522,9 @@ namespace SLDE
 			}
 		}
 
+		/// <summary>
+		/// Overridden to remove flickering
+		/// </summary>
 		protected override CreateParams CreateParams
 		{
 			get
@@ -467,11 +535,23 @@ namespace SLDE
 			}
 		}
 
+		/// <summary>
+		/// Adds two Points together
+		/// </summary>
+		/// <param name="a">A point</param>
+		/// <param name="b">Another point</param>
+		/// <returns>a + b</returns>
 		public static Point Add(Point a, Point b)
 		{
 			return new Point(a.X + b.X, a.Y + b.Y);
 		}
 
+		/// <summary>
+		/// Subtracts one Point from another
+		/// </summary>
+		/// <param name="a">A point</param>
+		/// <param name="b">Another point</param>
+		/// <returns>a - b</returns>
 		public static Point Subtract(Point a, Point b)
 		{
 			return new Point(a.X - b.X, a.Y - b.Y);
@@ -479,8 +559,15 @@ namespace SLDE
 		
 	}
 
+	/// <summary>
+	/// Allows a control to be closed. Required to be used in IDETab[T]
+	/// </summary>
 	public interface IClosable
 	{
+		/// <summary>
+		/// Attempts to close the tab
+		/// </summary>
+		/// <returns><c>true</c> on success, <c>false</c> on failure</returns>
 		bool TryClose();
 	}
 

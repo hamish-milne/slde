@@ -7,9 +7,13 @@ using System.Windows.Forms;
 
 namespace SLDE
 {
+	/// <summary>
+	/// A form that closes all <see cref="IDETab"/>s before closing itself
+	/// </summary>
 	public class IDEForm : Form
 	{
 		List<IDETab> tabs = new List<IDETab>();
+
 		protected override void OnClosing(CancelEventArgs e)
 		{
 			base.OnClosing(e);
@@ -27,7 +31,6 @@ namespace SLDE
 				}
 			tabs.Clear();
 		}
-
 		
 	}
 }

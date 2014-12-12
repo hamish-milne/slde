@@ -6,6 +6,9 @@ using System.Windows.Forms;
 
 namespace SLDE
 {
+	/// <summary>
+	/// A SplitContainer that changes orientation when double-clicked
+	/// </summary>
 	public class CustomSplitContainer : SplitContainer
 	{
 		protected override void OnDoubleClick(EventArgs e)
