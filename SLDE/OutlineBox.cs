@@ -9,6 +9,9 @@ using System.Windows.Forms;
 
 namespace SLDE
 {
+	/// <summary>
+	/// Controls a rectangular outline with a transparent fill, parented to a Form
+	/// </summary>
 	public class OutlineBox : Component
 	{
 		Control top, bottom, left, right;
@@ -17,6 +20,9 @@ namespace SLDE
 		int thickness = 5;
 		bool visible;
 
+		/// <summary>
+		/// The box's color
+		/// </summary>
 		[Browsable(true)]
 		public virtual Color Color
 		{
@@ -31,6 +37,9 @@ namespace SLDE
 			}
 		}
 
+		/// <summary>
+		/// The client-space rectangle
+		/// </summary>
 		[Browsable(true)]
 		public virtual Rectangle Rectangle
 		{
@@ -42,6 +51,9 @@ namespace SLDE
 			}
 		}
 
+		/// <summary>
+		/// The thickness in pixels
+		/// </summary>
 		[Browsable(true)]
 		public virtual int Thickness
 		{
@@ -53,6 +65,9 @@ namespace SLDE
 			}
 		}
 
+		/// <summary>
+		/// Gets and sets whether the box is visible
+		/// </summary>
 		[Browsable(true)]
 		public virtual bool Visible
 		{
@@ -70,6 +85,9 @@ namespace SLDE
 			}
 		}
 
+		/// <summary>
+		/// Brings the box to the front
+		/// </summary>
 		public virtual void BringToFront()
 		{
 			top.BringToFront();
@@ -78,6 +96,9 @@ namespace SLDE
 			right.BringToFront();
 		}
 
+		/// <summary>
+		/// Refreshes the child controls with respect to the current properties
+		/// </summary>
 		public virtual void Refresh()
 		{
 			top.Location = rectangle.Location;
@@ -92,6 +113,12 @@ namespace SLDE
 			bottom.Size = top.Size;
 		}
 
+		/// <summary>
+		/// Creates a new instance, parented to the given form
+		/// </summary>
+		/// <param name="form">The form to parent to</param>
+		/// <exception cref="ArgumentNullException"><paramref name="form"/>
+		/// is <c>null</c></exception>
 		public OutlineBox(Form form)
 		{
 			if (form == null)
@@ -106,6 +133,11 @@ namespace SLDE
 		static Dictionary<Form, OutlineBox> cache
 			= new Dictionary<Form, OutlineBox>();
 
+		/// <summary>
+		/// Gets the <see cref="OutlineBox"/> for a given <see cref="Form"/>
+		/// </summary>
+		/// <param name="form">The parent form</param>
+		/// <returns>An OutlineBox instance</returns>
 		public static OutlineBox Get(Form form)
 		{
 			if (form == null)

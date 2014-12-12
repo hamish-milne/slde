@@ -17,6 +17,7 @@ namespace SLDE
 		protected override void OnClosing(CancelEventArgs e)
 		{
 			base.OnClosing(e);
+			e.Cancel = false;
 			tabs.Clear();
 			for(int i = 0; i < IDETab.AllTabs.Count; i++)
 			{

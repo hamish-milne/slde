@@ -22,6 +22,17 @@ namespace SLDE
 			}
 		}
 
+		TabControl ActiveEditorPane
+		{
+			get
+			{
+				TabControl ret = IDETab<Editor>.ActivePane;
+				if (ret == null && IDETabControl.AllControls.Count > 0)
+					ret = IDETabControl.AllControls[0];
+				return ret;
+			}
+		}
+
 		private IDETab<Editor> CreateEditorTab(TabControl parent)
 		{
 			var ret = new IDETab<Editor>();
@@ -48,14 +59,6 @@ namespace SLDE
 				tab.Control.Language = e.Language;
 		}
 
-		private IDETab<Editor> CreateEditorTab(string fileName, TabControl parent)
-		{
-			var ret = CreateEditorTab(parent);
-			ret.Control.FileName = fileName;
-			ret.Control.TryOpen();
-			return ret;
-		}
-
 		public MainIDE()
 		{
 			InitializeComponent();
@@ -73,31 +76,15 @@ namespace SLDE
 				openedFiles |= TryOpenFile(arg);
 			if (!openedFiles)
 			{
-				CreateEditorTab(rootTabControl);
+				CreateEditorTab(ActiveEditorPane);
 			}
 
 		}
 
 		bool TryOpenFile(string file)
 		{
-			try
-			{
-				OpenFile(file);
-				return true;
-			} catch(Exception e)
-			{
-				Utility.ShowError(e.Message);
-				return false;
-			}
-		}
-
-		void OpenFile(string file)
-		{
-			CreateEditorTab(file, ActivePane);
-			var tab = new IDETab<ProjectView>();
-			rootTabControl.TabPages.Add(tab);
-			tab.Control.OpenFile += Control_OpenFile;
-			tab.Control.Root = System.IO.Path.GetDirectoryName(file);
+			var tab = CreateEditorTab(ActiveEditorPane);
+			return tab.Control.TryOpen(file);
 		}
 
 		void Control_OpenFile(object sender, OpenFileEventArgs e)
@@ -117,14 +104,19 @@ namespace SLDE
 
 		private void close_Click(object sender, EventArgs e)
 		{
-			/*var tab = sender.GetSourceControl() as TabControl;
-			if (tab != null)
-				CloseTab(tab.TabPages[tab.SelectedIndex]);*/
+			var tab = sender.GetSourceControl() as TabControl;
+			if (tab == null)
+				return;
+			var tabPage = tab.SelectedTab as IDETab;
+			if (tabPage != null)
+				tabPage.Destroy();
 		}
 
 		private void closePane_Click(object sender, EventArgs e)
 		{
-			//ClosePane(sender.GetSourceControl());
+			var tab = sender.GetSourceControl() as IDETabControl;
+			if (tab != null)
+				tab.Close(true);
 		}
 
 		private void splitPane_Click(object sender, EventArgs e)
@@ -148,15 +140,12 @@ namespace SLDE
 		private void openFile_Click(object sender, EventArgs e)
 		{
 			openFileDialog.Filter = Language.GetFilter();
-			openFileDialog.ShowDialog();
-		}
-
-		private void openFileDialog_FileOk(object sender, CancelEventArgs e)
-		{
-			var dialog = (OpenFileDialog)sender;
-			var names = dialog.FileNames;
-			for (int i = 0; i < names.Length; i++)
-				TryOpenFile(names[i]);
+			if(openFileDialog.ShowDialog() == DialogResult.OK)
+			{
+				var names = openFileDialog.FileNames;
+				for (int i = 0; i < names.Length; i++)
+					TryOpenFile(names[i]);
+			}
 		}
 
 		private void undo_Click(object sender, EventArgs e)
@@ -180,7 +169,43 @@ namespace SLDE
 
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Dispose();
+			Close();
+		}
+
+		private void saveAllButton_Click(object sender, EventArgs e)
+		{
+			for(int i = 0; i < IDETab<Editor>.AllTabs.Count; i++)
+			{
+				var tab = IDETab<Editor>.AllTabs[i];
+				if (tab != null)
+					tab.Control.Save();
+			}
+		}
+
+		private void saveAsMenuItem_Click(object sender, EventArgs e)
+		{
+			var tab = IDETab<Editor>.ActiveTab;
+			if (tab != null)
+			{
+				DialogCache.SaveFile.Filter = Language.GetFilter();
+				tab.Control.Save(true);
+			}
+		}
+
+		List<IDETab> tabList = new List<IDETab>();
+
+		private void closeAllButThis_Click(object sender, EventArgs e)
+		{
+			var tabs = sender.GetSourceControl() as TabControl;
+			if(tabs == null)
+				return;
+			tabList.Clear();
+			for (int i = 0; i < tabs.TabCount; i++)
+				if(tabs.TabPages[i] is IDETab)
+					tabList.Add((IDETab)tabs.TabPages[i]);
+			for (int i = 0; i < tabList.Count; i++)
+				if (tabList[i] != tabs.SelectedTab && !tabList[i].Destroy())
+					break;
 		}
 
 	}

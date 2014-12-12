@@ -201,11 +201,14 @@ namespace SLDE
 					return true;
 				closing = true;
 				SelectedIndex = 0;
+				// Add the tabs to an initial list, because the internal
+				// collection will be modified as we remove them
 				tabsToRemove.Clear();
 				for (int i = 0; i < TabCount; i++)
 					tabsToRemove.Add(TabPages[i]);
 				for (int i = 0; i < tabsToRemove.Count; i++)
 				{
+					// Destroy each tab. If one doesn't let us, stop here
 					var tab = tabsToRemove[i] as IDETab;
 					if (tab == null)
 						tabsToRemove[i].Parent = null;
@@ -218,6 +221,8 @@ namespace SLDE
 				}
 				tabsToRemove.Clear();
 			}
+			// If the parent isn't a SplitterPanel, assume we're the only control
+			// on the form
 			var splitPane = Parent as SplitterPanel;
 			if (splitPane == null)
 			{
@@ -227,6 +232,8 @@ namespace SLDE
 					form.Dispose();
 				} else
 				{
+					// If for some reason we're neither, remove the control anyway
+					// unless we're sure we're on the main window
 					if (!MainWindow)
 						Parent = null;
 				}
@@ -234,6 +241,8 @@ namespace SLDE
 				return true;
 			}
 			closing = false;
+			// If we *are* the child of a SplitterPanel, make the other
+			// panel fill the container
 			var container = (SplitContainer)splitPane.Parent;
 			var otherPane = splitPane == container.Panel1 ?
 				container.Panel2 : container.Panel1;
@@ -246,6 +255,10 @@ namespace SLDE
 			return true;
 		}
 
+		/// <summary>
+		/// Ensures we try to close the control when all tabs have been removed
+		/// </summary>
+		/// <param name="e"></param>
 		protected override void OnControlRemoved(ControlEventArgs e)
 		{
 			base.OnControlRemoved(e);
@@ -279,6 +292,7 @@ namespace SLDE
 				if (control.Parent == dragForm)
 					continue;
 				var clientPoint = control.PointToClient(screenPoint);
+				// If there are no tabs, just check the whole control
 				if(control.TabCount < 1)
 				{
 					rect = control.ClientRectangle;
@@ -289,6 +303,7 @@ namespace SLDE
 					}
 					continue;
 				}
+				// Get the whole header rect (need to manually construct)
 				index = control.GetTabUnderPosition(clientPoint);
 				var t0 = control.GetTabRect(0);
 				var headerRect = new Rectangle(t0.Location,
@@ -298,22 +313,27 @@ namespace SLDE
 					control.ClientRectangle.Width,
 					control.ClientRectangle.Height - headerRect.Height);
 				rect = tabRect;
+				// Check if we're over a specific tab
 				if (index >= 0)
 					return TabPosition.Tab;
+				// Otherwise, try the header as a whole
 				if(headerRect.Contains(clientPoint))
 				{
 					index = control.TabCount;
 					return TabPosition.Tab;
 				}
+				// Bottom
 				var newHeight = (tabRect.Height / 2);
 				rect = new Rectangle(new Point(tabRect.X, tabRect.Y + newHeight),
 					new Size(tabRect.Width, newHeight));
 				if (rect.Contains(clientPoint))
 					return TabPosition.Bottom;
+				// Left
 				rect = new Rectangle(tabRect.Location,
 					new Size(tabRect.Width / 2, tabRect.Height));
 				if (rect.Contains(clientPoint))
 					return TabPosition.Left;
+				// Right
 				rect = new Rectangle(new Point(rect.X + rect.Width, rect.Y),
 					rect.Size);
 				if (rect.Contains(clientPoint))
@@ -372,7 +392,12 @@ namespace SLDE
 						dragTab.Parent = control.Split(true, false);
 						break;
 					default:
+						// The 'sizable' frame entails an offset, which we fix here
+						dragForm.SuspendLayout();
 						dragForm.FormBorderStyle = FormBorderStyle.Sizable;
+						dragForm.Location = Add(dragForm.Location, 
+							dragForm.PointToClient(dragForm.Location));
+						dragForm.ResumeLayout();
 						break;
 				}
 				dragTab.Focus();
@@ -416,7 +441,8 @@ namespace SLDE
 				int index;
 				Rectangle rect;
 				IDETabControl control;
-				var newPosition = GetTabHover(e.Location, out control, out index, out rect);
+				var newPosition =
+					GetTabHover(e.Location, out control, out index, out rect);
 				if (newPosition != TabPosition.None)
 				{
 					if(newPosition != lastPosition)
@@ -478,6 +504,10 @@ namespace SLDE
 							justMoved = false;
 					} else if(newIndex != lastDragIndex)
 					{
+						// Set new drag point (to remove offset if we drag out later)
+						var tabOffset = Subtract(dragPoint,
+							GetTabRect(lastDragIndex).Location);
+						dragPoint = Add(GetTabRect(newIndex).Location, tabOffset);
 						// Drag tab along
 						var tab1 = TabPages[lastDragIndex];
 						TabPages[lastDragIndex] = TabPages[newIndex];
@@ -519,19 +549,6 @@ namespace SLDE
 						break;
 					}
 				}
-			}
-		}
-
-		/// <summary>
-		/// Overridden to remove flickering
-		/// </summary>
-		protected override CreateParams CreateParams
-		{
-			get
-			{
-				var cp = base.CreateParams;
-				cp.ExStyle |= 0x2000000;
-				return cp;
 			}
 		}
 

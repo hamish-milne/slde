@@ -98,12 +98,14 @@ namespace SLDE
 		/// <summary>
 		/// Saves the document, performing any necessary GUI actions
 		/// </summary>
+		/// <param name="forceDialog">If <c>true</c>, force a save dialog
+		/// box. Used for a 'Save as' command</param>
 		/// <returns><c>true</c> on success, <c>false</c> on cancel or failure</returns>
-		public virtual bool Save()
+		public virtual bool Save(bool forceDialog = false)
 		{
 			if(!Changed)
 				return true;
-			if(String.IsNullOrEmpty(FileName))
+			if(forceDialog || String.IsNullOrEmpty(FileName))
 			{
 				if (DialogCache.SaveFile.ShowDialog() == DialogResult.OK)
 					FileName = DialogCache.SaveFile.FileName;
@@ -126,20 +128,26 @@ namespace SLDE
 		/// <summary>
 		/// Tries to open the file referenced by FileName, showing an error on failure
 		/// </summary>
-		public virtual void TryOpen()
+		/// <param name="fileName">The file path</param>
+		/// <returns><c>true</c> on success, <c>false</c> on failure</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="fileName"/>
+		/// is <c>null</c></exception>
+		public virtual bool TryOpen(string fileName)
 		{
-			if(FileName != null)
+			if (fileName == null)
+				throw new ArgumentNullException("fileName");
+			try
 			{
-				try
-				{
-					Text = File.ReadAllText(FileName);
-					Changed = false;
-					Language = Language.GetByExtension(Path.GetExtension(FileName));
-				} catch(Exception e)
-				{
-					Utility.ShowError(e.Message);
-				}
+				Text = File.ReadAllText(fileName);
+				FileName = fileName;
+				Changed = false;
+				Language = Language.GetByExtension(Path.GetExtension(fileName));
+				return true;
+			} catch(Exception e)
+			{
+				Utility.ShowError(e.Message);
 			}
+			return false;
 		}
 
 		Language language;

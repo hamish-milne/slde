@@ -10,13 +10,23 @@ using System.IO;
 
 namespace SLDE
 {
+	/// <summary>
+	/// The project view window. Shows a file tree from a given root directory
+	/// </summary>
 	public partial class ProjectView : UserControl, IClosable
 	{
+		/// <summary>
+		/// Creates a new instance
+		/// </summary>
 		public ProjectView()
 		{
 			InitializeComponent();
 		}
 
+		/// <summary>
+		/// No action
+		/// </summary>
+		/// <returns><c>true</c></returns>
 		public virtual bool TryClose()
 		{
 			return true;
@@ -24,6 +34,9 @@ namespace SLDE
 
 		string root;
 
+		/// <summary>
+		/// Gets and sets the root directory, updating the tree as needed
+		/// </summary>
 		public string Root
 		{
 			get
@@ -51,14 +64,26 @@ namespace SLDE
 			}
 		}
 
+		/// <summary>
+		/// Called when a file entry is double-clicked
+		/// </summary>
 		public event OpenFileEventHandler OpenFile;
 
+		/// <summary>
+		/// Called when a file entry is double-clicked
+		/// </summary>
+		/// <param name="path"></param>
 		protected virtual void OnOpenFile(string path)
 		{
 			if (OpenFile != null)
 				OpenFile(this, new OpenFileEventArgs(path));
 		}
 
+		/// <summary>
+		/// Gets the icon index for the given file
+		/// </summary>
+		/// <param name="file">The file name</param>
+		/// <returns>Right now, <c>1</c></returns>
 		protected int GetImageIndex(string file)
 		{
 			return 1;
@@ -88,6 +113,7 @@ namespace SLDE
 							newNode.Nodes.Add(new TreeNode());
 						else
 							newNode.ImageIndex = GetImageIndex(f);
+						newNode.SelectedImageIndex = newNode.ImageIndex;
 						e.Node.Nodes.Add(newNode);
 					}
 				} catch(Exception ex)
@@ -114,21 +140,36 @@ namespace SLDE
 		}
 	}
 
+	/// <summary>
+	/// A TreeNode that also stores a file name
+	/// </summary>
+	[Serializable]
 	public class FileNode : TreeNode
 	{
 		string fileName;
 
+		/// <summary>
+		/// Gets and sets the stored file name
+		/// </summary>
 		public virtual string FileName
 		{
 			get { return fileName; }
 			set { fileName = value; }
 		}
 
+		/// <summary>
+		/// Gets whether the node represents a file
+		/// </summary>
 		public virtual bool IsFile
 		{
 			get { return ImageIndex > 0; }
 		}
 
+		/// <summary>
+		/// Creates a new instance
+		/// </summary>
+		/// <param name="text"></param>
+		/// <param name="fileName"></param>
 		public FileNode(string text, string fileName)
 			: base(text)
 		{
@@ -136,11 +177,27 @@ namespace SLDE
 		}
 	}
 
+	/// <summary>
+	/// The event type for an open file event in <see cref="ProjectView"/>
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="e"></param>
 	public delegate void OpenFileEventHandler(object sender, OpenFileEventArgs e);
 
+	/// <summary>
+	/// The EventArgs for an open file event in <see cref="ProjectView"/>
+	/// </summary>
 	public class OpenFileEventArgs : EventArgs
 	{
+		/// <summary>
+		/// The opened file
+		/// </summary>
 		public string File;
+
+		/// <summary>
+		/// Creates a new instance
+		/// </summary>
+		/// <param name="file">The opened file</param>
 		public OpenFileEventArgs(string file)
 		{
 			File = file;
