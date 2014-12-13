@@ -243,6 +243,7 @@ namespace SLDE
 			closing = false;
 			// If we *are* the child of a SplitterPanel, make the other
 			// panel fill the container
+			Parent = null;
 			var container = (SplitContainer)splitPane.Parent;
 			var otherPane = splitPane == container.Panel1 ?
 				container.Panel2 : container.Panel1;
@@ -572,6 +573,14 @@ namespace SLDE
 		public static Point Subtract(Point a, Point b)
 		{
 			return new Point(a.X - b.X, a.Y - b.Y);
+		}
+
+		private void IDETabControl_ParentChanged(object sender, EventArgs e)
+		{
+			if (Parent == null)
+				allControls.Remove(this);
+			else if (!allControls.Contains(this))
+				allControls.Add(this);
 		}
 		
 	}

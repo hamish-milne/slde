@@ -13,12 +13,13 @@
 		{
 			this.SuspendLayout();
 			// 
-			// CustomTab
+			// IDETabControl
 			// 
 			this.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.HotTrack = true;
+			this.ParentChanged += new System.EventHandler(this.IDETabControl_ParentChanged);
 			this.ResumeLayout(false);
 
 		}

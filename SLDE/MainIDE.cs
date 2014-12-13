@@ -11,22 +11,22 @@ namespace SLDE
 {
 	public partial class MainIDE : IDEForm
 	{
-		TabControl ActivePane
+		IDETabControl ActivePane
 		{
 			get
 			{
-				TabControl ret = IDETab.ActivePane;
+				IDETabControl ret = IDETab.ActivePane as IDETabControl;
 				if (ret == null && IDETabControl.AllControls.Count > 0)
 					ret = IDETabControl.AllControls[0];
 				return ret;
 			}
 		}
 
-		TabControl ActiveEditorPane
+		IDETabControl ActiveEditorPane
 		{
 			get
 			{
-				TabControl ret = IDETab<Editor>.ActivePane;
+				IDETabControl ret = IDETab<Editor>.ActivePane as IDETabControl;
 				if (ret == null && IDETabControl.AllControls.Count > 0)
 					ret = IDETabControl.AllControls[0];
 				return ret;
@@ -119,14 +119,6 @@ namespace SLDE
 				tab.Close(true);
 		}
 
-		private void splitPane_Click(object sender, EventArgs e)
-		{
-			var content = sender.GetSourceControl() as IDETabControl;
-			if (content == null)
-				return;
-			content.Split(true, true);
-		}
-
 		private void saveFile_Click(object sender, EventArgs e)
 		{
 			var tab = IDETab<Editor>.ActiveTab;
@@ -206,6 +198,32 @@ namespace SLDE
 			for (int i = 0; i < tabList.Count; i++)
 				if (tabList[i] != tabs.SelectedTab && !tabList[i].Destroy())
 					break;
+		}
+
+		private void splitPaneHorizontal_Click(object sender, EventArgs e)
+		{
+			var tabs = sender.GetSourceControl() as IDETabControl;
+			if (tabs == null)
+				return;
+			tabs.Split(true, false);
+		}
+
+		private void splitPaneVertical_Click(object sender, EventArgs e)
+		{
+			var tabs = sender.GetSourceControl() as IDETabControl;
+			if (tabs == null)
+				return;
+			tabs.Split(true, true);
+		}
+
+		private void splitVerticalMenuItem_Click(object sender, EventArgs e)
+		{
+			ActivePane.Split(true, true);
+		}
+
+		private void splitHorizontalMenuItem_Click(object sender, EventArgs e)
+		{
+			ActivePane.Split(true, false);
 		}
 
 	}
