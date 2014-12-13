@@ -54,6 +54,7 @@
     <Compile Include="ErrorList.Designer.cs">
       <DependentUpon>ErrorList.cs</DependentUpon>
     </Compile>
+    <Compile Include="HLSLCompletionProvider.cs" />
     <Compile Include="ICompiler.cs" />
     <Compile Include="IDEForm.cs">
       <SubType>Form</SubType>

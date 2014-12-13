@@ -51,6 +51,7 @@ namespace SLDE
 			{
 				base.FileName = value;
 				TabName = Path.GetFileName(value);
+				changed = !changed;
 				Changed = Changed;
 				newFileNumber = 0;
 			}
@@ -64,13 +65,19 @@ namespace SLDE
 			get { return changed; }
 			set
 			{
-				changed = value;
-				var lastChar = String.IsNullOrEmpty(TabName) ?
-					'\0' : TabName[TabName.Length - 1];
-				if (value && lastChar != '*')
-					TabName += "*";
-				else if (!value && lastChar == '*')
-					TabName = TabName.Substring(0, TabName.Length - 1);
+				if(changed != value)
+				{
+					changed = value;
+					var lastChar = String.IsNullOrEmpty(TabName) ?
+						'\0' : TabName[TabName.Length - 1];
+					if (value && lastChar != '*')
+						TabName += "*";
+					else if (!value && lastChar == '*')
+						TabName = TabName.Substring(0, TabName.Length - 1);
+					var tab = Parent as TabPage;
+					if (tab != null)
+						tab.ForeColor = changed ? Color.Red : Color.Black;
+				}
 			}
 		}
 
@@ -103,10 +110,16 @@ namespace SLDE
 		/// <returns><c>true</c> on success, <c>false</c> on cancel or failure</returns>
 		public virtual bool Save(bool forceDialog = false)
 		{
-			if(!Changed)
+			if(!forceDialog && !Changed)
 				return true;
 			if(forceDialog || String.IsNullOrEmpty(FileName))
 			{
+				if (!String.IsNullOrEmpty(FileName))
+				{
+					DialogCache.SaveFile.InitialDirectory =
+						Path.GetDirectoryName(FileName);
+				}
+				DialogCache.SaveFile.FileName = "";
 				if (DialogCache.SaveFile.ShowDialog() == DialogResult.OK)
 					FileName = DialogCache.SaveFile.FileName;
 				else
