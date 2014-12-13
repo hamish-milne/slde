@@ -104,13 +104,13 @@ namespace SLDE.ShaderAnalyzer.HLSL {
 
         private void OnNewOutputLine(object sender, DataReceivedEventArgs e) {
             if (e.Data != null) {
-                outputLines.Add(e.Data);  
+                outputLines.Add(e.Data.Trim());  
             }
         }
 
         private void OnNewErrorLine(object sender, DataReceivedEventArgs e) {
             if (e.Data != null) {
-                errorLines.Add(e.Data);
+                errorLines.Add(e.Data.Trim());
             }
         }
     }
