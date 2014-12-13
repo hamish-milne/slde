@@ -8,13 +8,14 @@ using System.Windows.Forms;
 
 namespace SLDE
 {
-	public interface ITabNameOverride
-	{
-		string TabName { get; }
-	}
-
+	/// <summary>
+	/// Provides common utility functions and extension methods
+	/// </summary>
 	public static class Utility
 	{
+		/// <summary>
+		/// All the anchor styles
+		/// </summary>
 		public const AnchorStyles AllAnchors =
 			AnchorStyles.Bottom |
 			AnchorStyles.Left |
@@ -31,6 +32,11 @@ namespace SLDE
 			allTypes = null;
 		}
 
+		/// <summary>
+		/// Gets the source control under the context menu item
+		/// </summary>
+		/// <param name="sender">The sender of the event</param>
+		/// <returns>The source control, or <c>null</c></returns>
 		public static Control GetSourceControl(this object sender)
 		{
 			Control ret = null;
@@ -44,16 +50,24 @@ namespace SLDE
 			return ret;
 		}
 
+		/// <summary>
+		/// Sets a control to completely fill its parent container
+		/// </summary>
+		/// <param name="content"></param>
 		public static void FillParent(this Control content)
 		{
+			if (content.Parent == null)
+				return;
 			content.Location = new Point();
-			var form = content.Parent as Form;
 			content.Anchor = Utility.AllAnchors;
-			content.Size = form == null ? content.Parent.Size : form.ClientSize;
+			content.Size = content.Parent.ClientSize;
 		}
 
 		static ReadOnlyCollection<Type> allTypes;
 
+		/// <summary>
+		/// A list of all types that aren't in the System* or Windows* assemblies
+		/// </summary>
 		public static ReadOnlyCollection<Type> AllTypes
 		{
 			get
@@ -69,7 +83,13 @@ namespace SLDE
 						if (fn.StartsWith("System", StringComparison.Ordinal) ||
 							fn.StartsWith("Windows", StringComparison.Ordinal))
 							continue;
-						typeArray[i] = asm[i].GetTypes();
+						try
+						{
+							typeArray[i] = asm[i].GetTypes();
+						} catch(TypeLoadException)
+						{
+							ShowError("Unable to load " + asm[i].GetName().Name);
+						}
 						totalCount += typeArray[i].Length;
 					}
 					var types = new Type[totalCount];
@@ -94,6 +114,13 @@ namespace SLDE
 			}
 		}
 
+		/// <summary>
+		/// Creates an instance of each T-derived type that has a TAttribute attribute
+		/// </summary>
+		/// <typeparam name="T">The instance type</typeparam>
+		/// <typeparam name="TAttribute">The attribute type</typeparam>
+		/// <param name="onFail">If a type cannot be created, this delegate is called</param>
+		/// <returns>A list of all the instances</returns>
 		public static List<T> CreateListOf<T, TAttribute>(Action<Type> onFail) where TAttribute : Attribute
 		{
 			var ret = new List<T>();
@@ -116,6 +143,10 @@ namespace SLDE
 			return ret;
 		}
 
+		/// <summary>
+		/// Shows an error message box
+		/// </summary>
+		/// <param name="text">The error text</param>
 		public static void ShowError(string text)
 		{
 			MessageBox.Show(text, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

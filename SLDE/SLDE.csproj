@@ -45,7 +45,20 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomSplitContainer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ErrorList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ErrorList.Designer.cs">
+      <DependentUpon>ErrorList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HLSLCompletionProvider.cs" />
     <Compile Include="ICompiler.cs" />
+    <Compile Include="IDEForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="IDETab.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -70,6 +83,9 @@
     </Compile>
     <Compile Include="MainIDE.Designer.cs">
       <DependentUpon>MainIDE.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OutlineBox.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="ProjectView.cs">
@@ -104,6 +120,9 @@
     </Compile>
     <EmbeddedResource Include="Editor.resx">
       <DependentUpon>Editor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ErrorList.resx">
+      <DependentUpon>ErrorList.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="IDETab.resx">
       <DependentUpon>IDETab.cs</DependentUpon>
@@ -260,6 +279,9 @@
     <None Include="Resources\Close_16xLG.png" />
     <None Include="Resources\SplitScreenHorizontally_12972.png" />
     <None Include="Resources\SplitScreenVertically_12973.png" />
+    <None Include="Resources\filter_16xLG.png" />
+    <None Include="Resources\Close_6519.png" />
+    <None Include="Resources\Start.png" />
     <Content Include="Resources\StatusAnnotations_Critical_16xEXSM_color.png" />
     <Content Include="Resources\StatusAnnotations_Critical_16xSM.png" />
     <Content Include="Resources\StatusAnnotations_Critical_16xSM_color.png" />

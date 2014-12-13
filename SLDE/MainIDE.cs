@@ -9,13 +9,24 @@ using System.Windows.Forms;
 
 namespace SLDE
 {
-	public partial class MainIDE : Form
+	public partial class MainIDE : IDEForm
 	{
-		TabControl ActivePane
+		IDETabControl ActivePane
 		{
 			get
 			{
-				TabControl ret = IDETab.ActivePane;
+				IDETabControl ret = IDETab.ActivePane as IDETabControl;
+				if (ret == null && IDETabControl.AllControls.Count > 0)
+					ret = IDETabControl.AllControls[0];
+				return ret;
+			}
+		}
+
+		IDETabControl ActiveEditorPane
+		{
+			get
+			{
+				IDETabControl ret = IDETab<Editor>.ActivePane as IDETabControl;
 				if (ret == null && IDETabControl.AllControls.Count > 0)
 					ret = IDETabControl.AllControls[0];
 				return ret;
@@ -48,17 +59,11 @@ namespace SLDE
 				tab.Control.Language = e.Language;
 		}
 
-		private IDETab<Editor> CreateEditorTab(string fileName, TabControl parent)
-		{
-			var ret = CreateEditorTab(parent);
-			ret.Control.FileName = fileName;
-			ret.Control.TryOpen();
-			return ret;
-		}
-
 		public MainIDE()
 		{
 			InitializeComponent();
+			DialogCache.SaveFile = saveFileDialog;
+			DialogCache.OpenFile = openFileDialog;
 			Language.FindAllLanguages();
 			languageMenu.OnSelectLanguage += languageMenu_OnSelectLanguage;
 			viewMenu.UpdateWindows();
@@ -71,44 +76,20 @@ namespace SLDE
 				openedFiles |= TryOpenFile(arg);
 			if (!openedFiles)
 			{
-				CreateEditorTab(rootTabControl);
+				CreateEditorTab(ActiveEditorPane);
 			}
 
 		}
 
 		bool TryOpenFile(string file)
 		{
-			try
-			{
-				OpenFile(file);
-				return true;
-			} catch(Exception e)
-			{
-				Utility.ShowError(e.Message);
-				return false;
-			}
-		}
-
-		void OpenFile(string file)
-		{
-			CreateEditorTab(file, ActivePane);
-			var tab = new IDETab<ProjectView>();
-			rootTabControl.TabPages.Add(tab);
-			tab.Control.OpenFile += Control_OpenFile;
-			tab.Control.Root = System.IO.Path.GetDirectoryName(file);
+			var tab = CreateEditorTab(ActiveEditorPane);
+			return tab.Control.TryOpen(file);
 		}
 
 		void Control_OpenFile(object sender, OpenFileEventArgs e)
 		{
 			TryOpenFile(e.File);
-		}
-
-		protected virtual SplitContainer CreateSplitContainer()
-		{
-			var ret = new SplitContainer();
-			ret.Anchor = Utility.AllAnchors;
-			ret.DoubleClick += splitContainer_DoubleClick;
-			return ret;
 		}
 
 		protected virtual TabControl CreateTabControl()
@@ -123,50 +104,19 @@ namespace SLDE
 
 		private void close_Click(object sender, EventArgs e)
 		{
-			/*var tab = sender.GetSourceControl() as TabControl;
-			if (tab != null)
-				CloseTab(tab.TabPages[tab.SelectedIndex]);*/
+			var tab = sender.GetSourceControl() as TabControl;
+			if (tab == null)
+				return;
+			var tabPage = tab.SelectedTab as IDETab;
+			if (tabPage != null)
+				tabPage.Destroy();
 		}
 
 		private void closePane_Click(object sender, EventArgs e)
 		{
-			//ClosePane(sender.GetSourceControl());
-		}
-
-		private void splitContainer_DoubleClick(object sender, EventArgs e)
-		{
-			var split = sender as SplitContainer;
-			if(split != null)
-				split.Orientation = split.Orientation == Orientation.Horizontal
-					? Orientation.Vertical : Orientation.Horizontal;
-		}
-
-		private void splitPane_Click(object sender, EventArgs e)
-		{
-			var content = sender.GetSourceControl();
-			if (content == null)
-				return;
-			var parent = content.Parent;
-			if (parent == null)
-				return;
-			var newContainer = CreateSplitContainer();
-			if(parent is SplitterPanel)
-			{
-				var oldOrientation = ((SplitContainer)parent.Parent).Orientation;
-				newContainer.Orientation = oldOrientation == Orientation.Horizontal
-					? Orientation.Vertical : Orientation.Horizontal;
-			}
-			newContainer.Parent = content.Parent;
-			newContainer.FillParent();
-			content.Parent = newContainer.Panel1;
-			content.FillParent();
-			var newTabs = CreateTabControl();
-			newTabs.Parent = newContainer.Panel2;
-			newTabs.FillParent();
-			if (newTabs.SelectedTab is IDETab<Editor>)
-				((IDETab<Editor>)newTabs.SelectedTab).Control.Focus();
-			else
-				newTabs.SelectedTab.Focus();
+			var tab = sender.GetSourceControl() as IDETabControl;
+			if (tab != null)
+				tab.Close(true);
 		}
 
 		private void saveFile_Click(object sender, EventArgs e)
@@ -174,23 +124,20 @@ namespace SLDE
 			var tab = IDETab<Editor>.ActiveTab;
 			if (tab != null)
 			{
-				saveFileDialog.Filter = Language.GetFilter();
-				tab.Control.Save(saveFileDialog);
+				DialogCache.SaveFile.Filter = Language.GetFilter();
+				tab.Control.Save();
 			}
 		}
 
 		private void openFile_Click(object sender, EventArgs e)
 		{
 			openFileDialog.Filter = Language.GetFilter();
-			openFileDialog.ShowDialog();
-		}
-
-		private void openFileDialog_FileOk(object sender, CancelEventArgs e)
-		{
-			var dialog = (OpenFileDialog)sender;
-			var names = dialog.FileNames;
-			for (int i = 0; i < names.Length; i++)
-				TryOpenFile(names[i]);
+			if(openFileDialog.ShowDialog() == DialogResult.OK)
+			{
+				var names = openFileDialog.FileNames;
+				for (int i = 0; i < names.Length; i++)
+					TryOpenFile(names[i]);
+			}
 		}
 
 		private void undo_Click(object sender, EventArgs e)
@@ -214,7 +161,69 @@ namespace SLDE
 
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Dispose();
+			Close();
+		}
+
+		private void saveAllButton_Click(object sender, EventArgs e)
+		{
+			for(int i = 0; i < IDETab<Editor>.AllTabs.Count; i++)
+			{
+				var tab = IDETab<Editor>.AllTabs[i];
+				if (tab != null)
+					tab.Control.Save();
+			}
+		}
+
+		private void saveAsMenuItem_Click(object sender, EventArgs e)
+		{
+			var tab = IDETab<Editor>.ActiveTab;
+			if (tab != null)
+			{
+				DialogCache.SaveFile.Filter = Language.GetFilter();
+				tab.Control.Save(true);
+			}
+		}
+
+		List<IDETab> tabList = new List<IDETab>();
+
+		private void closeAllButThis_Click(object sender, EventArgs e)
+		{
+			var tabs = sender.GetSourceControl() as TabControl;
+			if(tabs == null)
+				return;
+			tabList.Clear();
+			for (int i = 0; i < tabs.TabCount; i++)
+				if(tabs.TabPages[i] is IDETab)
+					tabList.Add((IDETab)tabs.TabPages[i]);
+			for (int i = 0; i < tabList.Count; i++)
+				if (tabList[i] != tabs.SelectedTab && !tabList[i].Destroy())
+					break;
+		}
+
+		private void splitPaneHorizontal_Click(object sender, EventArgs e)
+		{
+			var tabs = sender.GetSourceControl() as IDETabControl;
+			if (tabs == null)
+				return;
+			tabs.Split(true, false);
+		}
+
+		private void splitPaneVertical_Click(object sender, EventArgs e)
+		{
+			var tabs = sender.GetSourceControl() as IDETabControl;
+			if (tabs == null)
+				return;
+			tabs.Split(true, true);
+		}
+
+		private void splitVerticalMenuItem_Click(object sender, EventArgs e)
+		{
+			ActivePane.Split(true, true);
+		}
+
+		private void splitHorizontalMenuItem_Click(object sender, EventArgs e)
+		{
+			ActivePane.Split(true, false);
 		}
 
 	}

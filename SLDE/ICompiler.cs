@@ -39,6 +39,18 @@ namespace SLDE
 		IList<ErrorMarker> Errors { get; }
 	}
 
+	public struct PropertyName
+	{
+		public string Name;
+		public Type Type;
+
+		public PropertyName(string name, Type type)
+		{
+			Name = name;
+			Type = type;
+		}
+	}
+
 	public interface ICompiler
 	{
 		IDictionary<string, Stream> ProjectFiles { get; }

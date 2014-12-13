@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Specialized;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,34 +13,80 @@ using DigitalRune.Windows.TextEditor.Completion;
 
 namespace SLDE
 {
+	/// <summary>
+	/// A code language reference that includes syntax highlighting, code
+	/// completion, folding, error highlighting and compiling
+	/// </summary>
 	[ToolStripItemDesignerAvailability(ToolStripItemDesignerAvailability.MenuStrip)]
 	public class Language : ToolStripMenuItem
 	{
-		public static ObservableCollection<Language> AllLanguages
-			= new ObservableCollection<Language>();
+		static List<Language> allLanguages
+			= new List<Language>();
+		static ReadOnlyCollection<Language> _allLanguages;
 
-		public static void FindAllLanguages()
+		static Language()
 		{
-			AllLanguages.Clear();
-			var types = Utility.AllTypes;
-			for(int i = 0; i < types.Count; i++)
-			{
-				var t = types[i];
-				if(t.IsSubclassOf(typeof(Language)) &&
-					t.GetCustomAttributes(typeof(LanguageAttribute), false).Length > 0)
-				{
-					try
-					{
-						AllLanguages.Add((Language)Activator.CreateInstance(t));
-					}
-					catch
-					{
-						Utility.ShowError("Unable to create instance of " + t.FullName + ". Forgot a constructor?");
-					}
-				}
-			}
+			_allLanguages = allLanguages.AsReadOnly();
 		}
 
+		/// <summary>
+		/// The list of available languages
+		/// </summary>
+		public static ReadOnlyCollection<Language> AllLanguages
+		{
+			get { return _allLanguages; }
+		}
+
+		/// <summary>
+		/// Called when the list of languages is changed in any way
+		/// </summary>
+		public static event EventHandler LanguagesChanged;
+
+		/// <summary>
+		/// Clears the language list and adds in new instances of all valid classes
+		/// </summary>
+		/// <remarks>
+		/// A valid class derives from <see cref="Language"/> and has the
+		/// <see cref="LanguageAttribute"/> applied. An error is shown if
+		/// an instance of any type cannot be created.
+		/// </remarks>
+		public static void FindAllLanguages()
+		{
+			allLanguages.Clear();
+			allLanguages.Add(NoLanguage.Instance);
+			allLanguages.AddRange(
+				Utility.CreateListOf<Language, LanguageAttribute>(LanguageError)
+				);
+			if (LanguagesChanged != null)
+				LanguagesChanged(null, null);
+		}
+
+		static void LanguageError(Type t)
+		{
+			Utility.ShowError("Unable to create instance of " + t.FullName +
+				". Forgot a constructor?");
+		}
+
+		/// <summary>
+		/// Adds a language to the list
+		/// </summary>
+		/// <param name="language">The language to add</param>
+		/// <exception cref="ArgumentNullException"><paramref name="language"/>
+		/// is <c>null</c></exception>
+		public static void AddLanguage(Language language)
+		{
+			if (language == null)
+				throw new ArgumentNullException("language");
+			allLanguages.Add(language);
+			if (LanguagesChanged != null)
+				LanguagesChanged(null, null);
+		}
+
+		/// <summary>
+		/// Gets the appropriate language for the given extension
+		/// </summary>
+		/// <param name="extension">The file extension, including the dot</param>
+		/// <returns>An appropriate language, or <see cref="NoLanguage"/></returns>
 		public static Language GetByExtension(string extension)
 		{
 			for(int i = 0; i < AllLanguages.Count; i++)
@@ -55,14 +100,26 @@ namespace SLDE
 			return NoLanguage.Instance;
 		}
 
-		public static void SelectLanguage(Language l)
+		/// <summary>
+		/// Selects the given language, using it for the current editor tab
+		/// </summary>
+		/// <param name="language">The language to select</param>
+		/// <exception cref="ArgumentNullException"><paramref name="language"/>
+		/// is <c>null</c></exception>
+		public static void SelectLanguage(Language language)
 		{
+			if (language == null)
+				throw new ArgumentNullException("language");
 			for (int i = 0; i < AllLanguages.Count; i++)
 				if (AllLanguages[i] != null)
 					AllLanguages[i].Checked = false;
-			l.Checked = true;
+			language.Checked = true;
 		}
 
+		/// <summary>
+		/// Gets an extension filter suitable for Windows Forms file dialog boxes
+		/// </summary>
+		/// <returns>The full filter as a string</returns>
 		public static string GetFilter()
 		{
 			string filter = "";
@@ -78,12 +135,42 @@ namespace SLDE
 			return filter;
 		}
 		
+		/// <summary>
+		/// A list of file extensions that this language is valid for. Includes the dot
+		/// </summary>
 		public virtual IList<string> Extensions { get; protected set; }
+
+		/// <summary>
+		/// The highlighting strategy
+		/// </summary>
 		public virtual IHighlightingStrategy HighlightingStrategy { get; set; }
+
+		/// <summary>
+		/// The formatting strategy
+		/// </summary>
 		public virtual IFormattingStrategy FormattingStrategy { get; set; }
+
+		/// <summary>
+		/// The folding strategy
+		/// </summary>
 		public virtual IFoldingStrategy FoldingStrategy { get; set; }
+
+		/// <summary>
+		/// The completion data
+		/// </summary>
 		public virtual ICompletionDataProvider CompletionData { get; set; }
+
+		/// <summary>
+		/// The compiler
+		/// </summary>
 		public virtual ICompiler Compiler { get; set; }
+
+		/// <summary>
+		/// An extension filter for this language alone
+		/// </summary>
+		/// <remarks>
+		/// Defaults to <c>[Name]|*[Extension],*[Extension 2]...</c>
+		/// </remarks>
 		public virtual string Filter
 		{
 			get
@@ -100,11 +187,18 @@ namespace SLDE
 			}
 		}
 
+		/// <summary>
+		/// Creates a new language with the given name
+		/// </summary>
+		/// <param name="name"></param>
 		public Language(string name)
 		{
 			Name = name;
 		}
 
+		/// <summary>
+		/// Returns <see cref="Name"/>
+		/// </summary>
 		public override string Text
 		{
 			get { return Name; }
@@ -112,39 +206,80 @@ namespace SLDE
 		}
 	}
 
+	/// <summary>
+	/// Applied to a <see cref="Language"/> class to indicate it should
+	/// be added dynamically
+	/// </summary>
 	[AttributeUsage(AttributeTargets.Class)]
 	public class LanguageAttribute : Attribute
 	{
 	}
 
+	/// <summary>
+	/// The EventArgs for a language selection event
+	/// </summary>
 	public class LanguageSelectEventArgs : EventArgs
 	{
-		public Language Language;
+		Language language;
+
+		/// <summary>
+		/// The language that was just selected
+		/// </summary>
+		public Language Language
+		{
+			get { return language; }
+		}
+
+		/// <summary>
+		/// Creates a new instance
+		/// </summary>
+		/// <param name="language"></param>
 		public LanguageSelectEventArgs(Language language)
 		{
-			Language = language;
+			this.language = language;
 		}
 	}
 
+	/// <summary>
+	/// The event type for a language selection event
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="e"></param>
 	public delegate void LanguageSelectEventHandler(object sender, LanguageSelectEventArgs e);
 
+	/// <summary>
+	/// Used to select the language for the current editor tab
+	/// </summary>
 	[ToolStripItemDesignerAvailability(ToolStripItemDesignerAvailability.MenuStrip)]
 	public class LanguageMenu : ToolStripMenuItem
 	{
+		/// <summary>
+		/// Creates a new instance
+		/// </summary>
 		public LanguageMenu()
 			: base()
 		{
-			Language.AllLanguages.CollectionChanged += AllLanguages_CollectionChanged;
+			Language.LanguagesChanged += LanguagesChanged;
 		}
 
+		/// <summary>
+		/// Removes outstanding event handlers
+		/// </summary>
+		/// <param name="disposing"></param>
 		protected override void Dispose(bool disposing)
 		{
-			Language.AllLanguages.CollectionChanged -= AllLanguages_CollectionChanged;
+			Language.LanguagesChanged -= LanguagesChanged;
 			base.Dispose(disposing);
 		}
 
+		/// <summary>
+		/// Called when a language is selected
+		/// </summary>
 		public event LanguageSelectEventHandler OnSelectLanguage;
 
+		/// <summary>
+		/// Updates the menu's internal list from the list of all languages
+		/// </summary>
 		public void RefreshLanguages()
 		{
 			for (int i = DropDownItems.Count - 1; i >= 0; i--)
@@ -169,10 +304,16 @@ namespace SLDE
 			}
 		}
 
+		/// <summary>
+		/// Selects the given language in the menu
+		/// </summary>
+		/// <param name="language">The language to select</param>
+		/// <param name="visualOnly">If <c>true</c>, the change is only
+		/// a visual one, and no extra actions are performed</param>
 		public void SelectLanguage(Language language, bool visualOnly = false)
 		{
 			if (language == null)
-				throw new ArgumentNullException("language");
+				language = NoLanguage.Instance;
 			for (int i = 0; i < DropDownItems.Count; i++)
 			{
 				var l = DropDownItems[i] as Language;
@@ -184,7 +325,7 @@ namespace SLDE
 				OnSelectLanguage(this, new LanguageSelectEventArgs(language));
 		}
 
-		void AllLanguages_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		void LanguagesChanged(object sender, EventArgs e)
 		{
 			RefreshLanguages();
 		}
@@ -195,18 +336,9 @@ namespace SLDE
 		}
 	}
 
-	public struct PropertyName
-	{
-		public string Name;
-		public Type Type;
-
-		public PropertyName(string name, Type type)
-		{
-			Name = name;
-			Type = type;
-		}
-	}
-
+	/// <summary>
+	/// No language; no special strategies
+	/// </summary>
 	[Language]
 	public class NoLanguage : Language
 	{
@@ -223,24 +355,45 @@ namespace SLDE
 		}
 	}
 
+	/// <summary>
+	/// High-level shader language
+	/// </summary>
 	[Language]
 	public class HLSL : Language
 	{
+		static string[] HLSLExtensions = new string[] { ".fx", ".fxh", ".hlsl", ".compute", ".cginc" };
+
 		public HLSL() : base("HLSL")
 		{
-			Extensions = new string[] { ".fx", ".fxh", ".hlsl", ".compute", ".cginc" };
+			Extensions = HLSLExtensions;
 			HighlightingStrategy = HighlightingStrategyFactory.CreateHighlightingStrategy(Name);
 			FoldingStrategy = new HlslFoldingStrategy();
 			FormattingStrategy = new HlslFormattingStrategy();
 		}
 	}
 
+	/// <summary>
+	/// OpenGL shader language
+	/// </summary>
 	[Language]
 	public class GLSL : Language
 	{
 		public GLSL() : base("GLSL")
 		{
 			Extensions = new string[] { ".glsl", ".vert", ".frag", ".tesc", ".tese", ".geom", ".comp", ".glslv", ".glslf" };
+		}
+	}
+
+	/// <summary>
+	/// Unity shader language
+	/// </summary>
+	[Language]
+	public class ShaderLab : HLSL
+	{
+		public ShaderLab() : base()
+		{
+			Name = "ShaderLab";
+			Extensions = new string[] { ".shader" };
 		}
 	}
 	

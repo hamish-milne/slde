@@ -5,11 +5,18 @@ using System.Text;
 
 namespace SLDE
 {
+	/// <summary>
+	/// Applied to a <see cref="Locale"/> class to indicate it should
+	/// be added dynamically
+	/// </summary>
 	[AttributeUsage(AttributeTargets.Class)]
 	public class LocaleAttribute : Attribute
 	{
 	}
 
+	/// <summary>
+	/// Stores all the UI strings for a particular locale (language)
+	/// </summary>
 	public abstract class Locale
 	{
 		public virtual string Name { get; protected set; }
@@ -17,6 +24,9 @@ namespace SLDE
 		public virtual string NewFile { get; protected set; }
 	}
 
+	/// <summary>
+	/// English locale
+	/// </summary>
 	[Locale]
 	public abstract class EnglishLocale : Locale
 	{
