@@ -303,7 +303,7 @@
     <None Include="Resources\Undo_16x.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="d3dNative.dll">
+    <Content Include="d3dInterop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="fxc\d3dcompiler_47.dll">

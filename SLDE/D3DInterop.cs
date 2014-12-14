@@ -8,6 +8,19 @@ using System.Diagnostics;
 namespace SLDE.D3DInterop
 {
 
+	public interface IDllSelector
+	{
+		bool CopyDll(string baseName);
+	}
+
+	public class BasicDllSelector : IDllSelector
+	{
+		public bool CopyDll(string baseName)
+		{
+			return false;
+		}
+	}
+
 	public enum D3DErrorCode : uint
 	{
 		S_OK = 0,
@@ -76,8 +89,7 @@ namespace SLDE.D3DInterop
 
 	public static class D3DInterop
 	{
-		public const string DllPath = "D3DCompiler_47";
-		public const string InteropDllPath = "d3dNative.dll";
+		public const string InteropDllPath = "d3dInterop";
 
 		[StructLayout(LayoutKind.Sequential)]
 		struct D3D_SHADER_MACRO
@@ -98,8 +110,8 @@ namespace SLDE.D3DInterop
 		[DllImport(InteropDllPath)]
 		static extern UIntPtr GetBufferSize(IntPtr blob);
 
-		[DllImport(DllPath)]
-		static extern D3DErrorCode D3DCompile(
+		[DllImport(InteropDllPath)]
+		static extern D3DErrorCode Compile(
 			[MarshalAs(UnmanagedType.LPStr)] string pSrcData,
 			UIntPtr SrcDataSize,
 			[MarshalAs(UnmanagedType.LPStr)] string pSourceName,
@@ -112,8 +124,8 @@ namespace SLDE.D3DInterop
 			out IntPtr ppCode,
 			out IntPtr ppErrorMsgs);
 
-		[DllImport(DllPath)]
-		static extern D3DErrorCode D3DDisassemble(
+		[DllImport(InteropDllPath)]
+		static extern D3DErrorCode Disassemble(
 			IntPtr pSrcData,
 			UIntPtr SrcDataSize,
 			D3DDisasmFlags Flags,
@@ -128,14 +140,14 @@ namespace SLDE.D3DInterop
 		public static unsafe void TryCompile(string source)
 		{
 			IntPtr code, errors;
-			var result = D3DCompile(source, new UIntPtr((uint)source.Length), "myFile.hlsl",
+			var result = Compile(source, new UIntPtr((uint)source.Length), "myFile.hlsl",
 				new D3D_SHADER_MACRO[1]{ new D3D_SHADER_MACRO(null, null) },
 				new IntPtr(0), "VertexShaderFunction", "vs_1_1", D3DCompileFlags.DEBUG, 0, out code, out errors);
 			//Console.WriteLine(GetBufferSize(errors));
 			//Console.WriteLine(Marshal.PtrToStringAnsi(GetBufferPointer(errors), (int)GetBufferSize(errors)));
 
 			IntPtr dasm;
-			var dresult = D3DDisassemble(GetBufferPointer(code), GetBufferSize(code),
+			var dresult = Disassemble(GetBufferPointer(code), GetBufferSize(code),
 				D3DDisasmFlags.ENABLE_INSTRUCTION_NUMBERING, null, out dasm);
 			System.IO.File.WriteAllText("test.asm", Marshal.PtrToStringAnsi(GetBufferPointer(dasm)));
 			return;

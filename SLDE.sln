@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestShaderAnalyzer", "TestS
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5A2524C2-834B-494B-BC16-3353776751A6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "d3dNative", "d3dNative\d3dNative.vcxproj", "{9BE8F03D-F5AA-4AD4-BC21-2014BC101D93}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "d3dInterop", "d3dInterop\d3dInterop.vcxproj", "{9BE8F03D-F5AA-4AD4-BC21-2014BC101D93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
