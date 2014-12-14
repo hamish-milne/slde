@@ -1,4 +1,4 @@
-#include "./testinclude.hlsl"
+﻿#include "./testinclude.hlsl"
 
 float3 _SomeParameter;
 int2 _AnotherOne;

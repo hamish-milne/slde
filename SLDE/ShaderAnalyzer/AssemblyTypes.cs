@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SLDE.ShaderAnalyzer.HLSL;
 
 namespace SLDE.ShaderAnalyzer {
 
@@ -6,7 +7,8 @@ namespace SLDE.ShaderAnalyzer {
         Arithmetic,
         Sample,
         FlowControl,
-        Other
+        Other,
+        Ignore
     }
 
     public enum IdentifierType {
@@ -15,6 +17,7 @@ namespace SLDE.ShaderAnalyzer {
         Input,
         Output,
         Resource,
+        Label,
         Constant,
         Value,
         Other
@@ -34,12 +37,12 @@ namespace SLDE.ShaderAnalyzer {
         public string DisplayString { get; private set; }
         public IEnumerable<Identifier> Identifiers { get; private set; }
         public string SourceFilepath { get; private set; }
-        public uint SourceLine { get; private set; }
-        public uint IndentLevel { get; private set; }
-        public uint CostRank { get; private set; }
+        public int SourceLine { get; private set; }
+        public int IndentLevel { get; private set; }
+        public int CostRank { get; private set; }
 
         public Instruction(InstructionType type, string displayString, List<Identifier> identifiers = null,
-            string sourceFilepath = null, uint sourceLine = 0, uint indentLevel = 0, uint costRank = 0) {
+            string sourceFilepath = null, int sourceLine = 0, int indentLevel = 0, int costRank = 0) {
             Type = type;
             DisplayString = displayString;
             Identifiers = identifiers ?? new List<Identifier>();
@@ -57,15 +60,13 @@ namespace SLDE.ShaderAnalyzer {
     /// </summary>
     public class Identifier {
         public IdentifierType Type { get; private set; }
-        public uint StartPos { get; private set; }
-        public uint EndPos { get; private set; }
-        public string Description { get; private set; }
+        public int Offset { get; private set; }
+        public int Length { get; private set; }
 
-        public Identifier(IdentifierType type, uint startPos, uint endPos, string description = null) {
+        public Identifier(IdentifierType type, int offset, int length) {
             Type = type;
-            StartPos = startPos;
-            EndPos = endPos;
-            Description = description;
+            Offset = offset;
+            Length = length;
         }
     }
 
@@ -74,12 +75,10 @@ namespace SLDE.ShaderAnalyzer {
     /// </summary>
     public class Notification {
         public NotificationType Type { get; private set; }
-        public uint ID { get; private set; }
         public string Message { get; private set; }
 
-        public Notification(NotificationType type, uint id, string message) {
+        public Notification(NotificationType type, string message) {
             Type = type;
-            ID = id;
             Message = message;
         }
     }
@@ -88,15 +87,15 @@ namespace SLDE.ShaderAnalyzer {
     /// A notification referencing a section of the source code
     /// </summary>
     public class CodeNotification : Notification {
-        public uint SourceLine { get; private set; }
-        public uint StartPos { get; private set; }
-        public uint EndPos { get; private set; }
+        public int SourceLine { get; private set; }
+        public int Offset { get; private set; }
+        public int Length { get; private set; }
 
-        public CodeNotification(NotificationType type, uint id, string message, uint sourceLine,
-            uint startPos = 0, uint endPos = 0) : base(type, id, message) {
+        public CodeNotification(NotificationType type, string message, int sourceLine,
+            int offset = 0, int length = 0) : base(type, message) {
             SourceLine = sourceLine;
-            StartPos = startPos;
-            EndPos = endPos;
+            Offset = offset;
+            Length = length;
         }
     }
 
@@ -106,16 +105,15 @@ namespace SLDE.ShaderAnalyzer {
     /// about expensive branching, looping, dynamic array indexing, etc...
     /// </summary>
     public class AssemblyNotification : Notification {
-        public uint InstructionIndex { get; private set; }
-        public uint StartPos { get; private set; }
-        public uint EndPos { get; private set; }
+        public int InstructionIndex { get; private set; }
+        public int Offset { get; private set; }
+        public int Length { get; private set; }
 
-        public AssemblyNotification(NotificationType type, uint id, string message, uint instructionIndex,
-            uint startPos = 0, uint endPos = 0)
-            : base(type, id, message) {
+        public AssemblyNotification(NotificationType type, string message, int instructionIndex,
+            int offset = 0, int length = 0) : base(type, message) {
             InstructionIndex = instructionIndex;
-            StartPos = startPos;
-            EndPos = endPos;
+            Offset = offset;
+            Length = length;
         }
     }
 }
