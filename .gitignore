@@ -30,3 +30,9 @@
 # Build directories
 */bin/*
 */obj/*
+*/Debug/*
+*/Release/*
+
+*.tlog
+*.tlog*
+*.ipch

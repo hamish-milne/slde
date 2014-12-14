@@ -148,6 +148,7 @@
     <Compile Include="ShaderAnalyzer\HLSL\Analyzer.cs" />
     <Compile Include="ShaderAnalyzer\HLSL\Assembly.cs" />
     <Compile Include="ShaderAnalyzer\HLSL\CompileOptions.cs" />
+    <Compile Include="ShaderAnalyzer\HLSL\OpCodes.cs" />
     <Compile Include="ShaderAnalyzer\HLSL\Profile.cs" />
     <Compile Include="ShaderAnalyzer\IAssembly.cs" />
     <Compile Include="Editor.cs">
