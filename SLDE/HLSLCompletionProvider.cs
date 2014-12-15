@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using DigitalRune.Windows.TextEditor;
@@ -29,7 +30,7 @@ namespace SLDE.HLSL.Completion
 		protected string text;
 		protected string description;
 		protected int imageIndex;
-		protected int priority = 0;
+		protected double priority = 0;
 		protected int version;
 
 		public virtual bool IsCompatible
@@ -47,14 +48,29 @@ namespace SLDE.HLSL.Completion
 			get { return description; }
 		}
 
-		public virtual int Priority
+		public virtual double Priority
 		{
 			get { return priority; }
+		}
+
+		public virtual int ImageIndex
+		{
+			get { return imageIndex; }
 		}
 
 		public int Version
 		{
 			get { return version; }
+		}
+
+		public virtual IList<HLSLCompletionData> ValidData
+		{
+			get { return null; }
+		}
+
+		public virtual bool InsertAction(TextArea textArea, char insertChar)
+		{
+			return true;
 		}
 
 		public HLSLCompletionData(string text, string description, int imageIndex, int version = 0)
@@ -74,13 +90,48 @@ namespace SLDE.HLSL.Completion
 		{
 			newData = null;
 		}
+
+		protected static IList<HLSLCompletionData> GetValidDataRecursive(IScope scope, ref bool recursionLock, ref List<HLSLCompletionData> validData)
+		{
+			if (recursionLock)
+				return null;
+			recursionLock = true;
+			if (validData == null)
+				validData = new List<HLSLCompletionData>();
+			validData.Clear();
+			validData.AddRange(scope.Members);
+			var parentData = scope.Parent == null ? null : scope.Parent.ValidData;
+			if (parentData != null)
+				validData.AddRange(parentData);
+			recursionLock = false;
+			return validData;
+		}
+	}
+
+	public class HLSLKeyword : HLSLCompletionData
+	{
+		protected IList<HLSLCompletionData> validData;
+
+		public override IList<HLSLCompletionData> ValidData
+		{
+			get
+			{
+				if (validData == null)
+					validData = new List<HLSLCompletionData>();
+				return validData;
+			}
+		}
+
+		public HLSLKeyword(string name, string description, int imageIndex, int version = 0)
+			: base(name, description, imageIndex, version)
+		{
+		}
 	}
 
 	public class HLSLMember : HLSLCompletionData
 	{
 		protected HLSLType type;
 		protected HLSLType parent;
-		protected string path;
 
 		public virtual string Name
 		{
@@ -89,7 +140,6 @@ namespace SLDE.HLSL.Completion
 			{
 				text = value;
 				description = null;
-				path = null;
 			}
 		}
 
@@ -100,7 +150,6 @@ namespace SLDE.HLSL.Completion
 			{
 				parent = value;
 				description = null;
-				path = null;
 			}
 		}
 
@@ -111,7 +160,6 @@ namespace SLDE.HLSL.Completion
 			{
 				type = value;
 				description = null;
-				path = null;
 			}
 		}
 
@@ -135,12 +183,14 @@ namespace SLDE.HLSL.Completion
 	{
 		protected IList<HLSLCompletionData> members;
 		protected IScope parent;
+		bool recursionLock;
+		List<HLSLCompletionData> validData;
 
 		// TODO: Typedefs and templates
 
 		public virtual string TypeType
 		{
-			get { return ""; }
+			get { return null; }
 		}
 
 		public virtual string Name
@@ -163,10 +213,10 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		IScope IScope.Parent
+		/*IScope IScope.Parent
 		{
 			get { return Parent; }
-		}
+		}*/
 
 		public virtual IList<HLSLCompletionData> Members
 		{
@@ -178,19 +228,64 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
+		public override IList<HLSLCompletionData> ValidData
+		{
+			get
+			{
+				return GetValidDataRecursive(this, ref recursionLock, ref validData);
+			}
+		}
+
 		public override string Description
 		{
 			get
 			{
 				if (description == null)
-					description = TypeType + Name;
+					description = (TypeType == null ? "" : TypeType + " ") + Name;
 				return description;
 			}
 		}
 
-		public HLSLType(string name, HLSLType parent, int imageIndex, int version = 0)
+		public HLSLType(string name, IScope parent, int imageIndex, int version = 0)
 			: base(name, null, imageIndex, version)
 		{
+			this.parent = parent;
+		}
+	}
+
+	public class HLSLPrimitive : HLSLType
+	{
+
+		public override string Description
+		{
+			get
+			{
+				return description;
+			}
+		}
+
+		public override string Name
+		{
+			get { return text; }
+			set
+			{
+				text = value;
+			}
+		}
+
+		public override IScope Parent
+		{
+			get { return parent; }
+			set
+			{
+				parent = value;
+			}
+		}
+
+		public HLSLPrimitive(string name, string description, IScope parent, int version = 0)
+			: base(name, parent, 1, version)
+		{
+			this.description = description;
 		}
 	}
 
@@ -198,7 +293,7 @@ namespace SLDE.HLSL.Completion
 	{
 		public override string TypeType
 		{
-			get { return "struct "; }
+			get { return "struct"; }
 		}
 
 		public HLSLStruct(string name, HLSLType parent, int imageIndex, int version = 0)
@@ -211,7 +306,7 @@ namespace SLDE.HLSL.Completion
 	{
 		public override string TypeType
 		{
-			get { return "class "; }
+			get { return "class"; }
 		}
 
 		public HLSLClass(string name, HLSLType parent, int imageIndex, int version = 0)
@@ -224,7 +319,7 @@ namespace SLDE.HLSL.Completion
 	{
 		public override string TypeType
 		{
-			get { return "interface "; }
+			get { return "interface"; }
 		}
 
 		public HLSLInterface(string name, HLSLType parent, int imageIndex, int version = 0)
@@ -309,6 +404,7 @@ namespace SLDE.HLSL.Completion
 	public interface IScope
 	{
 		IList<HLSLCompletionData> Members { get; }
+		IList<HLSLCompletionData> ValidData { get; }
 		IScope Parent { get; }
 	}
 
@@ -316,6 +412,8 @@ namespace SLDE.HLSL.Completion
 	{
 		protected IList<HLSLCompletionData> members;
 		protected IScope parent;
+		protected List<HLSLCompletionData> validData;
+		bool recursionLock;
 
 		public IScope Parent
 		{
@@ -330,6 +428,15 @@ namespace SLDE.HLSL.Completion
 				if (members == null)
 					members = new List<HLSLCompletionData>();
 				return members;
+			}
+		}
+
+
+		public override IList<HLSLCompletionData> ValidData
+		{
+			get
+			{
+				return GetValidDataRecursive(this, ref recursionLock, ref validData);
 			}
 		}
 
@@ -373,7 +480,41 @@ namespace SLDE.HLSL.Completion
 
 	public abstract class HLSLCompletionProvider : AbstractCompletionDataProvider
 	{
-		
+		HLSLScope root;
+		HLSLPrimitive Bool, Int, UInt, DWord, Half, Float, Double;
+		HLSLPrimitive Min16float, Min10float, Min16int, Min12int, Min16uint;
+
+
+		public HLSLCompletionProvider()
+		{
+			root = new HLSLScope("", null, -1, 0);
+			Bool		= new HLSLPrimitive("bool", "true or false", root);
+			Int			= new HLSLPrimitive("int", "32-bit signed integer", root);
+			UInt		= new HLSLPrimitive("uint", "32-bit unsigned integer", root);
+			DWord		= new HLSLPrimitive("dword", "32-bit unsigned integer", root);
+			Half		= new HLSLPrimitive("half", "16-bit floating point value", root);
+			Float		= new HLSLPrimitive("float", "32-bit floating point value", root);
+			Double		= new HLSLPrimitive("double", "64-bit floating point value", root);
+			Min16float	= new HLSLPrimitive("min16float", "Minimum 16-bit floating point value", root, 112);
+			Min10float	= new HLSLPrimitive("min10float", "Minimum 10-bit floating point value", root, 112);
+			Min16int	= new HLSLPrimitive("min16int", "Minimum 16-bit signed integer", root, 112);
+			Min12int	= new HLSLPrimitive("min12int", "Minimum 12-bit signed integer", root, 112);
+			Min16uint	= new HLSLPrimitive("min16uint", "Minimum 16-bit unsigned integer", root, 112);
+
+			root.Members.Add(Bool);
+			root.Members.Add(Int);
+			root.Members.Add(UInt);
+			root.Members.Add(DWord);
+			root.Members.Add(Half);
+			root.Members.Add(Float);
+			root.Members.Add(Double);
+			root.Members.Add(Min16float);
+			root.Members.Add(Min10float);
+			root.Members.Add(Min16int);
+			root.Members.Add(Min12int);
+			root.Members.Add(Min16uint);
+		}
+
 
 		// Image list:
 		// 0: Not compatible
