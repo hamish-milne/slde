@@ -111,6 +111,9 @@ namespace SLDE.D3DInterop
 		static extern UIntPtr GetBufferSize(IntPtr blob);
 
 		[DllImport(InteropDllPath)]
+		static extern void Release(IntPtr blob);
+
+		[DllImport(InteropDllPath)]
 		static extern D3DErrorCode Compile(
 			[MarshalAs(UnmanagedType.LPStr)] string pSrcData,
 			UIntPtr SrcDataSize,
@@ -142,14 +145,17 @@ namespace SLDE.D3DInterop
 			IntPtr code, errors;
 			var result = Compile(source, new UIntPtr((uint)source.Length), "myFile.hlsl",
 				new D3D_SHADER_MACRO[1]{ new D3D_SHADER_MACRO(null, null) },
-				new IntPtr(0), "VertexShaderFunction", "vs_1_1", D3DCompileFlags.DEBUG, 0, out code, out errors);
-			//Console.WriteLine(GetBufferSize(errors));
-			//Console.WriteLine(Marshal.PtrToStringAnsi(GetBufferPointer(errors), (int)GetBufferSize(errors)));
+				new IntPtr(0), "VertexShaderFunction", "vs_1_1", D3DCompileFlags.DEBUG | D3DCompileFlags.ENABLE_BACKWARDS_COMPATIBILITY, 0, out code, out errors);
+			if((uint)GetBufferSize(errors) > 0)
+				Console.WriteLine(Marshal.PtrToStringAnsi(GetBufferPointer(errors), (int)GetBufferSize(errors)));
 
 			IntPtr dasm;
 			var dresult = Disassemble(GetBufferPointer(code), GetBufferSize(code),
 				D3DDisasmFlags.ENABLE_INSTRUCTION_NUMBERING, null, out dasm);
-			System.IO.File.WriteAllText("test.asm", Marshal.PtrToStringAnsi(GetBufferPointer(dasm)));
+			System.IO.File.WriteAllText("test1.asm", Marshal.PtrToStringAnsi(GetBufferPointer(dasm)));
+			Release(code);
+			Release(errors);
+			Release(dasm);
 			return;
 		}
 	}

@@ -359,11 +359,11 @@ namespace SLDE
 	/// High-level shader language
 	/// </summary>
 	[Language]
-	public class HLSL : Language
+	public class HLSLLanguage : Language
 	{
 		static string[] HLSLExtensions = new string[] { ".fx", ".fxh", ".hlsl", ".compute", ".cginc" };
 
-		public HLSL() : base("HLSL")
+		public HLSLLanguage() : base("HLSL")
 		{
 			Extensions = HLSLExtensions;
 			HighlightingStrategy = HighlightingStrategyFactory.CreateHighlightingStrategy(Name);
@@ -388,7 +388,7 @@ namespace SLDE
 	/// Unity shader language
 	/// </summary>
 	[Language]
-	public class ShaderLab : HLSL
+	public class ShaderLab : HLSLLanguage
 	{
 		public ShaderLab() : base()
 		{
