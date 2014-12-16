@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.IO;
 
 using DigitalRune.Windows.TextEditor;
+using DigitalRune.Windows.TextEditor.Completion;
 using DigitalRune.Windows.TextEditor.Formatting;
 using DigitalRune.Windows.TextEditor.Document;
 
@@ -196,7 +197,6 @@ namespace SLDE
 					Document.FoldingManager.FoldingStrategy = value.FoldingStrategy;
 					Document.FoldingManager.UpdateFolds();
 				}
-
 			}
 		}
 
@@ -234,6 +234,17 @@ namespace SLDE
 				}
 			}
 			return true;
+		}
+
+		private void Editor_CompletionRequest(object sender, CompletionEventArgs e)
+		{
+			if(language != null && language.CompletionData != null)
+			{
+				if (e.Key == '\0')
+					ShowCompletionWindow(language.CompletionData, e.Key, false);
+				else if (Char.IsLetter(e.Key))
+					ShowCompletionWindow(language.CompletionData, e.Key, true);
+			}
 		}
 	}
 

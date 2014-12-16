@@ -121,7 +121,7 @@ namespace SLDE
 		/// <typeparam name="TAttribute">The attribute type</typeparam>
 		/// <param name="onFail">If a type cannot be created, this delegate is called</param>
 		/// <returns>A list of all the instances</returns>
-		public static List<T> CreateListOf<T, TAttribute>(Action<Type> onFail) where TAttribute : Attribute
+		public static List<T> CreateListOf<T, TAttribute>(Action<Type, Exception> onFail) where TAttribute : Attribute
 		{
 			var ret = new List<T>();
 			for(int i = 0; i < AllTypes.Count; i++)
@@ -133,10 +133,10 @@ namespace SLDE
 					{
 						ret.Add((T)Activator.CreateInstance(t));
 					}
-					catch
+					catch(Exception e)
 					{
 						if (onFail != null)
-							onFail(t);
+							onFail(t, e.InnerException);
 					}
 				}
 			}

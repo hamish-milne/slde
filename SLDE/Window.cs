@@ -101,9 +101,9 @@ namespace SLDE
 			DropDownItems.AddRange(Utility.CreateListOf<Window, WindowAttribute>(OnFailToAdd).ToArray());
 		}
 
-		void OnFailToAdd(Type t)
+		void OnFailToAdd(Type t, Exception e)
 		{
-			Utility.ShowError("Unable to add Window " + t);
+			Utility.ShowError("Unable to add Window " + t + ": " + e.Message);
 		}
 	}
 

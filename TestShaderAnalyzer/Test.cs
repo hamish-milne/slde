@@ -22,7 +22,6 @@ struct VertexShaderInput
     // TODO: add input channels such as texture
     // coordinates and vertex colors here.
 };
-class MyClass { float a; };
 struct VertexShaderOutput
 {
     float4 Position : POSITION0;
@@ -30,15 +29,18 @@ struct VertexShaderOutput
     // coordinates here. These values will automatically be interpolated
     // over the triangle, and provided as input to your pixel shader.
 };
+class MyClass { float a; };
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 {
     VertexShaderOutput output;
-    float4 worldPosition : POSITION1;
+    float4 worldPosition;
     worldPosition.xzy = temp;
     worldPosition.w = 0.707;
+    MyClass mc;
+    mc.a = 0.5;
     float4 viewPosition = mul(worldPosition, View);
     output.Position = mul(viewPosition, Projection);
-    temp = output.Position.xyz;
+    temp = output.Position.xyz + mc.a;
     // TODO: add your vertex shader code here.
     return output;
 }
