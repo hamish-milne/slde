@@ -137,6 +137,11 @@ namespace SLDE.HLSL.Completion
 			get { return length; }
 		}
 
+		public char this[int index]
+		{
+			get { return source[start + index]; }
+		}
+
 		public override string ToString()
 		{
 			if (source == null)
@@ -181,13 +186,6 @@ namespace SLDE.HLSL.Completion
 		{
 			return str.ToString();
 		}
-	}
-
-	public static class Operators
-	{
-		public static readonly Substring Semicolon = ";";
-		public static readonly Substring OpenBrace = "{";
-		public static readonly Substring CloseBrace = "}";
 	}
 
 	public class HLSLCompletionData : ICompletionData
@@ -275,8 +273,11 @@ namespace SLDE.HLSL.Completion
 			if (validData == null)
 				validData = new CompletionDataList();
 			validData.Clear();
-			validData.AddRange(scope.Members);
-			var parentData = scope.Parent == null ? null : scope.Parent.DataItems;
+			if(scope.DataItems != null)
+				validData.AddRange(scope.DataItems);
+			if(scope.Members != null)
+				validData.AddRange(scope.Members);
+			var parentData = scope.Parent == null ? null : scope.Parent.GetValidData();
 			if (parentData != null)
 				validData.AddRange(parentData);
 			recursionLock = false;
@@ -286,16 +287,26 @@ namespace SLDE.HLSL.Completion
 
 	public class HLSLKeyword : HLSLCompletionData
 	{
-		protected IList<HLSLCompletionData> validData;
+		protected CompletionDataList validData;
 
 		public override IList<HLSLCompletionData> DataItems
 		{
 			get
 			{
 				if (validData == null)
-					validData = new List<HLSLCompletionData>();
+					validData = new CompletionDataList();
 				return validData;
 			}
+		}
+
+		public override void Parse(Substring item, out HLSLCompletionData newDefinition)
+		{
+			newDefinition = validData[item];
+		}
+
+		public override IList<HLSLCompletionData> GetValidData()
+		{
+			return DataItems;
 		}
 
 		public HLSLKeyword(Substring name, string description, int imageIndex, int version = 0)
@@ -578,12 +589,13 @@ namespace SLDE.HLSL.Completion
 	{
 		IList<HLSLCompletionData> Members { get; }
 		IList<HLSLCompletionData> DataItems { get; }
+		IList<HLSLCompletionData> GetValidData();
 		IScope Parent { get; }
 	}
 
 	public class HLSLScope : HLSLCompletionData, IScope
 	{
-		protected IList<HLSLCompletionData> members;
+		protected CompletionDataList members;
 		protected IScope parent;
 		protected CompletionDataList validData;
 		bool recursionLock;
@@ -599,7 +611,7 @@ namespace SLDE.HLSL.Completion
 			get
 			{
 				if (members == null)
-					members = new List<HLSLCompletionData>();
+					members = new CompletionDataList();
 				return members;
 			}
 		}
@@ -650,9 +662,32 @@ namespace SLDE.HLSL.Completion
 	
 	public class HLSLRootScope : HLSLScope
 	{
+		protected CompletionDataList dataItems;
+
+		public override IList<HLSLCompletionData> DataItems
+		{
+			get
+			{
+				if (dataItems == null)
+					dataItems = new CompletionDataList();
+				return dataItems;
+			}
+		}
 
 		public HLSLRootScope() : base("", null, -1, 0)
 		{
+		}
+
+		public override void Parse(Substring item, out HLSLCompletionData newDefinition)
+		{
+			newDefinition = null;
+			if (item.Length < 1)
+				return;
+			var c = item[0];
+			if (c == '{')
+				newDefinition = new HLSLScope("", this, -1, 0);
+			else
+				newDefinition = dataItems[item];
 		}
 	}
 
@@ -708,21 +743,21 @@ namespace SLDE.HLSL.Completion
 			unorm.DataItems.Add(Min10float);
 			unorm.DataItems.Add(Min16float);
 
-			root.Members.Add(Bool);
-			root.Members.Add(Int);
-			root.Members.Add(UInt);
-			root.Members.Add(DWord);
-			root.Members.Add(Half);
-			root.Members.Add(Float);
-			root.Members.Add(Double);
-			root.Members.Add(Min16float);
-			root.Members.Add(Min10float);
-			root.Members.Add(Min16int);
-			root.Members.Add(Min12int);
-			root.Members.Add(Min16uint);
+			root.DataItems.Add(Bool);
+			root.DataItems.Add(Int);
+			root.DataItems.Add(UInt);
+			root.DataItems.Add(DWord);
+			root.DataItems.Add(Half);
+			root.DataItems.Add(Float);
+			root.DataItems.Add(Double);
+			root.DataItems.Add(Min16float);
+			root.DataItems.Add(Min10float);
+			root.DataItems.Add(Min16int);
+			root.DataItems.Add(Min12int);
+			root.DataItems.Add(Min16uint);
 
-			root.Members.Add(snorm);
-			root.Members.Add(unorm);
+			root.DataItems.Add(snorm);
+			root.DataItems.Add(unorm);
 
 			currentScope = root;
 
@@ -740,11 +775,14 @@ namespace SLDE.HLSL.Completion
 
 		void ParseItem(string item)
 		{
-
+			currentScope.Parse(item, out currentScope);
+			if (currentScope == null)
+				currentScope = root;
 		}
 
 		public override ICompletionData[] GenerateCompletionData(string fileName, TextArea textArea, char charTyped)
 		{
+			currentScope = root;
 			var text = textArea.Document.TextBufferStrategy;
 			for(int pos = 0; pos < text.Length; pos++)
 			{
@@ -802,7 +840,18 @@ namespace SLDE.HLSL.Completion
 					ParseItem(item);
 					continue;
 				}
-
+				int start = pos;
+				while(++pos < text.Length)
+				{
+					c = text.GetCharAt(pos);
+					if(Char.IsWhiteSpace(c) || Char.IsControl(c) || operators.Contains(c))
+					{
+						var length = pos - start;
+						ParseItem(text.GetText(start, length));
+						pos--;
+						break;
+					}
+				}
 			}
 			return currentScope == null ? null : currentScope.GetValidData().ToArray();
 		}
