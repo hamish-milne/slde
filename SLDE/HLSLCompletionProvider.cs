@@ -95,7 +95,7 @@ namespace SLDE.HLSL.Completion
 			list.Clear();
 		}
 
-		public void AddRange(IList<HLSLCompletionData> list)
+		public void AddRange(CompletionDataList list)
 		{
 			if (list == null)
 				throw new ArgumentNullException("list");
@@ -289,7 +289,7 @@ namespace SLDE.HLSL.Completion
 
 		protected HLSLCompletionData parent;
 
-		public virtual IList<HLSLCompletionData> Members { get { return null; } }
+		public virtual CompletionDataList Members { get { return null; } }
 		public virtual HLSLCompletionData Parent
 		{
 			get { return parent; }
@@ -425,16 +425,18 @@ namespace SLDE.HLSL.Completion
 
 	public class HLSLType : HLSLCompletionData
 	{
-		protected IList<HLSLCompletionData> members;
+		protected CompletionDataList members;
 		bool recursionLock;
 		CompletionDataList validData;
 		bool open, closed;
+		Substring typeType;
 
 		// TODO: Typedefs and templates
 
 		public virtual Substring TypeType
 		{
-			get { return null; }
+			get { return typeType; }
+			set { typeType = value; }
 		}
 
 		public virtual bool Open
@@ -467,18 +469,20 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public override IList<HLSLCompletionData> Members
+		public override CompletionDataList Members
 		{
 			get
 			{
 				if(members == null)
-					members = new List<HLSLCompletionData>();
+					members = new CompletionDataList();
 				return members;
 			}
 		}
 
 		public override CompletionDataList GetValidData()
 		{
+			if (!Open)
+				return null;
 			return GetValidDataRecursive(this, ref recursionLock, ref validData);
 		}
 
@@ -527,9 +531,10 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public HLSLType(Substring name, HLSLCompletionData parent, int imageIndex, int version = 0)
+		public HLSLType(Substring typeType, Substring name, HLSLCompletionData parent, int imageIndex, int version = 0)
 			: base(name, null, imageIndex, version)
 		{
+			this.typeType = typeType;
 			this.parent = parent;
 		}
 	}
@@ -560,7 +565,7 @@ namespace SLDE.HLSL.Completion
 		{
 			get
 			{
-				return false;
+				return true;
 			}
 		}
 
@@ -596,53 +601,14 @@ namespace SLDE.HLSL.Completion
 		}
 
 		public HLSLPrimitive(Substring name, string description, HLSLCompletionData parent, int version = 0)
-			: base(name, parent, 1, version)
+			: base("", name, parent, 1, version)
 		{
 			this.description = description;
-			DataItems.Add(new HLSLCompletionData("wxyz", "", 0, 0));
-			DataItems.Add(new HLSLCompletionData("x", "", 0, 0));
-			DataItems.Add(new HLSLCompletionData("y", "", 0, 0));
-			DataItems.Add(new HLSLCompletionData("z", "", 0, 0));
-			DataItems.Add(new HLSLCompletionData("w", "", 0, 0));
-		}
-	}
-
-	public class HLSLStruct : HLSLType
-	{
-		public override Substring TypeType
-		{
-			get { return "struct"; }
-		}
-
-		public HLSLStruct(string name, HLSLType parent, int imageIndex, int version = 0)
-			: base(name, parent, imageIndex, version)
-		{
-		}
-	}
-
-	public class HLSLClass : HLSLType
-	{
-		public override Substring TypeType
-		{
-			get { return "class"; }
-		}
-
-		public HLSLClass(string name, HLSLType parent, int imageIndex, int version = 0)
-			: base(name, parent, imageIndex, version)
-		{
-		}
-	}
-
-	public class HLSLInterface : HLSLType
-	{
-		public override Substring TypeType
-		{
-			get { return "interface"; }
-		}
-
-		public HLSLInterface(string name, HLSLType parent, int imageIndex, int version = 0)
-			: base(name, parent, imageIndex, version)
-		{
+			Members.Add(new HLSLCompletionData("wxyz", "", 0, 0));
+			Members.Add(new HLSLCompletionData("x", "", 0, 0));
+			Members.Add(new HLSLCompletionData("y", "", 0, 0));
+			Members.Add(new HLSLCompletionData("z", "", 0, 0));
+			Members.Add(new HLSLCompletionData("w", "", 0, 0));
 		}
 	}
 
@@ -658,6 +624,13 @@ namespace SLDE.HLSL.Completion
 				semantic = value;
 				description = null;
 			}
+		}
+
+		public override CompletionDataList GetValidData()
+		{
+			if (Type != null)
+				return Type.Members;
+			return base.GetValidData();
 		}
 
 		public override string Description
@@ -725,7 +698,7 @@ namespace SLDE.HLSL.Completion
 		protected CompletionDataList validData;
 		bool recursionLock;
 
-		public override IList<HLSLCompletionData> Members
+		public override CompletionDataList Members
 		{
 			get
 			{
@@ -800,6 +773,8 @@ namespace SLDE.HLSL.Completion
 	public class HLSLRootScope : HLSLScope
 	{
 		protected CompletionDataList dataItems;
+		protected HashSet<Substring> typeTypes
+			= new HashSet<Substring>() { "struct", "class", "interface" };
 
 		public override CompletionDataList DataItems
 		{
@@ -809,6 +784,18 @@ namespace SLDE.HLSL.Completion
 					dataItems = new CompletionDataList();
 				return dataItems;
 			}
+		}
+
+		public override void Parse(Substring item, Stack<HLSLCompletionData> stack)
+		{
+			if (typeTypes.Contains(item))
+			{
+				var newType = new HLSLType(item, null, this, 0, 0);
+				Members.Add(newType);
+				stack.Push(newType);
+			}
+			else
+				base.Parse(item, stack);
 		}
 
 		public override CompletionDataList GetValidData()
@@ -899,6 +886,9 @@ namespace SLDE.HLSL.Completion
 
 			root.DataItems.Add(snorm);
 			root.DataItems.Add(unorm);
+			root.DataItems.Add(Struct);
+			root.DataItems.Add(Class);
+			root.DataItems.Add(Interface);
 
 			imageList = new ImageList();
 
@@ -970,6 +960,7 @@ namespace SLDE.HLSL.Completion
 							continue;
 						}
 					}
+					// Strings (including escape characters)
 					if(c == '"')
 					{
 						do
@@ -982,6 +973,7 @@ namespace SLDE.HLSL.Completion
 						} while (c != '"');
 						continue;
 					}
+					// Now get the operator itself
 					string item;
 					operatorCache.TryGetValue(c, out item);
 					if(item == null)
@@ -992,6 +984,7 @@ namespace SLDE.HLSL.Completion
 					ParseItem(item);
 					continue;
 				}
+				// If it's not an operator, it's some sort of identifier
 				int start = pos;
 				while (++pos < caretPos)
 				{
