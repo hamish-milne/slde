@@ -80,6 +80,8 @@ namespace SLDE.Completion
 
 		public void AddRange(IDataList list)
 		{
+			if (list == null)
+				return;
 			foreach (var item in list)
 				Add(item);
 		}
@@ -362,8 +364,19 @@ namespace SLDE.HLSL.Completion
 	{
 		protected HLSLType type;
 		protected List<HLSLKeyword> keywords;
-		bool hasSemantic, hasParameters;
+		bool hasSemantic, hasParameters, isFunction;
 		HLSLSemantic parsedSemantic;
+		IDataList members;
+
+		public override IDataList Members
+		{
+			get
+			{
+				if (members == null)
+					members = new DataList();
+				return members;
+			}
+		}
 
 		public virtual Substring Name
 		{
@@ -413,9 +426,23 @@ namespace SLDE.HLSL.Completion
 			get
 			{
 				if (description == null)
-					description = GetPrefix(Type, " ") + GetPrefix(Parent, ".") + Name;
+				{
+					if (Parent == null || !(Parent is HLSLFunction))
+						description = GetPrefix(Type, " ") + GetPrefix(Parent, ".") + Name;
+					else
+						description = GetPrefix(Type, " ") + Name;
+				}
 				return description;
 			}
+		}
+
+		public override IDataList GetValidData(Stack<CompletionData> stack)
+		{
+			if (hasSemantic && Type != null)
+				return Type.Semantics;
+			if (hasParameters)
+				return Parent.GetValidData(stack);
+			return null;
 		}
 
 		public override void Parse(Substring item, Stack<CompletionData> stack)
@@ -423,47 +450,57 @@ namespace SLDE.HLSL.Completion
 			if (item.Length < 1)
 				return;
 			var c = item[0];
+
 			switch(c)
 			{
 				case ':':
 					hasSemantic = true;
 					break;
-				case ';':
-					// Variable end
-					stack.Pop();
-					if (stack.Peek() == null)
-						return;
-					if (stack.Peek().Members == null)
-						return;
-					var variable = new HLSLVariable(Name, Type, Parent, ImageIndex, Version);
-					variable.Semantic = parsedSemantic;
-					stack.Peek().Members.Add(variable);
-					hasSemantic = false;
-					hasParameters = false;
-					parsedSemantic = null;
-					break;
 				case '(':
 					hasParameters = true;
+					isFunction = true;
 					break;
 				case ')':
-					hasParameters = false;
-					break;
+				case ',':
+				case ';':
 				case '{':
+					if(c == ')')
+						hasParameters = false;
+					if (isFunction && c == ',')
+						return;
+					if (!isFunction && c == '{')
+						return;
 					stack.Pop();
-					var func = new HLSLFunction(Name, Parent, ImageIndex, Version);
-					func.Members.AddRange(Members);
-					func.DataItems.AddRange(DataItems);
-					func.ReturnType = Type;
-					stack.Push(func);
+					if (stack.Peek() == null || stack.Peek().Members == null)
+						return;
+					CompletionData dataItem;
+					if(isFunction)
+					{
+						var func = new HLSLFunction(Name, stack.Peek(), ImageIndex, Version);
+						func.Arguments.AddRange(Members);
+						func.ReturnType = Type;
+						func.Semantic = parsedSemantic;
+						dataItem = func;
+					} else
+					{
+						var variable = new HLSLVariable(Name, Type, stack.Peek(), ImageIndex, Version);
+						variable.Semantic = parsedSemantic;
+						dataItem = variable;
+					}
+					stack.Peek().Members.Add(dataItem);
+					if (c == ',' && !(stack.Peek() is HLSLMember))
+						stack.Push(Type);
+					else if (c == ')' && stack.Peek() is HLSLMember)
+						stack.Peek().Parse(item, stack);
 					break;
 				default:
-					if(!CompletionUtility.Operators.Contains(c))
+					if (!CompletionUtility.Operators.Contains(c))
 					{
-						if(hasParameters)
+						if (hasParameters && Parent != null)
 						{
-
+							stack.Push(Parent.GetValidData(stack)[item]);
 						}
-						else if(hasSemantic)
+						else if (hasSemantic)
 						{
 							hasSemantic = false;
 							if (Type != null)
@@ -480,6 +517,7 @@ namespace SLDE.HLSL.Completion
 			: base(name, null, imageIndex, version)
 		{
 			this.type = type;
+			this.parent = parent;
 		}
 	}
 
@@ -637,7 +675,7 @@ namespace SLDE.HLSL.Completion
 			} else // Closed
 			{
 				stack.Pop();
-				stack.Push(new HLSLMember(item, this, stack.Peek() as HLSLType, 0, 0));
+				stack.Push(new HLSLMember(item, this, stack.Peek(), 0, 0));
 			}
 		}
 
@@ -803,7 +841,6 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-
 		public override IDataList GetValidData(Stack<CompletionData> stack)
 		{
 			return GetValidDataRecursive(stack, this, ref recursionLock, ref validData);
@@ -838,6 +875,9 @@ namespace SLDE.HLSL.Completion
 	{
 		IDataList arguments;
 		HLSLType returnType;
+		IDataList dataItems;
+		bool recursionLock;
+		HLSLSemantic semantic;
 
 		public virtual IDataList Arguments
 		{
@@ -847,6 +887,49 @@ namespace SLDE.HLSL.Completion
 					arguments = new DataList();
 				return arguments;
 			}
+		}
+
+		public override IDataList DataItems
+		{
+			get
+			{
+				if (dataItems == null)
+					dataItems = new DataList();
+				return dataItems;
+			}
+		}
+
+		public virtual HLSLSemantic Semantic
+		{
+			get { return semantic; }
+			set { semantic = value; }
+		}
+
+		public override string Description
+		{
+			get
+			{
+				var ret = ReturnType.Text + " " + Text + "(";
+				bool first = true;
+				if(Arguments != null)
+					foreach(var arg in Arguments)
+					{
+						if (first)
+							first = false;
+						else
+							ret += ", ";
+						ret += arg.Description;
+					}
+				ret += ")";
+				return ret;
+			}
+		}
+
+		public override IDataList GetValidData(Stack<CompletionData> stack)
+		{
+			GetValidDataRecursive(stack, this, ref recursionLock, ref validData);
+			validData.AddRange(Arguments);
+			return validData;
 		}
 
 		public virtual HLSLType ReturnType
@@ -923,7 +1006,8 @@ namespace SLDE.HLSL.Completion
 		public static readonly HashSet<char> Operators =
 			new HashSet<char> { '.', ':', ';', '<', '>', '@',
 				'[', ']', '{', '}', '(', ')', '#', '\'', '"',
-				'+', '-',  '&', '|', '~', '^', '$', '*', '/', '\\', '?', '!' };
+				'+', '-',  '&', '|', '~', '^', '$', '*', '/',
+				'\\', '?', '!' , ',' };
 	}
 
 	public class HLSLCompletionProvider : AbstractCompletionDataProvider
