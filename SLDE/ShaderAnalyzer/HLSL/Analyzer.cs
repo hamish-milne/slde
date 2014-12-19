@@ -49,8 +49,11 @@ namespace SLDE.ShaderAnalyzer.HLSL {
         /// <param name="entryPoint">The name of the entry function</param>
         /// <param name="target">The target shader profile</param>
         /// <returns>Compiled and parsed Assembly object</returns>
-        public Assembly Compile(string entryPoint, Profile target) {
-            return Compiler.CompileToAssembly(entryFilePath, entryPoint, target, options);
+        public Assembly Compile(string entryPoint, ShaderModel target) {
+            Assembly assembly = Compiler.CompileToAssembly(entryFilePath, entryPoint, target, options);
+            // TODO: set semantic translator function
+            assembly.Parse();
+            return assembly;
         }
 
         /// <summary>

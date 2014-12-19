@@ -8,7 +8,8 @@ namespace SLDE.ShaderAnalyzer {
         Sample,
         FlowControl,
         Other,
-        Ignore
+        Ignore,
+        Invalid
     }
 
     public enum IdentifierType {
@@ -19,7 +20,7 @@ namespace SLDE.ShaderAnalyzer {
         Resource,
         Label,
         Constant,
-        Value,
+        Literal,
         Other
     }
 
@@ -38,18 +39,14 @@ namespace SLDE.ShaderAnalyzer {
         public IEnumerable<Identifier> Identifiers { get; private set; }
         public string SourceFilepath { get; private set; }
         public int SourceLine { get; private set; }
-        public int IndentLevel { get; private set; }
-        public int CostRank { get; private set; }
 
         public Instruction(InstructionType type, string displayString, List<Identifier> identifiers = null,
-            string sourceFilepath = null, int sourceLine = 0, int indentLevel = 0, int costRank = 0) {
+            string sourceFilepath = null, int sourceLine = 0) {
             Type = type;
             DisplayString = displayString;
             Identifiers = identifiers ?? new List<Identifier>();
             SourceFilepath = sourceFilepath;
             SourceLine = sourceLine;
-            IndentLevel = indentLevel;
-            CostRank = costRank;
         }
     }
 
@@ -110,7 +107,7 @@ namespace SLDE.ShaderAnalyzer {
         public int Length { get; private set; }
 
         public AssemblyNotification(NotificationType type, string message, int instructionIndex,
-            int offset = 0, int length = 0) : base(type, message) {
+            int offset = 0, int length = -1) : base(type, message) {
             InstructionIndex = instructionIndex;
             Offset = offset;
             Length = length;

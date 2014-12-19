@@ -10,13 +10,13 @@ namespace SLDE.ShaderAnalyzer.HLSL {
         private List<string> outputLines = new List<string>();
         private List<string> errorLines = new List<string>();
 
-        public static Assembly CompileToAssembly(string shaderPath, string entryPoint, Profile target, CompileOptions options) {
+        public static Assembly CompileToAssembly(string shaderPath, string entryPoint, ShaderModel target, CompileOptions options) {
             var compiler = new Compiler();
             compiler.Compile(shaderPath, entryPoint, target, options);
             return compiler.AsAssembly();
         }
 
-        public void Compile(string shaderPath, string entryPoint, Profile target, CompileOptions options) {
+        public void Compile(string shaderPath, string entryPoint, ShaderModel target, CompileOptions options) {
             using (Process fxc = new Process()) {
                 fxc.EnableRaisingEvents = false;
                 fxc.StartInfo.FileName = PATH_TO_FXC;
@@ -41,7 +41,7 @@ namespace SLDE.ShaderAnalyzer.HLSL {
             return new Assembly(outputLines.ToArray(), errorLines.ToArray());
         }
 
-        private String BuildArguments(string shaderPath, string entryPoint, Profile target, CompileOptions options) {
+        private String BuildArguments(string shaderPath, string entryPoint, ShaderModel target, CompileOptions options) {
             var args = new StringBuilder();
 
             args.AppendFormat("/E {0} ", entryPoint);

@@ -97,6 +97,7 @@
     <Compile Include="ErrorList.Designer.cs">
       <DependentUpon>ErrorList.cs</DependentUpon>
     </Compile>
+    <Compile Include="HLSLCompletionData.cs" />
     <Compile Include="HLSLCompletionProvider.cs" />
     <Compile Include="ICompiler.cs" />
     <Compile Include="IDEForm.cs">
@@ -149,7 +150,8 @@
     <Compile Include="ShaderAnalyzer\HLSL\Assembly.cs" />
     <Compile Include="ShaderAnalyzer\HLSL\CompileOptions.cs" />
     <Compile Include="ShaderAnalyzer\HLSL\OpCodes.cs" />
-    <Compile Include="ShaderAnalyzer\HLSL\Profile.cs" />
+    <Compile Include="ShaderAnalyzer\HLSL\RegisterTranslator.cs" />
+    <Compile Include="ShaderAnalyzer\HLSL\ShaderModel.cs" />
     <Compile Include="ShaderAnalyzer\IAssembly.cs" />
     <Compile Include="Editor.cs">
       <SubType>UserControl</SubType>
@@ -157,6 +159,7 @@
     <Compile Include="Editor.Designer.cs">
       <DependentUpon>Editor.cs</DependentUpon>
     </Compile>
+    <Compile Include="ShaderAnalyzer\MiscUtilities.cs" />
     <Compile Include="Utility.cs" />
     <Compile Include="Window.cs">
       <SubType>Component</SubType>
