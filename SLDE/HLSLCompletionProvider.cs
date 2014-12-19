@@ -6,6 +6,7 @@ using System.Text;
 using DigitalRune.Windows.TextEditor;
 using DigitalRune.Windows.TextEditor.Completion;
 using System.Windows.Forms;
+using SLDE.Properties;
 
 namespace SLDE.Completion
 {
@@ -221,7 +222,6 @@ namespace SLDE.Completion
 	{
 		protected Substring text;
 		protected string description;
-		protected int imageIndex;
 		protected double priority = 0;
 		protected int version;
 
@@ -252,7 +252,7 @@ namespace SLDE.Completion
 
 		public virtual int ImageIndex
 		{
-			get { return imageIndex; }
+			get { return 0; }
 		}
 
 		public int Version
@@ -276,12 +276,10 @@ namespace SLDE.Completion
 			return false;
 		}
 
-		public CompletionData(Substring text, string description, int imageIndex, int version = 0)
+		public CompletionData(Substring text, string description)
 		{
-			this.version = version;
 			this.text = text;
 			this.description = description;
-			this.imageIndex = imageIndex;
 		}
 
 		protected static string GetPrefix(CompletionData data, string append)
@@ -354,8 +352,8 @@ namespace SLDE.HLSL.Completion
 			return DataItems;
 		}
 
-		public HLSLKeyword(Substring name, string description, int imageIndex, int version = 0)
-			: base(name, description, imageIndex, version)
+		public HLSLKeyword(Substring name, string description)
+			: base(name, description)
 		{
 		}
 	}
@@ -367,6 +365,14 @@ namespace SLDE.HLSL.Completion
 		bool hasSemantic, hasParameters, isFunction;
 		HLSLSemantic parsedSemantic;
 		IDataList members;
+
+		public override int ImageIndex
+		{
+			get
+			{
+				return 4;
+			}
+		}
 
 		public override IDataList Members
 		{
@@ -465,25 +471,32 @@ namespace SLDE.HLSL.Completion
 				case ';':
 				case '{':
 					if(c == ')')
+					{
 						hasParameters = false;
+						if (isFunction)
+							return;
+					}
 					if (isFunction && c == ',')
 						return;
-					if (!isFunction && c == '{')
-						return;
 					stack.Pop();
+					if (!isFunction && c == '{')
+					{
+						stack.Push(new HLSLScope("", stack.Peek()));
+						return;
+					}
 					if (stack.Peek() == null || stack.Peek().Members == null)
 						return;
 					CompletionData dataItem;
 					if(isFunction)
 					{
-						var func = new HLSLFunction(Name, stack.Peek(), ImageIndex, Version);
+						var func = new HLSLFunction(Name, stack.Peek());
 						func.Arguments.AddRange(Members);
 						func.ReturnType = Type;
 						func.Semantic = parsedSemantic;
 						dataItem = func;
 					} else
 					{
-						var variable = new HLSLVariable(Name, Type, stack.Peek(), ImageIndex, Version);
+						var variable = new HLSLVariable(Name, Type, stack.Peek());
 						variable.Semantic = parsedSemantic;
 						dataItem = variable;
 					}
@@ -492,6 +505,8 @@ namespace SLDE.HLSL.Completion
 						stack.Push(Type);
 					else if (c == ')' && stack.Peek() is HLSLMember)
 						stack.Peek().Parse(item, stack);
+					else if (c == '{' && isFunction)
+						stack.Push(dataItem);
 					break;
 				default:
 					if (!CompletionUtility.Operators.Contains(c))
@@ -506,15 +521,15 @@ namespace SLDE.HLSL.Completion
 							if (Type != null)
 								parsedSemantic = Type.Semantics[item] as HLSLSemantic;
 							if (parsedSemantic == null)
-								parsedSemantic = new HLSLSemantic(item, 0, 0);
+								parsedSemantic = new HLSLSemantic(item);
 						}
 					}
 					break;
 			}
 		}
 
-		public HLSLMember(Substring name, HLSLType type, CompletionData parent, int imageIndex, int version = 0)
-			: base(name, null, imageIndex, version)
+		public HLSLMember(Substring name, HLSLType type, CompletionData parent)
+			: base(name, null)
 		{
 			this.type = type;
 			this.parent = parent;
@@ -570,6 +585,14 @@ namespace SLDE.HLSL.Completion
 		Substring typeType;
 
 		// TODO: Typedefs and templates
+
+		public override int ImageIndex
+		{
+			get
+			{
+				return 1;
+			}
+		}
 
 		public virtual Substring TypeType
 		{
@@ -675,12 +698,12 @@ namespace SLDE.HLSL.Completion
 			} else // Closed
 			{
 				stack.Pop();
-				stack.Push(new HLSLMember(item, this, stack.Peek(), 0, 0));
+				stack.Push(new HLSLMember(item, this, stack.Peek()));
 			}
 		}
 
-		public HLSLType(Substring typeType, Substring name, CompletionData parent, int imageIndex, int version = 0)
-			: base(name, null, imageIndex, version)
+		public HLSLType(Substring typeType, Substring name, CompletionData parent)
+			: base(name, null)
 		{
 			this.typeType = typeType;
 			this.parent = parent;
@@ -743,15 +766,15 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public HLSLPrimitive(Substring name, string description, CompletionData parent, int version = 0)
-			: base("", name, parent, 1, version)
+		public HLSLPrimitive(Substring name, string description, CompletionData parent)
+			: base("", name, parent)
 		{
 			this.description = description;
-			Members.Add(new CompletionData("wxyz", "", 0, 0));
-			Members.Add(new CompletionData("x", "", 0, 0));
-			Members.Add(new CompletionData("y", "", 0, 0));
-			Members.Add(new CompletionData("z", "", 0, 0));
-			Members.Add(new CompletionData("w", "", 0, 0));
+			Members.Add(new CompletionData("wxyz", ""));
+			Members.Add(new CompletionData("x", ""));
+			Members.Add(new CompletionData("y", ""));
+			Members.Add(new CompletionData("z", ""));
+			Members.Add(new CompletionData("w", ""));
 		}
 	}
 
@@ -806,16 +829,16 @@ namespace SLDE.HLSL.Completion
 				stack.Pop();
 		}
 
-		public HLSLVariable(Substring name, HLSLType type, CompletionData parent, int imageIndex, int version = 0)
-			: base(name, type, parent, imageIndex, version)
+		public HLSLVariable(Substring name, HLSLType type, CompletionData parent)
+			: base(name, type, parent)
 		{
 		}
 	}
 
 	public class HLSLSemantic : CompletionData
 	{
-		public HLSLSemantic(Substring name, int imageIndex, int version = 0)
-			: base(name, name.ToString(), imageIndex, version)
+		public HLSLSemantic(Substring name)
+			: base(name, name.ToString())
 		{
 		}
 
@@ -852,7 +875,7 @@ namespace SLDE.HLSL.Completion
 				return;
 			var c = item[0];
 			if (c == '{')
-				stack.Push(new HLSLScope("", this, -1, 0));
+				stack.Push(new HLSLScope("", this));
 			else if (c == '}')
 				stack.Pop();
 			else
@@ -864,8 +887,8 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public HLSLScope(Substring name, CompletionData parent, int imageIndex, int version = 0)
-			: base(name, null, imageIndex, version)
+		public HLSLScope(Substring name, CompletionData parent)
+			: base(name, null)
 		{
 			this.parent = parent;
 		}
@@ -886,6 +909,14 @@ namespace SLDE.HLSL.Completion
 				if (arguments == null)
 					arguments = new DataList();
 				return arguments;
+			}
+		}
+
+		public override int ImageIndex
+		{
+			get
+			{
+				return 5;
 			}
 		}
 
@@ -938,8 +969,8 @@ namespace SLDE.HLSL.Completion
 			set { returnType = value; }
 		}
 
-		public HLSLFunction(Substring name, CompletionData parent, int imageIndex, int version = 0)
-			: base(name, parent, imageIndex, version)
+		public HLSLFunction(Substring name, CompletionData parent)
+			: base(name, parent)
 		{
 		}
 	}
@@ -975,7 +1006,7 @@ namespace SLDE.HLSL.Completion
 		{
 			if (typeTypes.Contains(item))
 			{
-				var newType = new HLSLType(item, null, this, 0, 0);
+				var newType = new HLSLType(item, null, this);
 				Members.Add(newType);
 				stack.Push(newType);
 			}
@@ -996,7 +1027,7 @@ namespace SLDE.HLSL.Completion
 			return validData;
 		}
 
-		public HLSLRootScope() : base("", null, -1, 0)
+		public HLSLRootScope() : base("", null)
 		{
 		}
 	}
@@ -1040,17 +1071,17 @@ namespace SLDE.HLSL.Completion
 			Half        = new HLSLPrimitive("half", "16-bit floating point value", root);
 			Float       = new HLSLPrimitive("float", "32-bit floating point value", root);
 			Double      = new HLSLPrimitive("double", "64-bit floating point value", root);
-			Min16float  = new HLSLPrimitive("min16float", "Minimum 16-bit floating point value", root, 112);
-			Min10float  = new HLSLPrimitive("min10float", "Minimum 10-bit floating point value", root, 112);
-			Min16int    = new HLSLPrimitive("min16int", "Minimum 16-bit signed integer", root, 112);
-			Min12int    = new HLSLPrimitive("min12int", "Minimum 12-bit signed integer", root, 112);
-			Min16uint   = new HLSLPrimitive("min16uint", "Minimum 16-bit unsigned integer", root, 112);
+			Min16float  = new HLSLPrimitive("min16float", "Minimum 16-bit floating point value", root);
+			Min10float  = new HLSLPrimitive("min10float", "Minimum 10-bit floating point value", root);
+			Min16int    = new HLSLPrimitive("min16int", "Minimum 16-bit signed integer", root);
+			Min12int    = new HLSLPrimitive("min12int", "Minimum 12-bit signed integer", root);
+			Min16uint   = new HLSLPrimitive("min16uint", "Minimum 16-bit unsigned integer", root);
 
-			snorm       = new HLSLKeyword("snorm", "Normalize float in range -1 to 1", 2, 100);
-			unorm       = new HLSLKeyword("unorm", "Normalize float in range 0 to 1", 2, 100);
-			Struct      = new HLSLKeyword("struct", "A structure. Groups data together", 2, 0);
-			Class       = new HLSLKeyword("class", "Groups data and functions together", 2, 0);
-			Interface   = new HLSLKeyword("interface", "An interface to another type", 2, 0);
+			snorm       = new HLSLKeyword("snorm", "Normalize float in range -1 to 1");
+			unorm       = new HLSLKeyword("unorm", "Normalize float in range 0 to 1");
+			Struct      = new HLSLKeyword("struct", "A structure. Groups data together");
+			Class       = new HLSLKeyword("class", "Groups data and functions together");
+			Interface   = new HLSLKeyword("interface", "An interface to another type");
 
 			snorm.DataItems.Add(Float);
 			snorm.DataItems.Add(Min10float);
@@ -1059,9 +1090,9 @@ namespace SLDE.HLSL.Completion
 			unorm.DataItems.Add(Min10float);
 			unorm.DataItems.Add(Min16float);
 
-			Float.Semantics.Add(new HLSLSemantic("COLOR0", 0, 0));
-			Float.Semantics.Add(new HLSLSemantic("COLOR1", 0, 0));
-			Int.Semantics.Add(new HLSLSemantic("MySemantic", 0, 0));
+			Float.Semantics.Add(new HLSLSemantic("COLOR0"));
+			Float.Semantics.Add(new HLSLSemantic("COLOR1"));
+			Int.Semantics.Add(new HLSLSemantic("MySemantic"));
 
 			root.DataItems.Add(Bool);
 			root.DataItems.Add(Int);
@@ -1083,16 +1114,14 @@ namespace SLDE.HLSL.Completion
 			root.RootDataItems.Add(Interface);
 
 			imageList = new ImageList();
-
+			imageList.ImageSize = new System.Drawing.Size(16, 16);
+			imageList.Images.Add(Resources.CodeLines);
+			imageList.Images.Add(Resources.Structure);
+			imageList.Images.Add(Resources.Class);
+			imageList.Images.Add(Resources.Interface);
+			imageList.Images.Add(Resources.Field);
+			imageList.Images.Add(Resources.Method);
 		}
-
-
-		// Image list:
-		// 0: Not compatible
-		// 1: Intrinsic type
-		// 2: Keyword
-		// 3: Semantic
-		// 
 
 		void ParseItem(string item)
 		{

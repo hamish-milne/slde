@@ -25,7 +25,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -331,6 +331,9 @@
     <None Include="Resources\filter_16xLG.png" />
     <None Include="Resources\Close_6519.png" />
     <None Include="Resources\Start.png" />
+    <None Include="Resources\Close_16xLG_inverted.png" />
+    <None Include="Resources\Class_489.png" />
+    <None Include="Resources\Interface_612.png" />
     <Content Include="Resources\StatusAnnotations_Critical_16xEXSM_color.png" />
     <Content Include="Resources\StatusAnnotations_Critical_16xSM.png" />
     <Content Include="Resources\StatusAnnotations_Critical_16xSM_color.png" />
