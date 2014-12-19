@@ -61,10 +61,10 @@ namespace SLDE
 				LanguagesChanged(null, null);
 		}
 
-		static void LanguageError(Type t)
+		static void LanguageError(Type t, Exception e)
 		{
 			Utility.ShowError("Unable to create instance of " + t.FullName +
-				". Forgot a constructor?");
+				": " + e.Message + "\n\n" + e.StackTrace);
 		}
 
 		/// <summary>
@@ -369,6 +369,7 @@ namespace SLDE
 			HighlightingStrategy = HighlightingStrategyFactory.CreateHighlightingStrategy(Name);
 			FoldingStrategy = new HlslFoldingStrategy();
 			FormattingStrategy = new HlslFormattingStrategy();
+			CompletionData = new SLDE.HLSL.Completion.HLSLCompletionProvider();
 		}
 	}
 

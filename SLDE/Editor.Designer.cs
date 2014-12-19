@@ -20,6 +20,7 @@
 			this.Name = "Editor";
 			this.ShowHRuler = true;
 			this.Size = new System.Drawing.Size(200, 200);
+			this.CompletionRequest += new System.EventHandler<DigitalRune.Windows.TextEditor.Completion.CompletionEventArgs>(this.Editor_CompletionRequest);
 			this.ParentChanged += new System.EventHandler(this.Editor_ParentChanged);
 			this.ResumeLayout(false);
 
