@@ -133,7 +133,7 @@
 			// filterButton
 			// 
 			this.filterButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.filterButton.Image = global::SLDE.Properties.Resources.filter_16xLG;
+			this.filterButton.Image = global::SLDE.Properties.Resources.Filter;
 			this.filterButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.filterButton.Name = "filterButton";
 			this.filterButton.Size = new System.Drawing.Size(29, 22);
@@ -141,7 +141,7 @@
 			// 
 			// errorButton
 			// 
-			this.errorButton.Image = global::SLDE.Properties.Resources.StatusAnnotations_Critical_16xLG_color;
+			this.errorButton.Image = global::SLDE.Properties.Resources.CriticalColor_16;
 			this.errorButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.errorButton.Name = "errorButton";
 			this.errorButton.Size = new System.Drawing.Size(57, 22);
@@ -149,7 +149,7 @@
 			// 
 			// warningButton
 			// 
-			this.warningButton.Image = global::SLDE.Properties.Resources.StatusAnnotations_Warning_16xLG_color;
+			this.warningButton.Image = global::SLDE.Properties.Resources.WarningColor;
 			this.warningButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.warningButton.Name = "warningButton";
 			this.warningButton.Size = new System.Drawing.Size(77, 22);
@@ -157,7 +157,7 @@
 			// 
 			// messageButton
 			// 
-			this.messageButton.Image = global::SLDE.Properties.Resources.StatusAnnotations_Information_16xLG_color;
+			this.messageButton.Image = global::SLDE.Properties.Resources.InformationColor;
 			this.messageButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.messageButton.Name = "messageButton";
 			this.messageButton.Size = new System.Drawing.Size(78, 22);
