@@ -172,7 +172,7 @@ namespace SLDE
 			tabToSet.dragPoint = dragTabs.PointToClient(mousePoint);
 
 			dragTabForm.FormBorderStyle = FormBorderStyle.None;
-			if (!mainWindow && !useThisForm && TabCount < 1 && Parent.Parent is Form)
+			if (!mainWindow && !useThisForm && TabCount < 1 && Parent != null && Parent.Parent is Form)
 				Parent.Parent = null;
 		}
 

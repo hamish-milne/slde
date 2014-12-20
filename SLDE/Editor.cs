@@ -242,7 +242,7 @@ namespace SLDE
 			{
 				if (e.Key == '\0')
 					ShowCompletionWindow(language.CompletionData, e.Key, false);
-				else if (Char.IsLetter(e.Key))
+				else if (Char.IsLetter(e.Key) && !CompletionWindowVisible)
 					ShowCompletionWindow(language.CompletionData, e.Key, true);
 			}
 		}

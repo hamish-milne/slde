@@ -44,3 +44,4 @@
 *.suo
 *.sdf
 *.opensdf
+*.sln.ide*

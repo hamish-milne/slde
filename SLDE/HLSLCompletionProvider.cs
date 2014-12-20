@@ -76,7 +76,10 @@ namespace SLDE.Completion
 		{
 			if (item == null)
 				throw new ArgumentNullException("item");
-			dict.Add(item.Text, item);
+			// TODO: Add priority combining
+			// For now, old > new
+			if(!dict.ContainsKey(item.Text))
+				dict.Add(item.Text, item);
 		}
 
 		public void AddRange(IDataList list)
@@ -509,7 +512,7 @@ namespace SLDE.HLSL.Completion
 						stack.Push(dataItem);
 					break;
 				default:
-					if (!CompletionUtility.Operators.Contains(c))
+					if (!item.IsOperator())
 					{
 						if (hasParameters && Parent != null)
 						{
@@ -536,7 +539,7 @@ namespace SLDE.HLSL.Completion
 		}
 	}
 
-	/*public class HLSLTypedef : HLSLType
+	public class HLSLTypedef : HLSLType
 	{
 		HLSLType reference;
 
@@ -544,6 +547,35 @@ namespace SLDE.HLSL.Completion
 		{
 			get { return reference; }
 			set { reference = value; }
+		}
+
+		public override CompletionData Parent
+		{
+			get
+			{
+				return reference == null ? base.Parent : reference.Parent;
+			}
+
+			set
+			{
+				base.Parent = value;
+				if (reference != null)
+					reference.Parent = value;
+			}
+		}
+
+		public override Substring TypeType
+		{
+			get
+			{
+				return reference == null ? base.TypeType : reference.TypeType;
+			}
+			set
+			{
+				base.TypeType = value;
+				if (reference != null)
+					reference.TypeType = value;
+			}
 		}
 
 		public override IDataList DataItems
@@ -574,7 +606,13 @@ namespace SLDE.HLSL.Completion
 					reference.Name = value;
 			}
 		}
-	}*/
+
+		public HLSLTypedef(Substring name, HLSLType reference)
+			: base("", name, null)
+		{
+			this.reference = reference;
+		}
+	}
 
 	public class HLSLType : CompletionData
 	{
@@ -674,7 +712,7 @@ namespace SLDE.HLSL.Completion
 			var c = item[0];
 			if(!Open && !Closed)
 			{
-				if(CompletionUtility.Operators.Contains(c))
+				if(item.IsOperator())
 				{
 					if (c == '{')
 						open = true;
@@ -698,7 +736,8 @@ namespace SLDE.HLSL.Completion
 			} else // Closed
 			{
 				stack.Pop();
-				stack.Push(new HLSLMember(item, this, stack.Peek()));
+				if(!item.IsOperator())
+					stack.Push(new HLSLMember(item, this, stack.Peek()));
 			}
 		}
 
@@ -770,11 +809,6 @@ namespace SLDE.HLSL.Completion
 			: base("", name, parent)
 		{
 			this.description = description;
-			Members.Add(new CompletionData("wxyz", ""));
-			Members.Add(new CompletionData("x", ""));
-			Members.Add(new CompletionData("y", ""));
-			Members.Add(new CompletionData("z", ""));
-			Members.Add(new CompletionData("w", ""));
 		}
 	}
 
@@ -974,6 +1008,120 @@ namespace SLDE.HLSL.Completion
 		{
 		}
 	}
+
+	public abstract class HLSLTemplate : HLSLPrimitive
+	{
+		protected bool templateOpen;
+		protected bool templateClosed;
+		protected List<CompletionData> templateParams = new List<CompletionData>();
+
+		public override void Parse(Substring item, Stack<CompletionData> stack)
+		{
+			if (item.Length < 1)
+				return;
+			var c = item[0];
+			if (templateOpen && templateClosed)
+				base.Parse(item, stack);
+			else if (templateOpen && !templateClosed)
+			{
+				if (c == '>')
+				{
+					templateClosed = true;
+					CloseTemplate();
+				}
+				else if (item.IsOperator() && c != ',')
+					stack.Pop();
+				else
+				{
+					var validData = Parent == null ? GetValidData(stack) : Parent.GetValidData(stack);
+					if (validData != null)
+					{
+						var data = validData[item];
+						if (data != null)
+							templateParams.Add(data);
+					}
+				}
+			} else
+			{
+				// !templateOpen
+				if (c == '<')
+					templateOpen = true;
+				else if (item.IsOperator())
+					stack.Pop();
+			}
+		}
+
+		protected abstract void CloseTemplate();
+
+		public HLSLTemplate(Substring name, string description, CompletionData parent)
+			: base(name, description, parent)
+		{
+		}
+	}
+
+	public class HLSLVector : HLSLTemplate
+	{
+		protected override void CloseTemplate()
+		{
+			if(templateParams.Count < 2)
+				return;
+			var type = templateParams[0] as HLSLPrimitive;
+			if (type == null || templateParams[1] == null)
+				return;
+			int num;
+			if (!Int32.TryParse(templateParams[1].Text.ToString(), out num))
+				return;
+			if (num < 1 || num > 4)
+				return;
+			Members.Add(new HLSLVariable("x", type, this));
+			if(num > 1)
+			{
+				Members.Add(new HLSLVariable("y", type, this));
+				Members.Add(new HLSLVariable("xy", type, this));
+				Members.Add(new HLSLVariable("yx", type, this));
+				if(num > 2)
+				{
+					Members.Add(new HLSLVariable("z", type, this));
+					Members.Add(new HLSLVariable("xz", type, this));
+					Members.Add(new HLSLVariable("zx", type, this));
+					Members.Add(new HLSLVariable("yz", type, this));
+					Members.Add(new HLSLVariable("zy", type, this));
+
+					Members.Add(new HLSLVariable("xyz", type, this));
+					Members.Add(new HLSLVariable("yxz", type, this));
+					Members.Add(new HLSLVariable("yzx", type, this));
+					Members.Add(new HLSLVariable("xzy", type, this));
+					Members.Add(new HLSLVariable("zxy", type, this));
+					Members.Add(new HLSLVariable("zyx", type, this));
+				}
+				if(num > 3)
+				{
+					Members.Add(new HLSLVariable("w", type, this));
+
+					Members.Add(new HLSLVariable("xyzw", type, this));
+					Members.Add(new HLSLVariable("yzxw", type, this));
+					Members.Add(new HLSLVariable("zyxw", type, this));
+					Members.Add(new HLSLVariable("wzyx", type, this));
+				}
+			}
+		}
+
+
+		public HLSLVector(string description, CompletionData parent)
+			: base("vector", description, parent)
+		{
+		}
+
+		public HLSLVector(HLSLPrimitive type, int number, CompletionData parent)
+			: this("", parent)
+		{
+			templateOpen = true;
+			templateClosed = true;
+			templateParams.Add(type);
+			templateParams.Add(new CompletionData(number.ToString(), ""));
+			CloseTemplate();
+		}
+	}
 	
 	public class HLSLRootScope : HLSLScope
 	{
@@ -1010,6 +1158,8 @@ namespace SLDE.HLSL.Completion
 				Members.Add(newType);
 				stack.Push(newType);
 			}
+			else if (item == "vector")
+				stack.Push(new HLSLVector("", this));
 			else
 				base.Parse(item, stack);
 		}
@@ -1037,8 +1187,16 @@ namespace SLDE.HLSL.Completion
 		public static readonly HashSet<char> Operators =
 			new HashSet<char> { '.', ':', ';', '<', '>', '@',
 				'[', ']', '{', '}', '(', ')', '#', '\'', '"',
-				'+', '-',  '&', '|', '~', '^', '$', '*', '/',
+				'/', '*', /*'+', '-',  '&', '|', '~', '^',*/ '$', 
 				'\\', '?', '!' , ',' };
+
+		public static bool IsOperator(this Substring item)
+		{
+			if (item.Length < 1)
+				return false;
+			return Operators.Contains(item[0]);
+		}
+
 	}
 
 	public class HLSLCompletionProvider : AbstractCompletionDataProvider
@@ -1090,9 +1248,51 @@ namespace SLDE.HLSL.Completion
 			unorm.DataItems.Add(Min10float);
 			unorm.DataItems.Add(Min16float);
 
-			Float.Semantics.Add(new HLSLSemantic("COLOR0"));
-			Float.Semantics.Add(new HLSLSemantic("COLOR1"));
-			Int.Semantics.Add(new HLSLSemantic("MySemantic"));
+			HLSLType Float4 = Float, Float2 = Float, UInt3 = UInt, Float3 = Float;
+
+			Float4.Semantics.Add(new HLSLSemantic("BINORMAL"));
+			UInt.Semantics.Add(new HLSLSemantic("BLENDINDICES"));
+			Float.Semantics.Add(new HLSLSemantic("BLENDWEIGHT"));
+			Float4.Semantics.Add(new HLSLSemantic("COLOR"));
+			Float4.Semantics.Add(new HLSLSemantic("NORMAL"));
+			Float4.Semantics.Add(new HLSLSemantic("POSITION"));
+			Float4.Semantics.Add(new HLSLSemantic("POSITIONT"));
+			Float.Semantics.Add(new HLSLSemantic("PSIZE"));
+			Float4.Semantics.Add(new HLSLSemantic("TANGENT"));
+			Float4.Semantics.Add(new HLSLSemantic("TEXCOORD"));
+			Float.Semantics.Add(new HLSLSemantic("FOG"));
+			Float.Semantics.Add(new HLSLSemantic("TESSFACTOR"));
+			Float.Semantics.Add(new HLSLSemantic("VFACE"));
+			Float2.Semantics.Add(new HLSLSemantic("VPOS"));
+			Float.Semantics.Add(new HLSLSemantic("DEPTH"));
+
+			Float.Semantics.Add(new HLSLSemantic("SV_ClipDistance"));
+			Float.Semantics.Add(new HLSLSemantic("SV_CullDistance"));
+			UInt.Semantics.Add(new HLSLSemantic("SV_Coverage"));
+			Float.Semantics.Add(new HLSLSemantic("SV_Depth"));
+			UInt3.Semantics.Add(new HLSLSemantic("SV_DispatchThreadID"));
+			Float2.Semantics.Add(new HLSLSemantic("SV_DomainLocation"));
+			Float3.Semantics.Add(Float2.Semantics["SV_DomainLocation"]);
+			UInt3.Semantics.Add(new HLSLSemantic("SV_GroupID"));
+			UInt.Semantics.Add(new HLSLSemantic("SV_GroupIndex"));
+			UInt3.Semantics.Add(new HLSLSemantic("SV_GroupThreadID"));
+			UInt.Semantics.Add(new HLSLSemantic("SV_GSInstanceID"));
+			Float.Semantics.Add(new HLSLSemantic("SV_InsideTessFactor"));
+			Float2.Semantics.Add(Float.Semantics["SV_InsideTessFactor"]);
+			Bool.Semantics.Add(new HLSLSemantic("SV_IsFrontFace"));
+			UInt.Semantics.Add(new HLSLSemantic("SV_OutputControlPointID"));
+			Float4.Semantics.Add(new HLSLSemantic("SV_Position"));
+			UInt.Semantics.Add(new HLSLSemantic("SV_RenderTargetArrayIndex"));
+			UInt.Semantics.Add(new HLSLSemantic("SV_SampleIndex"));
+			Float.Semantics.Add(new HLSLSemantic("SV_Target"));
+			Float2.Semantics.Add(new HLSLSemantic("SV_TessFactor"));
+			Float3.Semantics.Add(Float2.Semantics["SV_TessFactor"]);
+			Float4.Semantics.Add(Float2.Semantics["SV_TessFactor"]);
+			UInt.Semantics.Add(new HLSLSemantic("SV_ViewportArrayIndex"));
+			UInt.Semantics.Add(new HLSLSemantic("SV_InstanceID"));
+			UInt.Semantics.Add(new HLSLSemantic("SV_PrimitiveID"));
+			UInt.Semantics.Add(new HLSLSemantic("SV_VertexID"));
+
 
 			root.DataItems.Add(Bool);
 			root.DataItems.Add(Int);
