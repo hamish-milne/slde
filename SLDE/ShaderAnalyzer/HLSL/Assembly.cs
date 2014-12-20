@@ -119,7 +119,7 @@ namespace SLDE.ShaderAnalyzer.HLSL {
                     // Line number directive perhaps?
                     Match match = lineNumberMatchRegex.Match(line);
                     if (match.Success) {
-                        sourceLine = Int32.Parse(match.Groups["lineno"].Value);
+                        sourceLine = Int32.Parse(match.Groups["lineno"].Value) / 3;
                         if (match.Groups["filepath"].Success) {
                             sourcePath = match.Groups["filepath"].Value;
                         }
@@ -171,9 +171,7 @@ namespace SLDE.ShaderAnalyzer.HLSL {
 
                         // And beautify it!
 
-                        for (int argIndex = 0; argIndex < args.Count; argIndex++) {
-                            args[argIndex] = rt.Translate(args[argIndex]);
-                        }
+                        rt.Translate(args);
 
                         OpCodes.IOperator op;
                         string formattedLine;
@@ -205,7 +203,7 @@ namespace SLDE.ShaderAnalyzer.HLSL {
                 return false;
             }
 
-            return false;
+            return true;
         }
 
         private bool SplitArguments(string args, out List<string> ary) {

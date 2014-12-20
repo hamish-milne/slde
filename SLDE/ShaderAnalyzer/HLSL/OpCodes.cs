@@ -55,13 +55,13 @@ namespace SLDE.ShaderAnalyzer.HLSL {
         protected void AddOpCode(string id, InstructionType type, int returns, int arguments,
             int altArguments = -1, bool indents = false, bool dedents = false, string description = null) {
             
-            string format = constructDefaultFormatString(id, arguments);
-            string altFormat = constructDefaultFormatString(id, altArguments);
+            string format = ConstructDefaultFormatString(id, arguments);
+            string altFormat = ConstructDefaultFormatString(id, altArguments);
 
             AddOpCode(id, type, returns, format, altFormat, indents, dedents, description);
         }
 
-        private string constructDefaultFormatString(string id, int arguments) {
+        private string ConstructDefaultFormatString(string id, int arguments) {
             if (arguments > 0) {
                 string[] args = new string[arguments];
                 for (int i = 0; i < arguments; i++) {
@@ -111,8 +111,10 @@ namespace SLDE.ShaderAnalyzer.HLSL {
                 string returnString = String.Join(", ", tokens, startAt, returns);
                 startAt += returns;
 
-                object[] args = new object[tokens.Length - startAt];
-                Array.Copy(tokens, startAt, args, 0, args.Length);
+                var args = new object[tokens.Length - startAt];
+                for (int i = 0; i < args.Length; i++) {
+                    args[i] = new ArgFormatter(tokens[i + startAt]);
+                }
 
                 string bodyString;
                 try {
@@ -127,6 +129,34 @@ namespace SLDE.ShaderAnalyzer.HLSL {
 
                 return returnString + bodyString;
             }
+
+            private struct ArgFormatter : IFormattable {
+                private string value;
+
+                public ArgFormatter(string value) {
+                    this.value = value;
+                }
+
+                // Provides means to escape or hide negative sign in arguments
+                public string ToString(string format, IFormatProvider formatProvider) {
+                    if (format == "A") {
+                        // The argument is used in addition, let's convert the + sign if negative
+                        bool isNegative = value.StartsWith("-");
+                        if (isNegative) {
+                            return "- " + value.Substring(1);
+                        } else {
+                            return "+ " + value;
+                        }
+                    } else if (format == "P") {
+                        // The argument needs escaping through parentheses if negative
+                        bool isNegative = value.StartsWith("-");
+                        if (isNegative) {
+                            return String.Format("({0})", value);
+                        }
+                    }
+                    return value;
+                }
+            }
         }
 
         public class OpCodesDX9 : OpCodes {
@@ -137,13 +167,13 @@ namespace SLDE.ShaderAnalyzer.HLSL {
                 //            id                     type            ret  format/args    
                 AddOpCode("abs",         InstructionType.Arithmetic,   1, 1,
                     description: "Computes absolute value.");
-                AddOpCode("add",         InstructionType.Arithmetic,   1, "{0} + {1}");
+                AddOpCode("add",         InstructionType.Arithmetic,   1, "{0} {1:A}");
                 AddOpCode("cmp",         InstructionType.Arithmetic,   1, "({0} >= 0) ? {1} : {2}");
                 AddOpCode("crs",         InstructionType.Arithmetic,   1, 2,
                     description: "Computes a cross product using the right-hand rule.");
                 AddOpCode("dp2",         InstructionType.Arithmetic,   1, 2,
                     description: "Computes the two-component dot product of the source registers.");
-                AddOpCode("dp2add",      InstructionType.Arithmetic,   1, "dp2({0}, {1}) + {2}");
+                AddOpCode("dp2add",      InstructionType.Arithmetic,   1, "dp2({0}, {1}) {2:A}");
                 AddOpCode("dp3",         InstructionType.Arithmetic,   1, 2,
                     description: "Computes the three-component dot product of the source registers.");
                 AddOpCode("dp4",         InstructionType.Arithmetic,   1, 2,
@@ -180,19 +210,19 @@ namespace SLDE.ShaderAnalyzer.HLSL {
                     description: "Multiplies a 4-component vector by a 4x3 matrix starting at the specified register.");
                 AddOpCode("m4x4",        InstructionType.Arithmetic,   1, 2,
                     description: "Multiplies a 4-component vector by a 4x4 matrix starting at the specified register.");
-                AddOpCode("mad",         InstructionType.Arithmetic,   1, "{0} * {1} + {2}");
+                AddOpCode("mad",         InstructionType.Arithmetic,   1, "{0} * {1:P} {2:A}");
                 AddOpCode("max",         InstructionType.Arithmetic,   1, 2,
                     description: "Calculates the component-wise maximum of the sources.");
                 AddOpCode("min",         InstructionType.Arithmetic,   1, 2,
                     description: "Calculates the component-wise minimum of the sources.");
                 AddOpCode("mov",         InstructionType.Arithmetic,   1, "{0}");
                 AddOpCode("mova",        InstructionType.Arithmetic,   1, "{0}");
-                AddOpCode("mul",         InstructionType.Arithmetic,   1, "{0} * {1}");
+                AddOpCode("mul",         InstructionType.Arithmetic,   1, "{0} * {1:P}");
                 AddOpCode("nrm",         InstructionType.Arithmetic,   1, 1,
                     description: "Normalize a 3D vector.");
                 AddOpCode("pow",         InstructionType.Arithmetic,   1, 2,
                     description: "Full precision abs(x)^y.");
-                AddOpCode("rcp",         InstructionType.Arithmetic,   1, "1.0 / {0}");
+                AddOpCode("rcp",         InstructionType.Arithmetic,   1, "1.0 / {0:P}");
                 AddOpCode("rsq",         InstructionType.Arithmetic,   1, "1.0 / sqrt({0})");
                 AddOpCode("sge",         InstructionType.Arithmetic,   1, "({0} >= {1}) ? 1.0 : 0.0");
                 AddOpCode("sgn",         InstructionType.Arithmetic,   1, 3,
@@ -294,7 +324,7 @@ namespace SLDE.ShaderAnalyzer.HLSL {
 
                 //                 -----  Arithmetic Instructions -----
                 //            id                     type            ret  format/args    
-                AddOpCode("add",         InstructionType.Arithmetic,   1, "{0} + {1}");
+                AddOpCode("add",         InstructionType.Arithmetic,   1, "{0} {1:A}");
                 AddOpCode("dp2",         InstructionType.Arithmetic,   1, 2,
                     description: "Computes the two-component dot product of the source registers.");
                 AddOpCode("dp3",         InstructionType.Arithmetic,   1, 2,
@@ -307,14 +337,14 @@ namespace SLDE.ShaderAnalyzer.HLSL {
                     description: "Returns the fractional portion of each input component.");
                 AddOpCode("log",         InstructionType.Arithmetic,   1, 1,
                     description: "Provides full precision base 2 logarithm.");
-                AddOpCode("mad",         InstructionType.Arithmetic,   1, "{0} * {1} + {2}");
+                AddOpCode("mad",         InstructionType.Arithmetic,   1, "{0} * {1:P} {2:A}");
                 AddOpCode("max",         InstructionType.Arithmetic,   1, 2,
                     description: "Calculates the component-wise maximum of the sources.");
                 AddOpCode("min",         InstructionType.Arithmetic,   1, 2,
                     description: "Calculates the component-wise minimum of the sources.");
                 AddOpCode("mov",         InstructionType.Arithmetic,   1, "{0}");
-                AddOpCode("mul",         InstructionType.Arithmetic,   1, "{0} * {1}");
-                AddOpCode("rcp",         InstructionType.Arithmetic,   1, "1.0 / {0}");
+                AddOpCode("mul",         InstructionType.Arithmetic,   1, "{0} * {1:P}");
+                AddOpCode("rcp",         InstructionType.Arithmetic,   1, "1.0 / {0:P}");
                 AddOpCode("rsq",         InstructionType.Arithmetic,   1, "1.0 / sqrt({0})");
                 AddOpCode("sincos",      InstructionType.Arithmetic,   2, 1,
                     description: "Component-wise sin(x) in the first output and cos(x) in the second " +

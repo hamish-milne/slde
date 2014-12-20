@@ -97,7 +97,6 @@
     <Compile Include="ErrorList.Designer.cs">
       <DependentUpon>ErrorList.cs</DependentUpon>
     </Compile>
-    <Compile Include="HLSLCompletionData.cs" />
     <Compile Include="HLSLCompletionProvider.cs" />
     <Compile Include="ICompiler.cs" />
     <Compile Include="IDEForm.cs">

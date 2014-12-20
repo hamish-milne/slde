@@ -127,33 +127,21 @@ namespace SLDE.ShaderAnalyzer.HLSL {
 
         }
 
-        public string Translate(string identifier) {
-            Match item = identifierParseRegex.Match(identifier);
-            if (item.Success) {
-                string id = item.Groups["id"].Value;
-                if (registerDict.ContainsKey(id)) {
-                    var rm = new RegisterMatch();
-                    rm.id = id;
-                    rm.mask = item.Groups["mask"].Value;
-
-                    if (item.Groups["index1"].Success) {
-                        rm.index = Int32.Parse(item.Groups["index1"].Value); // TODO: support for dynamic indexing
+        public void Translate(List<string> args) {
+            string outputMask = null;
+            for (int i = 0; i < args.Count; i++) {
+                var rm = new RegisterMatch(args[i], outputMask);
+                if (rm.IsValid()) {
+                    if (registerDict.ContainsKey(rm.id)) {
+                        args[i] = registerDict[rm.id].Translate(rm);
+                    } else {
+                        args[i] = rm.ToString();
                     }
-                    if (item.Groups["index2"].Success) {
-                        rm.bodyIndex = Int32.Parse(item.Groups["index2"].Value);
-                    }
-                    if (item.Groups["absl"].Success || item.Groups["absk"].Success) {
-                        rm.hasAbs = true;
-                    }
-                    if (item.Groups["neg"].Success) {
-                        rm.hasNeg = true;
-                    }
-
-                    return registerDict[id].Translate(rm);
+                }
+                if (i == 0) {
+                    outputMask = rm.mask;
                 }
             }
-
-            return identifier;
         }
 
         private class RegisterMatch {
@@ -164,6 +152,30 @@ namespace SLDE.ShaderAnalyzer.HLSL {
             public string mask = null;
             public bool hasAbs;
             public bool hasNeg;
+
+            public RegisterMatch(string identifier, string outputMask = null) {
+                Match item = identifierParseRegex.Match(identifier);
+                id = item.Groups["id"].Value;
+                mask = FilterMask(item.Groups["mask"].Value, outputMask);
+
+                if (item.Groups["index1"].Success) {
+                    index = Int32.Parse(item.Groups["index1"].Value); // TODO: support for dynamic indexing
+                }
+                if (item.Groups["index2"].Success) {
+                    bodyIndex = Int32.Parse(item.Groups["index2"].Value);
+                }
+                if (item.Groups["absl"].Success || item.Groups["absk"].Success) {
+                    hasAbs = true;
+                }
+                if (item.Groups["neg"].Success) {
+                    hasNeg = true;
+                }
+
+            }
+
+            public bool IsValid() {
+                return !String.IsNullOrEmpty(id);
+            }
 
             public bool IsIndexed() {
                 return index >= 0;
@@ -179,6 +191,44 @@ namespace SLDE.ShaderAnalyzer.HLSL {
 
             public bool IsMasked() {
                 return !String.IsNullOrEmpty(mask);
+            }
+
+            public override string ToString() {
+                // Identity translation
+                var sb = new StringBuilder(id.Length + 11);
+                if (hasNeg) {
+                    sb.Append("-");
+                }
+                if (hasAbs) {
+                    sb.Append("abs(");
+                }
+                sb.Append(id);
+                if (IsMasked() && mask != "xyzw") {
+                    sb.Append(".");
+                    sb.Append(mask);
+                }
+                if (hasAbs) {
+                    sb.Append(")");
+                }
+                return sb.ToString();
+            }
+
+            private string FilterMask(string argMask, string outputMask = null) {
+                if (outputMask == null || outputMask.Length < 2 || outputMask.Length > 3) {
+                    return argMask;
+                }
+
+                if (String.IsNullOrEmpty(argMask)) {
+                    return outputMask;
+                } else if (argMask.Length < 4) {
+                    return argMask;
+                } else {
+                    var sb = new StringBuilder(4);
+                    foreach (char c in outputMask) {
+                        sb.Append(argMask[MiscUtilities.ComponentMaskToIndex(c)]);
+                    }
+                    return sb.ToString();
+                }
             }
 
         }
@@ -266,9 +316,8 @@ namespace SLDE.ShaderAnalyzer.HLSL {
                 this.width = width;
             }
 
-
             public string Translate(RegisterMatch match) {
-                StringBuilder sb = new StringBuilder(name.Length + 11);
+                var sb = new StringBuilder(name.Length + 11);
                 if (match.hasNeg) {
                     sb.Append("-");
                 }
@@ -309,7 +358,7 @@ namespace SLDE.ShaderAnalyzer.HLSL {
             }
 
             public string Translate(RegisterMatch match) {
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 if (match.hasNeg) {
                     sb.Append("-");
                 }

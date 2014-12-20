@@ -16,7 +16,7 @@ namespace TestShaderAnalyzer
 			string shader = File.ReadAllText(path);
             
             analyzer.UpdateShader(shader, path);
-            IAssembly assembly = analyzer.Compile("main", ShaderModel.PIXEL_SHADER_3_0);
+            IAssembly assembly = analyzer.Compile("main2", ShaderModel.PIXEL_SHADER_3_0);
 
 
             Debug.Print("\n---------- Assembly ----------");
@@ -25,7 +25,13 @@ namespace TestShaderAnalyzer
 
             Debug.Print("\n---------- Errors ----------");
 
-            Debug.Print(assembly.GetRawCompilerErrors());
+            foreach (Notification nt in assembly.GetNotifications()) {
+                Debug.Print(nt.Message);
+            }
+
+            foreach (AssemblyNotification ant in assembly.GetAssemblyNotifications()) {
+                Debug.Print("{0}: {1}", ant.InstructionIndex, ant.Message);
+            }
 
             Debug.Print("\n---------- Parsed assembly ----------");
 
