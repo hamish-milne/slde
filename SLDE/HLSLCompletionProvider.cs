@@ -1346,9 +1346,9 @@ namespace SLDE.HLSL.Completion
 			root.Members.Clear();
 			var text = textArea.Document.TextBufferStrategy;
 			var caretPos = textArea.Caret.Offset;
-			for(int pos = 0; pos < caretPos; pos++)
+			for(int pos = 0; pos <= caretPos; pos++)
 			{
-				var c = text.GetCharAt(pos);
+				var c = pos >= caretPos ? charTyped : text.GetCharAt(pos);
 				if (Char.IsWhiteSpace(c) || Char.IsControl(c))
 					continue;
 				if(CompletionUtility.Operators.Contains(c))
@@ -1407,10 +1407,12 @@ namespace SLDE.HLSL.Completion
 				}
 				// If it's not an operator, it's some sort of identifier
 				int start = pos;
-				while (++pos < caretPos)
+				while (++pos <= caretPos)
 				{
-					c = text.GetCharAt(pos);
-					if(Char.IsWhiteSpace(c) || Char.IsControl(c)
+					if(pos < caretPos)
+						c = text.GetCharAt(pos);
+					if(pos >= caretPos
+						|| Char.IsWhiteSpace(c) || Char.IsControl(c)
 						|| CompletionUtility.Operators.Contains(c))
 					{
 						var length = pos - start;

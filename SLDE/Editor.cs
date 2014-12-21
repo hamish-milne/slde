@@ -240,10 +240,11 @@ namespace SLDE
 		{
 			if(language != null && language.CompletionData != null)
 			{
-				if (e.Key == '\0')
-					ShowCompletionWindow(language.CompletionData, e.Key, false);
-				else if (Char.IsLetter(e.Key) && !CompletionWindowVisible)
-					ShowCompletionWindow(language.CompletionData, e.Key, true);
+				bool isForceComplete = language.ForceCompletionChars == null
+					? false : language.ForceCompletionChars.Contains(e.Key);
+				if (!Char.IsWhiteSpace(e.Key) &&
+					(isForceComplete || (Char.IsLetterOrDigit(e.Key) && !CompletionWindowVisible)))
+					ShowCompletionWindow(language.CompletionData, e.Key, !isForceComplete);
 			}
 		}
 	}

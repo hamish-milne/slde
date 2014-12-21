@@ -161,6 +161,11 @@ namespace SLDE
 		public virtual ICompletionDataProvider CompletionData { get; set; }
 
 		/// <summary>
+		/// These keys will force a completion window to open
+		/// </summary>
+		public virtual ICollection<char> ForceCompletionChars { get; set; }
+
+		/// <summary>
 		/// The compiler
 		/// </summary>
 		public virtual ICompiler Compiler { get; set; }
@@ -361,7 +366,7 @@ namespace SLDE
 	[Language]
 	public class HLSLLanguage : Language
 	{
-		static string[] HLSLExtensions = new string[] { ".fx", ".fxh", ".hlsl", ".compute", ".cginc" };
+		static string[] HLSLExtensions = new string[] { ".fx", ".fxh", ".hlsl", ".compute" };
 
 		public HLSLLanguage() : base("HLSL")
 		{
@@ -370,6 +375,18 @@ namespace SLDE
 			FoldingStrategy = new HlslFoldingStrategy();
 			FormattingStrategy = new HlslFormattingStrategy();
 			CompletionData = new SLDE.HLSL.Completion.HLSLCompletionProvider();
+			ForceCompletionChars = new char[] { '\0', '.' };
+		}
+	}
+
+	[Language]
+	public class CgLanguage : HLSLLanguage
+	{
+		static string[] CgExtensions = new string[] { ".cg", ".cginc" };
+
+		public CgLanguage() : base()
+		{
+			Name = "Cg";
 		}
 	}
 
@@ -389,12 +406,12 @@ namespace SLDE
 	/// Unity shader language
 	/// </summary>
 	[Language]
-	public class ShaderLab : HLSLLanguage
+	public class ShaderLab : CgLanguage
 	{
 		public ShaderLab() : base()
 		{
 			Name = "ShaderLab";
-			Extensions = new string[] { ".shader" };
+			Extensions = new string[] { ".shader", ".compute" };
 		}
 	}
 	
