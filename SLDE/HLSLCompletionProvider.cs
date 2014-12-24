@@ -1,336 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using DigitalRune.Windows.TextEditor;
 using DigitalRune.Windows.TextEditor.Completion;
 using System.Windows.Forms;
 using SLDE.Properties;
-
-namespace SLDE.Completion
-{
-	public interface IDataList : ICollection<CompletionData>
-	{
-		CompletionData this[Substring name] { get; }
-		void AddRange(IDataList list);
-		CompletionData[] ToArray();
-	}
-
-	public class DataList : IDataList
-	{
-		class Enumerator : IEnumerator<CompletionData>
-		{
-			IEnumerator<KeyValuePair<Substring, CompletionData>> internalEnumerator;
-
-			public CompletionData Current
-			{
-				get { return internalEnumerator.Current.Value; }
-			}
-
-			object IEnumerator.Current
-			{
-				get { return internalEnumerator.Current.Value; }
-			}
-
-			public bool MoveNext()
-			{
-				return internalEnumerator.MoveNext();
-			}
-
-			public void Dispose()
-			{
-				internalEnumerator.Dispose();
-			}
-
-			public void Reset()
-			{
-				internalEnumerator.Reset();
-			}
-
-			public Enumerator(IEnumerator<KeyValuePair<Substring, CompletionData>> internalEnumerator)
-			{
-				this.internalEnumerator = internalEnumerator;
-			}
-		}
-
-		Dictionary<Substring, CompletionData> dict
-			= new Dictionary<Substring, CompletionData>();
-
-		public int Count
-		{
-			get { return dict.Count; }
-		}
-
-		public CompletionData this[Substring name]
-		{
-			get
-			{
-				CompletionData ret;
-				dict.TryGetValue(name, out ret);
-				return ret;
-			}
-		}
-
-		public void Add(CompletionData item)
-		{
-			if (item == null)
-				throw new ArgumentNullException("item");
-			// TODO: Add priority combining
-			// For now, old > new
-			if(!dict.ContainsKey(item.Text))
-				dict.Add(item.Text, item);
-		}
-
-		public void AddRange(IDataList list)
-		{
-			if (list == null)
-				return;
-			foreach (var item in list)
-				Add(item);
-		}
-
-		public IEnumerator<CompletionData> GetEnumerator()
-		{
-			return new Enumerator(dict.GetEnumerator());
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
-		public CompletionData[] ToArray()
-		{
-			var values = dict.Values;
-			var array = new CompletionData[values.Count];
-			values.CopyTo(array, 0);
-			return array;
-		}
-
-		public void Clear()
-		{
-			dict.Clear();
-		}
-
-		public bool Contains(CompletionData item)
-		{
-			if (item == null)
-				return false;
-			return dict.ContainsKey(item.Text);
-		}
-
-		public void CopyTo(CompletionData[] array, int arrayIndex)
-		{
-			dict.Values.CopyTo(array, arrayIndex);
-		}
-
-		public bool IsReadOnly
-		{
-			get { return false; }
-		}
-
-		public bool Remove(CompletionData item)
-		{
-			if (item == null)
-				return false;
-			return dict.Remove(item.Text);
-		}
-
-	}
-
-	public struct Substring : IEquatable<Substring>
-	{
-		string source;
-		int start;
-		int length;
-
-		public Substring(string source, int start, int length)
-		{
-			if (source == null || start < 0 || length < 0 
-				|| (start + length) > source.Length)
-				throw new ArgumentException("Invalid substring arguments");
-			this.source = source;
-			this.start = start;
-			this.length = length;
-		}
-
-		public int Length
-		{
-			get { return length; }
-		}
-
-		public char this[int index]
-		{
-			get { return source[start + index]; }
-		}
-
-		public override string ToString()
-		{
-			if (source == null)
-				return "";
-			return source.Substring(start, length);
-		}
-
-		public override int GetHashCode()
-		{
-			int length = this.length;
-			int hash = 5381;
-			while (length-- > 0)
-				hash = ((hash << 5) + hash) ^ (int)source[length];
-			return hash;
-		}
-
-		public bool Equals(Substring other)
-		{
-			if (other.length != this.length)
-				return false;
-			int length = this.length;
-			while (length-- > 0)
-				if (source[start + length] != other.source[other.start + length])
-					return false;
-			return true;
-		}
-
-		public override bool Equals(object obj)
-		{
-			if (obj == null || !(obj is Substring))
-				return false;
-			return Equals((Substring)obj);
-		}
-
-		public static implicit operator Substring(string str)
-		{
-			if (str == null) str = "";
-			return new Substring(str, 0, str.Length);
-		}
-
-		public static explicit operator string(Substring str)
-		{
-			return str.ToString();
-		}
-
-		public static bool operator ==(Substring a, Substring b)
-		{
-			return a.Equals(b);
-		}
-
-		public static bool operator !=(Substring a, Substring b)
-		{
-			return !a.Equals(b);
-		}
-	}
-
-	public class CompletionData : ICompletionData
-	{
-		protected Substring text;
-		protected string description;
-		protected double priority = 0;
-		protected int version;
-
-		public virtual bool IsCompatible
-		{
-			get { return true; }
-		}
-
-		string ICompletionData.Text
-		{
-			get { return Text.ToString(); }
-		}
-
-		public virtual Substring Text
-		{
-			get { return text; }
-		}
-		
-		public virtual string Description
-		{
-			get { return description; }
-		}
-
-		public virtual double Priority
-		{
-			get { return priority; }
-		}
-
-		public virtual int ImageIndex
-		{
-			get { return 0; }
-		}
-
-		public int Version
-		{
-			get { return version; }
-		}
-
-		public virtual IDataList DataItems
-		{
-			get { return null; }
-		}
-
-		public virtual IDataList GetValidData(Stack<CompletionData> stack)
-		{
-			return DataItems;
-		}
-
-		public virtual bool InsertAction(TextArea textArea, char insertChar)
-		{
-			textArea.InsertString(Text.ToString());
-			return false;
-		}
-
-		public CompletionData(Substring text, string description)
-		{
-			this.text = text;
-			this.description = description;
-		}
-
-		protected static string GetPrefix(CompletionData data, string append)
-		{
-			return (data == null ? "" : data.Text + append);
-		}
-
-		public virtual void Parse(Substring item, Stack<CompletionData> stack)
-		{
-			if (DataItems == null)
-				stack.Pop();
-			else
-			{
-				var data = DataItems[item];
-				if (data != null)
-					stack.Push(data);
-			}
-		}
-
-		protected CompletionData parent;
-
-		public virtual IDataList Members { get { return null; } }
-		public virtual CompletionData Parent
-		{
-			get { return parent; }
-			set { parent = value; }
-		}
-
-		protected static IDataList GetValidDataRecursive(Stack<CompletionData> stack, CompletionData scope, ref bool recursionLock, ref IDataList validData)
-		{
-			if (recursionLock)
-				return null;
-			recursionLock = true;
-			if (validData == null)
-				validData = new DataList();
-			validData.Clear();
-			if(scope.DataItems != null)
-				validData.AddRange(scope.DataItems);
-			if(scope.Members != null)
-				validData.AddRange(scope.Members);
-			var parentData = scope.Parent == null ? null : scope.Parent.GetValidData(stack);
-			if (parentData != null)
-				validData.AddRange(parentData);
-			recursionLock = false;
-			return validData;
-		}
-	}
-}
 
 namespace SLDE.HLSL.Completion
 {
@@ -340,7 +13,7 @@ namespace SLDE.HLSL.Completion
 	{
 		protected IDataList validData;
 
-		public override IDataList DataItems
+		public virtual IDataList DataItems
 		{
 			get
 			{
@@ -350,9 +23,15 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public override IDataList GetValidData(Stack<CompletionData> stack)
+		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
 		{
 			return DataItems;
+		}
+
+		public override void AddChild(CompletionData item)
+		{
+			if(item != null)
+				DataItems.Add(item);
 		}
 
 		public HLSLKeyword(Substring name, string description)
@@ -377,7 +56,7 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public override IDataList Members
+		public virtual IDataList Members
 		{
 			get
 			{
@@ -445,12 +124,12 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public override IDataList GetValidData(Stack<CompletionData> stack)
+		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
 		{
 			if (hasSemantic && Type != null)
 				return Type.Semantics;
 			if (hasParameters)
-				return Parent.GetValidData(stack);
+				return base.GetVisibleItems<T>(stack);
 			return null;
 		}
 
@@ -487,7 +166,7 @@ namespace SLDE.HLSL.Completion
 						stack.Push(new HLSLScope("", stack.Peek()));
 						return;
 					}
-					if (stack.Peek() == null || stack.Peek().Members == null)
+					if (stack.Peek() == null)
 						return;
 					CompletionData dataItem;
 					if(isFunction)
@@ -503,7 +182,7 @@ namespace SLDE.HLSL.Completion
 						variable.Semantic = parsedSemantic;
 						dataItem = variable;
 					}
-					stack.Peek().Members.Add(dataItem);
+					stack.Peek().AddChild(dataItem);
 					if (c == ',' && !(stack.Peek() is HLSLMember))
 						stack.Push(Type);
 					else if (c == ')' && stack.Peek() is HLSLMember)
@@ -516,7 +195,7 @@ namespace SLDE.HLSL.Completion
 					{
 						if (hasParameters && Parent != null)
 						{
-							stack.Push(Parent.GetValidData(stack)[item]);
+							stack.Push(Parent.GetVisibleItems(stack)[item]);
 						}
 						else if (hasSemantic)
 						{
@@ -535,7 +214,7 @@ namespace SLDE.HLSL.Completion
 			: base(name, null)
 		{
 			this.type = type;
-			this.parent = parent;
+			base.Parent = parent;
 		}
 	}
 
@@ -578,20 +257,17 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public override IDataList DataItems
-		{
-			get
-			{
-				return reference == null ? null : reference.DataItems;
-			}
-		}
-
 		public override IDataList Members
 		{
 			get
 			{
 				return reference == null ? null : reference.Members;
 			}
+		}
+
+		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
+		{
+			return reference == null ? null : reference.GetVisibleItems<T>(stack);
 		}
 
 		public override Substring Name
@@ -616,9 +292,8 @@ namespace SLDE.HLSL.Completion
 
 	public class HLSLType : CompletionData
 	{
-		protected IDataList members;
-		bool recursionLock;
-		IDataList validData, semantics;
+		IDataList members;
+		IDataList semantics;
 		bool open, closed;
 		Substring typeType;
 
@@ -670,15 +345,15 @@ namespace SLDE.HLSL.Completion
 
 		public override CompletionData Parent
 		{
-			get { return parent; }
+			get { return base.Parent; }
 			set
 			{
-				parent = value;
+				base.Parent = value;
 				description = null;
 			}
 		}
 
-		public override IDataList Members
+		public virtual IDataList Members
 		{
 			get
 			{
@@ -688,11 +363,11 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public override IDataList GetValidData(Stack<CompletionData> stack)
+		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
 		{
 			if (!Open || Closed)
 				return null;
-			return GetValidDataRecursive(stack, this, ref recursionLock, ref validData);
+			return base.GetVisibleItems<T>(stack);
 		}
 
 		public override string Description
@@ -729,7 +404,7 @@ namespace SLDE.HLSL.Completion
 					stack.Pop();
 					return;
 				}
-				var data = GetValidData(stack);
+				var data = GetVisibleItems(stack);
 				var push = data == null ? null : data[item];
 				if(push != null)
 					stack.Push(push);
@@ -745,7 +420,7 @@ namespace SLDE.HLSL.Completion
 			: base(name, null)
 		{
 			this.typeType = typeType;
-			this.parent = parent;
+			base.Parent = parent;
 		}
 	}
 
@@ -753,21 +428,13 @@ namespace SLDE.HLSL.Completion
 	{
 		protected IDataList dataItems;
 
-		public override IDataList DataItems
+		public virtual IDataList DataItems
 		{
 			get
 			{
 				if (dataItems == null)
 					dataItems = new DataList();
 				return dataItems;
-			}
-		}
-
-		public override string Description
-		{
-			get
-			{
-				return description;
 			}
 		}
 
@@ -787,24 +454,6 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public override Substring Name
-		{
-			get { return text; }
-			set
-			{
-				text = value;
-			}
-		}
-
-		public override CompletionData Parent
-		{
-			get { return parent; }
-			set
-			{
-				parent = value;
-			}
-		}
-
 		public HLSLPrimitive(Substring name, string description, CompletionData parent)
 			: base("", name, parent)
 		{
@@ -814,8 +463,8 @@ namespace SLDE.HLSL.Completion
 
 	public class HLSLVariable : HLSLMember
 	{
-		protected HLSLSemantic semantic;
-		protected bool hasDot;
+		HLSLSemantic semantic;
+		bool hasDot;
 
 		public virtual HLSLSemantic Semantic
 		{
@@ -827,14 +476,14 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public override IDataList GetValidData(Stack<CompletionData> stack)
+		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
 		{
 			if (hasDot && Type != null)
 			{
 				hasDot = false;
 				return Type.Members;
 			}
-			return base.GetValidData(stack);
+			return base.GetVisibleItems<T>(stack);
 		}
 
 		public override string Description
@@ -886,9 +535,8 @@ namespace SLDE.HLSL.Completion
 	{
 		protected IDataList members;
 		protected IDataList validData;
-		bool recursionLock;
 
-		public override IDataList Members
+		public virtual IDataList Members
 		{
 			get
 			{
@@ -896,11 +544,6 @@ namespace SLDE.HLSL.Completion
 					members = new DataList();
 				return members;
 			}
-		}
-
-		public override IDataList GetValidData(Stack<CompletionData> stack)
-		{
-			return GetValidDataRecursive(stack, this, ref recursionLock, ref validData);
 		}
 
 		public override void Parse(Substring item, Stack<CompletionData> stack)
@@ -914,7 +557,7 @@ namespace SLDE.HLSL.Completion
 				stack.Pop();
 			else
 			{
-				var allData = GetValidData(stack);
+				var allData = GetVisibleItems(stack);
 				var dataItem = allData[item];
 				if (dataItem != null)
 					stack.Push(dataItem);
@@ -924,7 +567,7 @@ namespace SLDE.HLSL.Completion
 		public HLSLScope(Substring name, CompletionData parent)
 			: base(name, null)
 		{
-			this.parent = parent;
+			base.Parent = parent;
 		}
 	}
 
@@ -933,7 +576,6 @@ namespace SLDE.HLSL.Completion
 		IDataList arguments;
 		HLSLType returnType;
 		IDataList dataItems;
-		bool recursionLock;
 		HLSLSemantic semantic;
 
 		public virtual IDataList Arguments
@@ -954,7 +596,7 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public override IDataList DataItems
+		public virtual IDataList DataItems
 		{
 			get
 			{
@@ -990,11 +632,13 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public override IDataList GetValidData(Stack<CompletionData> stack)
+		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
 		{
-			GetValidDataRecursive(stack, this, ref recursionLock, ref validData);
-			validData.AddRange(Arguments);
-			return validData;
+			var data = GetVisibleItems(stack);
+			if (data == null)
+				return Arguments;
+			data.AddRange(Arguments);
+			return data;
 		}
 
 		public virtual HLSLType ReturnType
@@ -1024,22 +668,25 @@ namespace SLDE.HLSL.Completion
 				base.Parse(item, stack);
 			else if (templateOpen && !templateClosed)
 			{
+				if (item.IsOperator())
+				{
+					if(c != ',' && c != '>')
+						stack.Pop();
+				} else
+				{
+					var validData = Parent == null ?
+						GetVisibleItems(stack) : Parent.GetVisibleItems(stack);
+					CompletionData data = null;
+					if (validData != null)
+						data = validData[item];
+					if (data == null)
+						data = new CompletionData(item, "");
+					templateParams.Add(data);
+				}
 				if (c == '>')
 				{
 					templateClosed = true;
 					CloseTemplate();
-				}
-				else if (item.IsOperator() && c != ',')
-					stack.Pop();
-				else
-				{
-					var validData = Parent == null ? GetValidData(stack) : Parent.GetValidData(stack);
-					if (validData != null)
-					{
-						var data = validData[item];
-						if (data != null)
-							templateParams.Add(data);
-					}
 				}
 			} else
 			{
@@ -1130,7 +777,7 @@ namespace SLDE.HLSL.Completion
 			= new HashSet<Substring>() { "struct", "class", "interface" };
 		protected IDataList rootDataItems;
 
-		public override IDataList DataItems
+		public virtual IDataList DataItems
 		{
 			get
 			{
@@ -1164,7 +811,7 @@ namespace SLDE.HLSL.Completion
 				base.Parse(item, stack);
 		}
 
-		public override IDataList GetValidData(Stack<CompletionData> stack)
+		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
 		{
 			if (validData == null)
 				validData = new DataList();
@@ -1424,7 +1071,7 @@ namespace SLDE.HLSL.Completion
 			}
 			if (stack.Count < 1 || stack.Peek() == null)
 				return null;
-			var data = stack.Peek().GetValidData(stack);
+			var data = stack.Peek().GetVisibleItems(stack);
 			return data == null ? null : data.ToArray();
 		}
 
