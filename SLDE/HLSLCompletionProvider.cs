@@ -366,8 +366,8 @@ namespace SLDE.HLSL.Completion
 		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
 		{
 			if (!Open || Closed)
-				return null;
-			return base.GetVisibleItems<T>(stack);
+				return new DataList();
+			return base.GetVisibleItems<T>(stack).AddRange(Members);
 		}
 
 		public override string Description
@@ -414,6 +414,11 @@ namespace SLDE.HLSL.Completion
 				if(!item.IsOperator())
 					stack.Push(new HLSLMember(item, this, stack.Peek()));
 			}
+		}
+
+		public override void AddChild(CompletionData item)
+		{
+			Members.Add(item);
 		}
 
 		public HLSLType(Substring typeType, Substring name, CompletionData parent)
@@ -531,10 +536,9 @@ namespace SLDE.HLSL.Completion
 		}
 	}
 
-	public class HLSLScope : CompletionData
+	public class HLSLScopeBase : CompletionData
 	{
 		protected IDataList members;
-		protected IDataList validData;
 
 		public virtual IDataList Members
 		{
@@ -564,10 +568,23 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public HLSLScope(Substring name, CompletionData parent)
+		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
+		{
+			return base.GetVisibleItems<T>(stack).AddRange(Members);
+		}
+
+		public HLSLScopeBase(Substring name, CompletionData parent)
 			: base(name, null)
 		{
 			base.Parent = parent;
+		}
+	}
+
+	public class HLSLScope : HLSLScopeBase
+	{
+		public HLSLScope(Substring name, CompletionData parent)
+			: base(name, parent)
+		{
 		}
 	}
 
@@ -776,6 +793,7 @@ namespace SLDE.HLSL.Completion
 		protected HashSet<Substring> typeTypes
 			= new HashSet<Substring>() { "struct", "class", "interface" };
 		protected IDataList rootDataItems;
+		protected IDataList validData;
 
 		public virtual IDataList DataItems
 		{

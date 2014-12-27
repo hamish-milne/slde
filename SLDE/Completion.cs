@@ -10,7 +10,7 @@ namespace SLDE.Completion
 	public interface IDataList : ICollection<CompletionData>
 	{
 		CompletionData this[Substring name] { get; }
-		void AddRange(IDataList list);
+		IDataList AddRange(IDataList list);
 		CompletionData[] ToArray();
 	}
 
@@ -79,12 +79,13 @@ namespace SLDE.Completion
 				dict.Add(item.Text, item);
 		}
 
-		public void AddRange(IDataList list)
+		public IDataList AddRange(IDataList list)
 		{
 			if (list == null)
-				return;
+				return this;
 			foreach (var item in list)
 				Add(item);
+			return this;
 		}
 
 		public IEnumerator<CompletionData> GetEnumerator()
@@ -343,7 +344,7 @@ namespace SLDE.Completion
 		public virtual IDataList GetVisibleItems<T>(Stack<CompletionData> stack) where T : CompletionData
 		{
 			if (recursionLock || Parent == null)
-				return null;
+				return new DataList();
 			recursionLock = true;
 			var ret = Parent.GetVisibleItems<T>(stack);
 			recursionLock = false;
