@@ -133,6 +133,30 @@ namespace SLDE.HLSL.Completion
 			return null;
 		}
 
+		CompletionData Create(Stack<CompletionData> stack)
+		{
+			CompletionData dataItem;
+			if (isFunction)
+			{
+				var func = new HLSLFunction(Name, Type, stack.Peek());
+				func.Arguments.AddRange(Members);
+				func.Semantic = parsedSemantic;
+				dataItem = func;
+			}
+			else
+			{
+				var variable = new HLSLVariable(Name, Type, stack.Peek());
+				variable.Semantic = parsedSemantic;
+				dataItem = variable;
+			}
+			return dataItem;
+		}
+
+		public override void AddChild(CompletionData item)
+		{
+			Members.Add(item);
+		}
+
 		public override void Parse(Substring item, Stack<CompletionData> stack)
 		{
 			if (item.Length < 1)
@@ -155,40 +179,35 @@ namespace SLDE.HLSL.Completion
 					if(c == ')')
 					{
 						hasParameters = false;
+						// If this is a function, don't
+						// create the member yet
 						if (isFunction)
 							return;
 					}
 					if (isFunction && c == ',')
 						return;
 					stack.Pop();
-					if (!isFunction && c == '{')
+					if (/*!isFunction &&*/ c == '{')
 					{
-						stack.Push(new HLSLScope("", stack.Peek()));
+						var scope = new HLSLScope("", stack.Peek());
+						scope.Members.AddRange(Members);
+						stack.Push(scope);
 						return;
 					}
 					if (stack.Peek() == null)
 						return;
-					CompletionData dataItem;
-					if(isFunction)
-					{
-						var func = new HLSLFunction(Name, stack.Peek());
-						func.Arguments.AddRange(Members);
-						func.ReturnType = Type;
-						func.Semantic = parsedSemantic;
-						dataItem = func;
-					} else
-					{
-						var variable = new HLSLVariable(Name, Type, stack.Peek());
-						variable.Semantic = parsedSemantic;
-						dataItem = variable;
-					}
+					var dataItem = Create(stack);
 					stack.Peek().AddChild(dataItem);
+					// 'is HLSLMember' is used to check
+					// if we're defining the parameters of a function
 					if (c == ',' && !(stack.Peek() is HLSLMember))
 						stack.Push(Type);
 					else if (c == ')' && stack.Peek() is HLSLMember)
 						stack.Peek().Parse(item, stack);
-					else if (c == '{' && isFunction)
-						stack.Push(dataItem);
+					// Functions are now separate from scopes,
+					// so we don't need the following:
+					//else if (c == '{' && isFunction)
+					//	stack.Push(dataItem);
 					break;
 				default:
 					if (!item.IsOperator())
@@ -418,7 +437,8 @@ namespace SLDE.HLSL.Completion
 
 		public override void AddChild(CompletionData item)
 		{
-			Members.Add(item);
+			if(item is HLSLMember)
+				Members.Add(item);
 		}
 
 		public HLSLType(Substring typeType, Substring name, CompletionData parent)
@@ -568,6 +588,12 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
+		public override void AddChild(CompletionData item)
+		{
+			if (item is HLSLVariable)
+				Members.Add(item);
+		}
+
 		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
 		{
 			return base.GetVisibleItems<T>(stack).AddRange(Members);
@@ -588,10 +614,9 @@ namespace SLDE.HLSL.Completion
 		}
 	}
 
-	public class HLSLFunction : HLSLScope
+	public class HLSLFunction : HLSLMember
 	{
 		IDataList arguments;
-		HLSLType returnType;
 		IDataList dataItems;
 		HLSLSemantic semantic;
 
@@ -633,7 +658,7 @@ namespace SLDE.HLSL.Completion
 		{
 			get
 			{
-				var ret = ReturnType.Text + " " + Text + "(";
+				var ret = Type.Text + " " + Text + "(";
 				bool first = true;
 				if(Arguments != null)
 					foreach(var arg in Arguments)
@@ -658,14 +683,8 @@ namespace SLDE.HLSL.Completion
 			return data;
 		}
 
-		public virtual HLSLType ReturnType
-		{
-			get { return returnType; }
-			set { returnType = value; }
-		}
-
-		public HLSLFunction(Substring name, CompletionData parent)
-			: base(name, parent)
+		public HLSLFunction(Substring name, HLSLType type, CompletionData parent)
+			: base(name, type, parent)
 		{
 		}
 	}
