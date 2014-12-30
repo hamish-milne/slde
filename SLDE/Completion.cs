@@ -74,9 +74,10 @@ namespace SLDE.Completion
 			if (item == null)
 				throw new ArgumentNullException("item");
 			// TODO: Add priority combining
-			// For now, old > new
-			if (!dict.ContainsKey(item.Text))
-				dict.Add(item.Text, item);
+			// For now, new > old
+			//if (!dict.ContainsKey(item.Text))
+			//	dict.Add(item.Text, item);
+			dict[item.Text] = item;
 		}
 
 		public IDataList AddRange(IDataList list)
@@ -299,7 +300,7 @@ namespace SLDE.Completion
 				if (dataItem == null)
 					stack.Pop();
 				else
-					stack.Push(dataItem);
+					dataItem.Select(stack);
 			}
 		}
 
@@ -349,6 +350,26 @@ namespace SLDE.Completion
 			var ret = Parent.GetVisibleItems<T>(stack);
 			recursionLock = false;
 			return ret;
+		}
+
+		public virtual void Select(Stack<CompletionData> stack)
+		{
+			stack.Push(this);
+		}
+	}
+
+	public class CreatorKeyword<T> : CompletionData where T : CompletionData, new()
+	{
+		public override void Select(Stack<CompletionData> stack)
+		{
+			var obj = new T();
+			obj.Parent = stack.Peek();
+			obj.Select(stack);
+		}
+
+		public CreatorKeyword(Substring text, string description)
+			: base(text, description)
+		{
 		}
 	}
 }

@@ -189,9 +189,9 @@ namespace SLDE.HLSL.Completion
 					stack.Pop();
 					if (/*!isFunction &&*/ c == '{')
 					{
-						var scope = new HLSLScope("", stack.Peek());
+						var scope = new HLSLScope(stack.Peek());
 						scope.Members.AddRange(Members);
-						stack.Push(scope);
+						scope.Select(stack);
 						return;
 					}
 					if (stack.Peek() == null)
@@ -201,20 +201,20 @@ namespace SLDE.HLSL.Completion
 					// 'is HLSLMember' is used to check
 					// if we're defining the parameters of a function
 					if (c == ',' && !(stack.Peek() is HLSLMember))
-						stack.Push(Type);
+						Type.Select(stack);
 					else if (c == ')' && stack.Peek() is HLSLMember)
 						stack.Peek().Parse(item, stack);
 					// Functions are now separate from scopes,
 					// so we don't need the following:
 					//else if (c == '{' && isFunction)
-					//	stack.Push(dataItem);
+					//	dataItem.Select(stack);
 					break;
 				default:
 					if (!item.IsOperator())
 					{
 						if (hasParameters && Parent != null)
 						{
-							stack.Push(Parent.GetVisibleItems(stack)[item]);
+							Parent.GetVisibleItems(stack)[item].Select(stack);
 						}
 						else if (hasSemantic)
 						{
@@ -313,7 +313,7 @@ namespace SLDE.HLSL.Completion
 	{
 		IDataList members;
 		IDataList semantics;
-		bool open, closed;
+		bool /*open,*/ closed;
 		Substring typeType;
 
 		// TODO: Typedefs and templates
@@ -332,10 +332,10 @@ namespace SLDE.HLSL.Completion
 			set { typeType = value; }
 		}
 
-		public virtual bool Open
+		/*public virtual bool Open
 		{
 			get { return open; }
-		}
+		}*/
 
 		public virtual bool Closed
 		{
@@ -384,7 +384,7 @@ namespace SLDE.HLSL.Completion
 
 		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
 		{
-			if (!Open || Closed)
+			if (/*!Open || */Closed)
 				return new DataList();
 			return base.GetVisibleItems<T>(stack).AddRange(Members);
 		}
@@ -404,7 +404,7 @@ namespace SLDE.HLSL.Completion
 			if(item.Length == 0)
 				return;
 			var c = item[0];
-			if(!Open && !Closed)
+			/*if(!Open && !Closed)
 			{
 				if(item.IsOperator())
 				{
@@ -415,7 +415,7 @@ namespace SLDE.HLSL.Completion
 				} else
 					Name = item;
 				return;
-			} else if(Open && !Closed)
+			} else*/ if(/*Open &&*/ !Closed)
 			{
 				if(c ==  '}')
 				{
@@ -425,13 +425,13 @@ namespace SLDE.HLSL.Completion
 				}
 				var data = GetVisibleItems(stack);
 				var push = data == null ? null : data[item];
-				if(push != null)
-					stack.Push(push);
+				if (push != null)
+					push.Select(stack);
 			} else // Closed
 			{
 				stack.Pop();
 				if(!item.IsOperator())
-					stack.Push(new HLSLMember(item, this, stack.Peek()));
+				new HLSLMember(item, this, stack.Peek()).Select(stack);
 			}
 		}
 
@@ -463,13 +463,13 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public override bool Open
+		/*public override bool Open
 		{
 			get
 			{
 				return true;
 			}
-		}
+		}*/
 
 		public override bool Closed
 		{
@@ -532,7 +532,7 @@ namespace SLDE.HLSL.Completion
 				var member = Type.Members[item];
 				stack.Pop();
 				if (member != null)
-					stack.Push(member);
+					member.Select(stack);
 			} else
 				stack.Pop();
 		}
@@ -559,6 +559,7 @@ namespace SLDE.HLSL.Completion
 	public class HLSLScopeBase : CompletionData
 	{
 		protected IDataList members;
+		protected IDataList keywords;
 
 		public virtual IDataList Members
 		{
@@ -570,13 +571,23 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
+		public virtual IDataList Keywords
+		{
+			get
+			{
+				if (keywords == null)
+					keywords = new DataList();
+				return keywords;
+			}
+		}
+
 		public override void Parse(Substring item, Stack<CompletionData> stack)
 		{
 			if (item.Length < 1)
 				return;
 			var c = item[0];
 			if (c == '{')
-				stack.Push(new HLSLScope("", this));
+				new HLSLScope(this).Select(stack);
 			else if (c == '}')
 				stack.Pop();
 			else
@@ -584,19 +595,18 @@ namespace SLDE.HLSL.Completion
 				var allData = GetVisibleItems(stack);
 				var dataItem = allData[item];
 				if (dataItem != null)
-					stack.Push(dataItem);
+					dataItem.Select(stack);
 			}
-		}
-
-		public override void AddChild(CompletionData item)
-		{
-			if (item is HLSLVariable)
-				Members.Add(item);
 		}
 
 		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
 		{
-			return base.GetVisibleItems<T>(stack).AddRange(Members);
+			return base.GetVisibleItems<T>(stack).AddRange(Members).AddRange(Keywords);
+		}
+
+		public override void AddChild(CompletionData item)
+		{
+			Keywords.Add(item);
 		}
 
 		public HLSLScopeBase(Substring name, CompletionData parent)
@@ -606,10 +616,34 @@ namespace SLDE.HLSL.Completion
 		}
 	}
 
+	public class HLSLNamespace : HLSLScopeBase
+	{
+		public override void AddChild(CompletionData item)
+		{
+			if (item is HLSLType || item is HLSLMember)
+				Members.Add(item);
+			else
+				base.AddChild(item);
+		}
+
+		public HLSLNamespace(Substring name, CompletionData parent)
+			: base(name, parent)
+		{
+		}
+	}
+
 	public class HLSLScope : HLSLScopeBase
 	{
-		public HLSLScope(Substring name, CompletionData parent)
-			: base(name, parent)
+		public override void AddChild(CompletionData item)
+		{
+			if (item is HLSLVariable)
+				Members.Add(item);
+			else
+				base.AddChild(item);
+		}
+
+		public HLSLScope(CompletionData parent)
+			: base("", parent)
 		{
 		}
 	}
@@ -617,7 +651,6 @@ namespace SLDE.HLSL.Completion
 	public class HLSLFunction : HLSLMember
 	{
 		IDataList arguments;
-		IDataList dataItems;
 		HLSLSemantic semantic;
 
 		public virtual IDataList Arguments
@@ -635,16 +668,6 @@ namespace SLDE.HLSL.Completion
 			get
 			{
 				return 5;
-			}
-		}
-
-		public virtual IDataList DataItems
-		{
-			get
-			{
-				if (dataItems == null)
-					dataItems = new DataList();
-				return dataItems;
 			}
 		}
 
@@ -676,11 +699,7 @@ namespace SLDE.HLSL.Completion
 
 		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
 		{
-			var data = GetVisibleItems(stack);
-			if (data == null)
-				return Arguments;
-			data.AddRange(Arguments);
-			return data;
+			return GetVisibleItems(stack).AddRange(Arguments);
 		}
 
 		public HLSLFunction(Substring name, HLSLType type, CompletionData parent)
@@ -706,7 +725,7 @@ namespace SLDE.HLSL.Completion
 			{
 				if (item.IsOperator())
 				{
-					if(c != ',' && c != '>')
+					if(/*c != ',' && c != '>'*/ c == '{')
 						stack.Pop();
 				} else
 				{
@@ -729,7 +748,7 @@ namespace SLDE.HLSL.Completion
 				// !templateOpen
 				if (c == '<')
 					templateOpen = true;
-				else if (item.IsOperator())
+				else if (/*item.IsOperator()*/ c == '{')
 					stack.Pop();
 			}
 		}
@@ -744,6 +763,17 @@ namespace SLDE.HLSL.Completion
 
 	public class HLSLVector : HLSLTemplate
 	{
+		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
+		{
+			var list = new DataList();
+			if (Parent == null || !templateOpen || templateClosed || templateParams.Count > 0)
+				return list;
+			foreach (var item in Parent.GetVisibleItems<T>(stack))
+				if (item != null && item is HLSLPrimitive)
+					list.Add(item);
+			return list;
+		}
+
 		protected override void CloseTemplate()
 		{
 			if(templateParams.Count < 2)
@@ -795,8 +825,13 @@ namespace SLDE.HLSL.Completion
 		{
 		}
 
-		public HLSLVector(HLSLPrimitive type, int number, CompletionData parent)
-			: this("", parent)
+		public HLSLVector()
+			: this("", null)
+		{
+		}
+
+		public HLSLVector(Substring name, HLSLPrimitive type, int number, CompletionData parent)
+			: base(name, "", parent)
 		{
 			templateOpen = true;
 			templateClosed = true;
@@ -805,12 +840,43 @@ namespace SLDE.HLSL.Completion
 			CloseTemplate();
 		}
 	}
+
+	public class HLSLTypeKeyword : CompletionData
+	{
+		Substring parsedName;
+
+		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
+		{
+			return null;
+		}
+
+		public override void Parse(Substring item, Stack<CompletionData> stack)
+		{
+			if (item.Length < 1)
+				return;
+			if (item[0] == '{')
+			{
+				stack.Pop();
+				var type = new HLSLType(Text, parsedName, stack.Peek());
+				if (parsedName.Length > 0)
+				{
+					stack.Peek().AddChild(type);
+					type.Select(stack);
+				}
+			}
+			else if (!item.IsOperator())
+				parsedName = item;
+		}
+
+		public HLSLTypeKeyword(Substring name, string description)
+			: base(name, description)
+		{
+		}
+	}
 	
-	public class HLSLRootScope : HLSLScope
+	public class HLSLRootScope : HLSLNamespace
 	{
 		protected IDataList dataItems;
-		protected HashSet<Substring> typeTypes
-			= new HashSet<Substring>() { "struct", "class", "interface" };
 		protected IDataList rootDataItems;
 		protected IDataList validData;
 
@@ -834,29 +900,14 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public override void Parse(Substring item, Stack<CompletionData> stack)
-		{
-			if (typeTypes.Contains(item))
-			{
-				var newType = new HLSLType(item, null, this);
-				Members.Add(newType);
-				stack.Push(newType);
-			}
-			else if (item == "vector")
-				stack.Push(new HLSLVector("", this));
-			else
-				base.Parse(item, stack);
-		}
-
 		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
 		{
 			if (validData == null)
 				validData = new DataList();
 			else
 				validData.Clear();
-			validData.AddRange(DataItems);
-			validData.AddRange(Members);
-			if (stack.Peek() == this)
+			validData.AddRange(Members).AddRange(DataItems);
+			if (stack.Peek() is HLSLNamespace)
 				validData.AddRange(RootDataItems);
 			return validData;
 		}
@@ -871,8 +922,8 @@ namespace SLDE.HLSL.Completion
 		public static readonly HashSet<char> Operators =
 			new HashSet<char> { '.', ':', ';', '<', '>', '@',
 				'[', ']', '{', '}', '(', ')', '#', '\'', '"',
-				'/', '*', /*'+', '-',  '&', '|', '~', '^',*/ '$', 
-				'\\', '?', '!' , ',' };
+				'/', '*', '+', '-',  '&', '|', '~', '^', '$', 
+				'\\', '?', '!' , ',', '=' };
 
 		public static bool IsOperator(this Substring item)
 		{
@@ -893,7 +944,10 @@ namespace SLDE.HLSL.Completion
 		HLSLRootScope root;
 		HLSLPrimitive Bool, Int, UInt, DWord, Half, Float, Double;
 		HLSLPrimitive Min16float, Min10float, Min16int, Min12int, Min16uint;
-		HLSLKeyword snorm, unorm, Struct, Class, Interface;
+		HLSLKeyword snorm, unorm;
+		CompletionData vector;
+		HLSLTypeKeyword Struct, Class, Interface;
+		HLSLVector[] floatVectors, uintVectors;
 
 		ImageList imageList;
 		Stack<CompletionData> stack = new Stack<CompletionData>();
@@ -901,6 +955,17 @@ namespace SLDE.HLSL.Completion
 		public override ImageList ImageList
 		{
 			get { return imageList; }
+		}
+
+		HLSLVector[] MakeVectors(HLSLPrimitive primitive, HLSLRootScope root)
+		{
+			var ret = new HLSLVector[4];
+			for (int i = 0; i < 4; i++)
+			{
+				ret[i] = new HLSLVector(primitive.Name.ToString() + (i + 1), primitive, i + 1, root);
+				root.RootDataItems.Add(ret[i]);
+			}
+			return ret;
 		}
 
 		public HLSLCompletionProvider()
@@ -921,9 +986,10 @@ namespace SLDE.HLSL.Completion
 
 			snorm       = new HLSLKeyword("snorm", "Normalize float in range -1 to 1");
 			unorm       = new HLSLKeyword("unorm", "Normalize float in range 0 to 1");
-			Struct      = new HLSLKeyword("struct", "A structure. Groups data together");
-			Class       = new HLSLKeyword("class", "Groups data and functions together");
-			Interface   = new HLSLKeyword("interface", "An interface to another type");
+			Struct      = new HLSLTypeKeyword("struct", "A structure. Groups data together");
+			Class       = new HLSLTypeKeyword("class", "Groups data and functions together");
+			Interface   = new HLSLTypeKeyword("interface", "An interface to another type");
+			vector		= new CreatorKeyword<HLSLVector>("vector", "The vector template type");
 
 			snorm.DataItems.Add(Float);
 			snorm.DataItems.Add(Min10float);
@@ -932,7 +998,13 @@ namespace SLDE.HLSL.Completion
 			unorm.DataItems.Add(Min10float);
 			unorm.DataItems.Add(Min16float);
 
-			HLSLType Float4 = Float, Float2 = Float, UInt3 = UInt, Float3 = Float;
+			floatVectors = MakeVectors(Float, root);
+			uintVectors = MakeVectors(UInt, root);
+
+			var Float2 = floatVectors[1];
+			var Float3 = floatVectors[2];
+			var Float4 = floatVectors[3];
+			var UInt3 = uintVectors[2];
 
 			Float4.Semantics.Add(new HLSLSemantic("BINORMAL"));
 			UInt.Semantics.Add(new HLSLSemantic("BLENDINDICES"));
@@ -991,11 +1063,14 @@ namespace SLDE.HLSL.Completion
 			root.DataItems.Add(Min12int);
 			root.DataItems.Add(Min16uint);
 
+			root.DataItems.Add(Float3);
+
 			root.DataItems.Add(snorm);
 			root.DataItems.Add(unorm);
 			root.RootDataItems.Add(Struct);
 			root.RootDataItems.Add(Class);
 			root.RootDataItems.Add(Interface);
+			root.RootDataItems.Add(vector);
 
 			imageList = new ImageList();
 			imageList.ImageSize = new System.Drawing.Size(16, 16);
@@ -1095,7 +1170,7 @@ namespace SLDE.HLSL.Completion
 				{
 					if(pos < caretPos)
 						c = text.GetCharAt(pos);
-					if(pos >= caretPos
+					if((pos >= caretPos && charTyped == '.')
 						|| Char.IsWhiteSpace(c) || Char.IsControl(c)
 						|| CompletionUtility.Operators.Contains(c))
 					{
