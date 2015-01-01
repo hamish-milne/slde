@@ -11,7 +11,6 @@ namespace SLDE.Completion
 	{
 		CompletionData this[Substring name] { get; }
 		IDataList AddRange(IDataList list);
-		CompletionData[] ToArray();
 	}
 
 	public class DataList : IDataList
@@ -97,14 +96,6 @@ namespace SLDE.Completion
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
-		}
-
-		public CompletionData[] ToArray()
-		{
-			var values = dict.Values;
-			var array = new CompletionData[values.Count];
-			values.CopyTo(array, 0);
-			return array;
 		}
 
 		public void Clear()
@@ -226,10 +217,12 @@ namespace SLDE.Completion
 		protected string description;
 		protected double priority = 0;
 		protected int version;
+		protected bool hidden;
 
-		public virtual bool IsCompatible
+		public virtual bool Hidden
 		{
-			get { return true; }
+			get { return hidden; }
+			set { hidden = value; }
 		}
 
 		string ICompletionData.Text
@@ -244,7 +237,7 @@ namespace SLDE.Completion
 
 		public virtual string Description
 		{
-			get { return description; }
+			get { return description == null ? ToString() : description; }
 		}
 
 		public virtual double Priority
@@ -307,31 +300,11 @@ namespace SLDE.Completion
 		CompletionData parent;
 		bool recursionLock;
 
-		//public virtual IDataList Members { get { return null; } }
 		public virtual CompletionData Parent
 		{
 			get { return parent; }
 			set { parent = value; }
 		}
-
-		/*protected static IDataList GetValidDataRecursive(Stack<CompletionData> stack, CompletionData scope, ref bool recursionLock, ref IDataList validData)
-		{
-			if (recursionLock)
-				return null;
-			recursionLock = true;
-			if (validData == null)
-				validData = new DataList();
-			validData.Clear();
-			if (scope.DataItems != null)
-				validData.AddRange(scope.DataItems);
-			if (scope.Members != null)
-				validData.AddRange(scope.Members);
-			var parentData = scope.Parent == null ? null : scope.Parent.GetValidData(stack);
-			if (parentData != null)
-				validData.AddRange(parentData);
-			recursionLock = false;
-			return validData;
-		}*/
 
 		public virtual void AddChild(CompletionData item)
 		{
@@ -355,6 +328,45 @@ namespace SLDE.Completion
 		public virtual void Select(Stack<CompletionData> stack)
 		{
 			stack.Push(this);
+		}
+
+		public virtual bool AsNumber(out double number)
+		{
+			return Double.TryParse(Text.ToString(), out number);
+		}
+
+		public override string ToString()
+		{
+			return Text.ToString();
+		}
+	}
+
+	public class NumberItem : CompletionData
+	{
+		double number;
+
+		public virtual double Number
+		{
+			get { return number; }
+			set { number = value; }
+		}
+
+		public override Substring Text
+		{
+			get { return number.ToString(); }
+		}
+
+		public override bool AsNumber(out double number)
+		{
+			number = this.number;
+			return true;
+		}
+
+		public NumberItem(double number)
+			: base("", "")
+		{
+			this.number = number;
+			base.Hidden = true;
 		}
 	}
 

@@ -9,7 +9,7 @@ namespace SLDE.HLSL.Completion
 {
 	using SLDE.Completion;
 
-	public class HLSLKeyword : CompletionData
+	public class HLSLModifier : CompletionData
 	{
 		protected IDataList validData;
 
@@ -34,7 +34,7 @@ namespace SLDE.HLSL.Completion
 				DataItems.Add(item);
 		}
 
-		public HLSLKeyword(Substring name, string description)
+		public HLSLModifier(Substring name, string description)
 			: base(name, description)
 		{
 		}
@@ -43,7 +43,7 @@ namespace SLDE.HLSL.Completion
 	public class HLSLMember : CompletionData
 	{
 		protected HLSLType type;
-		protected List<HLSLKeyword> keywords;
+		protected List<HLSLModifier> keywords;
 		bool hasSemantic, hasParameters, isFunction;
 		HLSLSemantic parsedSemantic;
 		IDataList members;
@@ -99,12 +99,12 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
-		public virtual IList<HLSLKeyword> Keywords
+		public virtual IList<HLSLModifier> Keywords
 		{
 			get
 			{
 				if (keywords == null)
-					keywords = new List<HLSLKeyword>();
+					keywords = new List<HLSLModifier>();
 				return keywords;
 			}
 		}
@@ -449,28 +449,33 @@ namespace SLDE.HLSL.Completion
 		}
 	}
 
-	public class HLSLPrimitive : HLSLType
+	public class HLSLVoid : HLSLType
 	{
-		protected IDataList dataItems;
-
-		public virtual IDataList DataItems
+		public override int ImageIndex
 		{
 			get
 			{
-				if (dataItems == null)
-					dataItems = new DataList();
-				return dataItems;
+				return 0;
 			}
 		}
 
-		/*public override bool Open
+		public override bool Closed
 		{
 			get
 			{
 				return true;
 			}
-		}*/
+		}
 
+		public HLSLVoid(Substring name, string description, CompletionData parent)
+			: base("", name, parent)
+		{
+			this.description = description;
+		}
+	}
+
+	public class HLSLPrimitive : HLSLType
+	{
 		public override bool Closed
 		{
 			get
@@ -618,9 +623,31 @@ namespace SLDE.HLSL.Completion
 
 	public class HLSLNamespace : HLSLScopeBase
 	{
+		DataList types;
+
+		public virtual IDataList Types
+		{
+			get
+			{
+				if (types == null)
+					types = new DataList();
+				return types;
+			}
+		}
+
+		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
+		{
+			var ret = base.GetVisibleItems<T>(stack);
+			if (!(stack.Peek() is HLSLNamespace))
+				ret.AddRange(Members);
+			return ret;
+		}
+
 		public override void AddChild(CompletionData item)
 		{
-			if (item is HLSLType || item is HLSLMember)
+			if (item is HLSLType)
+				Types.Add(item);
+			else if (item is HLSLMember)
 				Members.Add(item);
 			else
 				base.AddChild(item);
@@ -708,6 +735,18 @@ namespace SLDE.HLSL.Completion
 		}
 	}
 
+	public class HLSLKeyword : CompletionData
+	{
+		public override void Select(Stack<CompletionData> stack)
+		{
+		}
+
+		public HLSLKeyword(Substring text, string description)
+			: base(text, description)
+		{
+		}
+	}
+
 	public abstract class HLSLTemplate : HLSLPrimitive
 	{
 		protected bool templateOpen;
@@ -748,21 +787,14 @@ namespace SLDE.HLSL.Completion
 				// !templateOpen
 				if (c == '<')
 					templateOpen = true;
-				else if (/*item.IsOperator()*/ c == '{')
-					stack.Pop();
+				else
+				{
+					Default();
+					base.Parse(item, stack);
+				}
 			}
 		}
 
-		protected abstract void CloseTemplate();
-
-		public HLSLTemplate(Substring name, string description, CompletionData parent)
-			: base(name, description, parent)
-		{
-		}
-	}
-
-	public class HLSLVector : HLSLTemplate
-	{
 		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
 		{
 			var list = new DataList();
@@ -774,6 +806,19 @@ namespace SLDE.HLSL.Completion
 			return list;
 		}
 
+		protected abstract void CloseTemplate();
+		protected abstract void Default();
+
+		public HLSLTemplate(Substring name, string description, CompletionData parent)
+			: base(name, description, parent)
+		{
+		}
+	}
+
+	public class HLSLVector : HLSLTemplate
+	{
+		public static HLSLType DefaultType;
+
 		protected override void CloseTemplate()
 		{
 			if(templateParams.Count < 2)
@@ -781,10 +826,10 @@ namespace SLDE.HLSL.Completion
 			var type = templateParams[0] as HLSLPrimitive;
 			if (type == null || templateParams[1] == null)
 				return;
-			int num;
-			if (!Int32.TryParse(templateParams[1].Text.ToString(), out num))
+			double num;
+			if (!templateParams[1].AsNumber(out num))
 				return;
-			if (num < 1 || num > 4)
+			if (num < 1)
 				return;
 			Members.Add(new HLSLVariable("x", type, this));
 			if(num > 1)
@@ -795,16 +840,16 @@ namespace SLDE.HLSL.Completion
 				if(num > 2)
 				{
 					Members.Add(new HLSLVariable("z", type, this));
-					Members.Add(new HLSLVariable("xz", type, this));
-					Members.Add(new HLSLVariable("zx", type, this));
-					Members.Add(new HLSLVariable("yz", type, this));
-					Members.Add(new HLSLVariable("zy", type, this));
+					//Members.Add(new HLSLVariable("xz", type, this));
+					//Members.Add(new HLSLVariable("zx", type, this));
+					//Members.Add(new HLSLVariable("yz", type, this));
+					//Members.Add(new HLSLVariable("zy", type, this));
 
 					Members.Add(new HLSLVariable("xyz", type, this));
-					Members.Add(new HLSLVariable("yxz", type, this));
-					Members.Add(new HLSLVariable("yzx", type, this));
-					Members.Add(new HLSLVariable("xzy", type, this));
-					Members.Add(new HLSLVariable("zxy", type, this));
+					//Members.Add(new HLSLVariable("yxz", type, this));
+					//Members.Add(new HLSLVariable("yzx", type, this));
+					//Members.Add(new HLSLVariable("xzy", type, this));
+					//Members.Add(new HLSLVariable("zxy", type, this));
 					Members.Add(new HLSLVariable("zyx", type, this));
 				}
 				if(num > 3)
@@ -819,6 +864,14 @@ namespace SLDE.HLSL.Completion
 			}
 		}
 
+		protected override void Default()
+		{
+			templateOpen = true;
+			templateClosed = true;
+			templateParams.Add(DefaultType);
+			templateParams.Add(new NumberItem(4));
+			CloseTemplate();
+		}
 
 		public HLSLVector(string description, CompletionData parent)
 			: base("vector", description, parent)
@@ -836,7 +889,89 @@ namespace SLDE.HLSL.Completion
 			templateOpen = true;
 			templateClosed = true;
 			templateParams.Add(type);
-			templateParams.Add(new CompletionData(number.ToString(), ""));
+			templateParams.Add(new NumberItem(number));
+			CloseTemplate();
+		}
+
+		public override string ToString()
+		{
+			if (templateParams.Count < 1)
+				return base.ToString();
+			var list = new object[(templateParams.Count * 2) + 2];
+			list[0] = base.ToString();
+			list[1] = "<";
+			for (int i = 0; i < templateParams.Count; i++)
+			{
+				list[(i * 2) + 2] = templateParams[i];
+				if (i < (templateParams.Count - 1))
+					list[(i * 2) + 3] = ", ";
+			}
+			list[(templateParams.Count * 2) + 1] = ">";
+			return String.Concat(list);
+		}
+	}
+
+	public class HLSLMatrix : HLSLTemplate
+	{
+		public static HLSLType DefaultType;
+
+		protected override void CloseTemplate()
+		{
+			if (templateParams.Count < 2)
+				return;
+			var type = templateParams[0] as HLSLPrimitive;
+			if (type == null || templateParams[1] == null)
+				return;
+			double rows, cols;
+			if (!templateParams[1].AsNumber(out rows))
+				return;
+			if (templateParams.Count < 3 || templateParams[2] == null)
+				cols = rows;
+			else if (!templateParams[2].AsNumber(out cols))
+				return;
+			if (rows < 1 || cols < 1)
+				return;
+			if (rows > 4)
+				rows = 4;
+			if (cols > 4)
+				cols = 4;
+			Members.Add(new HLSLVariable("_m00", type, this));
+			Members.Add(new HLSLVariable("_11", type, this));
+			if (rows > 1 || cols > 1)
+			{
+				Members.Add(new HLSLVariable("_m" + ((int)rows-1).ToString() + ((int)cols-1).ToString(), type, this));
+				Members.Add(new HLSLVariable("_" + ((int)rows).ToString() + ((int)cols).ToString(), type, this));
+			}
+		}
+
+		protected override void Default()
+		{
+			templateOpen = true;
+			templateClosed = true;
+			templateParams.Add(DefaultType);
+			templateParams.Add(new NumberItem(4));
+			templateParams.Add(new NumberItem(4));
+			CloseTemplate();
+		}
+
+		public HLSLMatrix(string description, CompletionData parent)
+			: base("matrix", description, parent)
+		{
+		}
+
+		public HLSLMatrix()
+			: this("", null)
+		{
+		}
+
+		public HLSLMatrix(Substring name, HLSLPrimitive type, int rows, int cols, CompletionData parent)
+			: base(name, "", parent)
+		{
+			templateOpen = true;
+			templateClosed = true;
+			templateParams.Add(type);
+			templateParams.Add(new NumberItem(rows));
+			templateParams.Add(new NumberItem(cols));
 			CloseTemplate();
 		}
 	}
@@ -879,6 +1014,7 @@ namespace SLDE.HLSL.Completion
 		protected IDataList dataItems;
 		protected IDataList rootDataItems;
 		protected IDataList validData;
+		protected IDataList functionItems;
 
 		public virtual IDataList DataItems
 		{
@@ -887,6 +1023,16 @@ namespace SLDE.HLSL.Completion
 				if (dataItems == null)
 					dataItems = new DataList();
 				return dataItems;
+			}
+		}
+
+		public virtual IDataList FunctionItems
+		{
+			get
+			{
+				if (functionItems == null)
+					functionItems = new DataList();
+				return functionItems;
 			}
 		}
 
@@ -906,9 +1052,10 @@ namespace SLDE.HLSL.Completion
 				validData = new DataList();
 			else
 				validData.Clear();
-			validData.AddRange(Members).AddRange(DataItems);
-			if (stack.Peek() is HLSLNamespace)
-				validData.AddRange(RootDataItems);
+			validData.AddRange(Types)
+				.AddRange((stack.Peek() is HLSLNamespace)
+					? RootDataItems : Members.AddRange(FunctionItems))
+				.AddRange(DataItems);
 			return validData;
 		}
 
@@ -942,10 +1089,11 @@ namespace SLDE.HLSL.Completion
 			= new Dictionary<char, string>();
 
 		HLSLRootScope root;
+		HLSLVoid VoidType;
 		HLSLPrimitive Bool, Int, UInt, DWord, Half, Float, Double;
 		HLSLPrimitive Min16float, Min10float, Min16int, Min12int, Min16uint;
-		HLSLKeyword snorm, unorm;
-		CompletionData vector;
+		HLSLModifier snorm, unorm;
+		CompletionData vector, matrix;
 		HLSLTypeKeyword Struct, Class, Interface;
 		HLSLVector[] floatVectors, uintVectors;
 
@@ -963,6 +1111,7 @@ namespace SLDE.HLSL.Completion
 			for (int i = 0; i < 4; i++)
 			{
 				ret[i] = new HLSLVector(primitive.Name.ToString() + (i + 1), primitive, i + 1, root);
+				ret[i].Hidden = true;
 				root.RootDataItems.Add(ret[i]);
 			}
 			return ret;
@@ -971,6 +1120,8 @@ namespace SLDE.HLSL.Completion
 		public HLSLCompletionProvider()
 		{
 			root = new HLSLRootScope();
+			VoidType    = new HLSLVoid("void", "No data", root);
+			// Primitives
 			Bool        = new HLSLPrimitive("bool", "true or false", root);
 			Int         = new HLSLPrimitive("int", "32-bit signed integer", root);
 			UInt        = new HLSLPrimitive("uint", "32-bit unsigned integer", root);
@@ -984,12 +1135,14 @@ namespace SLDE.HLSL.Completion
 			Min12int    = new HLSLPrimitive("min12int", "Minimum 12-bit signed integer", root);
 			Min16uint   = new HLSLPrimitive("min16uint", "Minimum 16-bit unsigned integer", root);
 
-			snorm       = new HLSLKeyword("snorm", "Normalize float in range -1 to 1");
-			unorm       = new HLSLKeyword("unorm", "Normalize float in range 0 to 1");
+			// Keywords
+			snorm       = new HLSLModifier("snorm", "Normalize float in range -1 to 1");
+			unorm       = new HLSLModifier("unorm", "Normalize float in range 0 to 1");
 			Struct      = new HLSLTypeKeyword("struct", "A structure. Groups data together");
 			Class       = new HLSLTypeKeyword("class", "Groups data and functions together");
 			Interface   = new HLSLTypeKeyword("interface", "An interface to another type");
 			vector		= new CreatorKeyword<HLSLVector>("vector", "The vector template type");
+			matrix      = new CreatorKeyword<HLSLMatrix>("matrix", "The matrix template type");
 
 			snorm.DataItems.Add(Float);
 			snorm.DataItems.Add(Min10float);
@@ -998,14 +1151,21 @@ namespace SLDE.HLSL.Completion
 			unorm.DataItems.Add(Min10float);
 			unorm.DataItems.Add(Min16float);
 
+			// Predefined vectors
 			floatVectors = MakeVectors(Float, root);
 			uintVectors = MakeVectors(UInt, root);
+			MakeVectors(Bool, root);
+			MakeVectors(Int, root);
+			MakeVectors(DWord, root);
+			MakeVectors(Half, root);
+			MakeVectors(Double, root);
 
 			var Float2 = floatVectors[1];
 			var Float3 = floatVectors[2];
 			var Float4 = floatVectors[3];
 			var UInt3 = uintVectors[2];
 
+			// DX9 semantics
 			Float4.Semantics.Add(new HLSLSemantic("BINORMAL"));
 			UInt.Semantics.Add(new HLSLSemantic("BLENDINDICES"));
 			Float.Semantics.Add(new HLSLSemantic("BLENDWEIGHT"));
@@ -1022,6 +1182,7 @@ namespace SLDE.HLSL.Completion
 			Float2.Semantics.Add(new HLSLSemantic("VPOS"));
 			Float.Semantics.Add(new HLSLSemantic("DEPTH"));
 
+			// DX10 semantics
 			Float.Semantics.Add(new HLSLSemantic("SV_ClipDistance"));
 			Float.Semantics.Add(new HLSLSemantic("SV_CullDistance"));
 			UInt.Semantics.Add(new HLSLSemantic("SV_Coverage"));
@@ -1049,7 +1210,8 @@ namespace SLDE.HLSL.Completion
 			UInt.Semantics.Add(new HLSLSemantic("SV_PrimitiveID"));
 			UInt.Semantics.Add(new HLSLSemantic("SV_VertexID"));
 
-
+			// Add all the items
+			root.DataItems.Add(VoidType);
 			root.DataItems.Add(Bool);
 			root.DataItems.Add(Int);
 			root.DataItems.Add(UInt);
@@ -1063,7 +1225,15 @@ namespace SLDE.HLSL.Completion
 			root.DataItems.Add(Min12int);
 			root.DataItems.Add(Min16uint);
 
-			root.DataItems.Add(Float3);
+			root.FunctionItems.Add(new HLSLKeyword("while", null));
+			root.FunctionItems.Add(new HLSLKeyword("for", null));
+			root.FunctionItems.Add(new HLSLKeyword("do", null));
+			root.FunctionItems.Add(new HLSLKeyword("continue", null));
+			root.FunctionItems.Add(new HLSLKeyword("break", null));
+			root.FunctionItems.Add(new HLSLKeyword("return", null));
+
+			HLSLVector.DefaultType = Float;
+			HLSLMatrix.DefaultType = Float;
 
 			root.DataItems.Add(snorm);
 			root.DataItems.Add(unorm);
@@ -1071,6 +1241,7 @@ namespace SLDE.HLSL.Completion
 			root.RootDataItems.Add(Class);
 			root.RootDataItems.Add(Interface);
 			root.RootDataItems.Add(vector);
+			root.RootDataItems.Add(matrix);
 
 			imageList = new ImageList();
 			imageList.ImageSize = new System.Drawing.Size(16, 16);
@@ -1082,6 +1253,7 @@ namespace SLDE.HLSL.Completion
 			imageList.Images.Add(Resources.Method);
 		}
 
+		// This simply cleans the array before parsing the given item
 		void ParseItem(string item)
 		{
 			if (stack.Count < 1)
@@ -1184,7 +1356,12 @@ namespace SLDE.HLSL.Completion
 			if (stack.Count < 1 || stack.Peek() == null)
 				return null;
 			var data = stack.Peek().GetVisibleItems(stack);
-			return data == null ? null : data.ToArray();
+			if (data == null) return null;
+			var list = new List<ICompletionData>(data.Count);
+			foreach (var item in data)
+				if (item != null && !item.Hidden)
+					list.Add(item);
+			return list.ToArray();
 		}
 
 		
