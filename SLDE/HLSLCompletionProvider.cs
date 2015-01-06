@@ -47,6 +47,7 @@ namespace SLDE.HLSL.Completion
 		bool hasSemantic, hasParameters, isFunction;
 		HLSLSemantic parsedSemantic;
 		IDataList members;
+		IDataList modifiers;
 
 		public override int ImageIndex
 		{
@@ -63,6 +64,16 @@ namespace SLDE.HLSL.Completion
 				if (members == null)
 					members = new DataList();
 				return members;
+			}
+		}
+
+		public virtual IDataList Modifiers
+		{
+			get
+			{
+				if (modifiers == null)
+					modifiers = new DataList();
+				return modifiers;
 			}
 		}
 
@@ -115,10 +126,13 @@ namespace SLDE.HLSL.Completion
 			{
 				if (description == null)
 				{
-					if (Parent == null || !(Parent is HLSLFunction))
-						description = GetPrefix(Type, " ") + GetPrefix(Parent, ".") + Name;
+					description = "";
+					foreach (var item in Modifiers)
+						description += item + " ";
+					if (Parent != null && Parent is HLSLType)
+						description += GetPrefix(Type, " ") + GetPrefix(Parent, ".") + Name;
 					else
-						description = GetPrefix(Type, " ") + Name;
+						description += GetPrefix(Type, " ") + Name;
 				}
 				return description;
 			}
@@ -135,7 +149,7 @@ namespace SLDE.HLSL.Completion
 
 		CompletionData Create(Stack<CompletionData> stack)
 		{
-			CompletionData dataItem;
+			HLSLMember dataItem;
 			if (isFunction)
 			{
 				var func = new HLSLFunction(Name, Type, stack.Peek());
@@ -149,6 +163,7 @@ namespace SLDE.HLSL.Completion
 				variable.Semantic = parsedSemantic;
 				dataItem = variable;
 			}
+			dataItem.Modifiers.AddRange(Modifiers);
 			return dataItem;
 		}
 
@@ -187,7 +202,7 @@ namespace SLDE.HLSL.Completion
 					if (isFunction && c == ',')
 						return;
 					stack.Pop();
-					if (/*!isFunction &&*/ c == '{')
+					if (c == '{')
 					{
 						var scope = new HLSLScope(stack.Peek());
 						scope.Members.AddRange(Members);
@@ -204,10 +219,6 @@ namespace SLDE.HLSL.Completion
 						Type.Select(stack);
 					else if (c == ')' && stack.Peek() is HLSLMember)
 						stack.Peek().Parse(item, stack);
-					// Functions are now separate from scopes,
-					// so we don't need the following:
-					//else if (c == '{' && isFunction)
-					//	dataItem.Select(stack);
 					break;
 				default:
 					if (!item.IsOperator())
@@ -227,6 +238,14 @@ namespace SLDE.HLSL.Completion
 					}
 					break;
 			}
+		}
+
+		public override void Select(Stack<CompletionData> stack)
+		{
+			while (stack.Peek() is HLSLModifier)
+				Modifiers.Add(stack.Pop());
+			description = null;
+			base.Select(stack);
 		}
 
 		public HLSLMember(Substring name, HLSLType type, CompletionData parent)
@@ -313,10 +332,8 @@ namespace SLDE.HLSL.Completion
 	{
 		IDataList members;
 		IDataList semantics;
-		bool /*open,*/ closed;
+		bool closed;
 		Substring typeType;
-
-		// TODO: Typedefs and templates
 
 		public override int ImageIndex
 		{
@@ -331,11 +348,6 @@ namespace SLDE.HLSL.Completion
 			get { return typeType; }
 			set { typeType = value; }
 		}
-
-		/*public virtual bool Open
-		{
-			get { return open; }
-		}*/
 
 		public virtual bool Closed
 		{
@@ -384,7 +396,7 @@ namespace SLDE.HLSL.Completion
 
 		public override IDataList GetVisibleItems<T>(Stack<CompletionData> stack)
 		{
-			if (/*!Open || */Closed)
+			if (Closed)
 				return new DataList();
 			return base.GetVisibleItems<T>(stack).AddRange(Members);
 		}
@@ -404,18 +416,7 @@ namespace SLDE.HLSL.Completion
 			if(item.Length == 0)
 				return;
 			var c = item[0];
-			/*if(!Open && !Closed)
-			{
-				if(item.IsOperator())
-				{
-					if (c == '{')
-						open = true;
-					else
-						stack.Pop();
-				} else
-					Name = item;
-				return;
-			} else*/ if(/*Open &&*/ !Closed)
+			if(!Closed)
 			{
 				if(c ==  '}')
 				{
@@ -427,7 +428,7 @@ namespace SLDE.HLSL.Completion
 				var push = data == null ? null : data[item];
 				if (push != null)
 					push.Select(stack);
-			} else // Closed
+			} else
 			{
 				stack.Pop();
 				if(!item.IsOperator())
