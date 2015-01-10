@@ -129,18 +129,44 @@ namespace SLDE.Completion
 
 	}
 
+	public interface IPreprocessorData
+	{
+		public IDictionary<Substring, Substring> PreprocessorData { get; }
+	}
+
 	public struct Substring : IEquatable<Substring>
 	{
-		string source;
+		static Dictionary<string, char[]> charArrayCache
+			= new Dictionary<string, char[]>();
+
+		char[] source;
 		int start;
 		int length;
+
+		static char[] GetCharArray(string source)
+		{
+			char[] ret;
+			if(!charArrayCache.TryGetValue(source, out ret))
+			{
+				ret = source.ToCharArray();
+				charArrayCache.Add(source, ret);
+			}
+			return ret;
+		}
+
+		public Substring(char[] source, int start, int length)
+		{
+			this.source = source;
+			this.start = start;
+			this.length = length;
+		}
 
 		public Substring(string source, int start, int length)
 		{
 			if (source == null || start < 0 || length < 0
 				|| (start + length) > source.Length)
 				throw new ArgumentException("Invalid substring arguments");
-			this.source = source;
+			this.source = GetCharArray(source);
 			this.start = start;
 			this.length = length;
 		}
@@ -159,7 +185,7 @@ namespace SLDE.Completion
 		{
 			if (source == null)
 				return "";
-			return source.Substring(start, length);
+			return new string(source, start, length);
 		}
 
 		public override int GetHashCode()

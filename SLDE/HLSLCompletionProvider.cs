@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using DigitalRune.Windows.TextEditor;
 using DigitalRune.Windows.TextEditor.Completion;
+using DigitalRune.Windows.TextEditor.TextBuffer;
 using System.Windows.Forms;
 using SLDE.Properties;
+using System.Text;
 
 namespace SLDE.HLSL.Completion
 {
@@ -1226,13 +1228,30 @@ namespace SLDE.HLSL.Completion
 			root.DataItems.Add(Min12int);
 			root.DataItems.Add(Min16uint);
 
+			// Variable modifiers
+			root.RootDataItems.Add(new HLSLModifier("extern", "Marks a global variable as external input to the shader"));
+			root.DataItems.Add(new HLSLModifier("static", "Marks a local variable as persistent across function calls"));
+			root.DataItems.Add(new HLSLModifier("nointerpolation", "Do not interpolate the outputs of a vertex shader"));
+			root.DataItems.Add(new HLSLModifier("precise", "Prevent the compiler from making IEEE unsafe optimizations"));
+			root.DataItems.Add(new HLSLModifier("shared", "Mark a variable for sharing between effects"));
+			root.DataItems.Add(new HLSLModifier("groupshared", "Mark a variable for thread-group-shared memory"));
+			root.DataItems.Add(new HLSLModifier("uniform", "Mark a variable whose data is consistent throughout execution"));
+			root.DataItems.Add(new HLSLModifier("volatile", "Mark a variable that changes frequently"));
+
+			root.DataItems.Add(new HLSLModifier("const", "Mark a variable that cannot be changed"));
+			root.DataItems.Add(new HLSLModifier("row_major", "Mark a variable that stores four components in a single row"));
+			root.DataItems.Add(new HLSLModifier("column_major", "Mark a variable that stores four components in a single column"));
+
 			root.FunctionItems.Add(new HLSLKeyword("while", null));
 			root.FunctionItems.Add(new HLSLKeyword("for", null));
 			root.FunctionItems.Add(new HLSLKeyword("do", null));
 			root.FunctionItems.Add(new HLSLKeyword("continue", null));
 			root.FunctionItems.Add(new HLSLKeyword("break", null));
 			root.FunctionItems.Add(new HLSLKeyword("return", null));
-
+			root.FunctionItems.Add(new HLSLKeyword("for", null));
+			root.FunctionItems.Add(new HLSLKeyword("true", null));
+			root.FunctionItems.Add(new HLSLKeyword("false", null));
+			
 			HLSLVector.DefaultType = Float;
 			HLSLMatrix.DefaultType = Float;
 
@@ -1268,6 +1287,140 @@ namespace SLDE.HLSL.Completion
 						stack.Push(array[i]);
 			}
 			stack.Peek().Parse(item, stack);
+		}
+
+		const int blockSize = 4096;
+		char[] textBuffer = new char[blockSize];
+
+		void EnsureBufferCapacity(int size, bool keepData)
+		{
+			if(size > textBuffer.Length)
+			{
+				var newSize = ((size % blockSize) + 1) * blockSize;
+				if (keepData)
+					Array.Resize(ref textBuffer, newSize);
+				else
+					textBuffer = new char[newSize];
+			}
+		}
+
+		static bool IsNewline(char c)
+		{
+			return (c == '\n' || c == '\r');
+		}
+
+		static Func<char, bool> isNewLine = IsNewline;
+		static Func<char, bool> isWhitespace = Char.IsWhiteSpace;
+
+		IDictionary<string, string> defines = new Dictionary<string, string>();
+
+		struct PPStack
+		{
+			public bool active;
+			public bool wasActive;
+
+			public PPStack(bool active, bool wasActive)
+			{
+				this.active = active;
+				this.wasActive = wasActive;
+			}
+		}
+
+		void Preprocess(ITextBufferStrategy text)
+		{
+			EnsureBufferCapacity(text.Length, false);
+			bool validStart = true;
+			var stack = new Stack<PPStack>();
+			for(int i = 0; i < text.Length; i++)
+			{
+				var c = text.GetCharAt(i);
+				if (IsNewline(c))
+					validStart = true;
+				else if(validStart)
+				{
+					if(c == '#')
+					{
+						string identifier;
+						bool reverse = false;
+						switch(ReadPPLine(text, ref i, isWhitespace))
+						{
+							case "include":
+								break;
+							case "define":
+								if (stack.Count == 0 || stack.Peek().active)
+									break;
+								identifier = ReadPPLine(text, ref i, isWhitespace);
+								if (identifier == null)
+									break;
+								defines[identifier] = ReadPPLine(text, ref i, isNewLine);
+								break;
+							case "undef":
+								if (stack.Count == 0 || stack.Peek().active)
+									break;
+								identifier = ReadPPLine(text, ref i, isWhitespace);
+								if (identifier != null)
+									defines.Remove(identifier);
+								break;
+							case "if":
+								// Not supported yet. Neither are logical operations etc.
+								stack.Push(new PPStack(false, true));
+								break;
+							case "ifndef":
+								reverse = true;
+								goto case "ifdef";
+							case "ifdef":
+								if(!stack.Peek().active)
+									stack.Push(new PPStack(false, true));
+								else
+								{
+									var contains = defines.ContainsKey(ReadPPLine(text, ref i, isWhitespace));
+									contains ^= reverse;
+									stack.Push(new PPStack(contains, contains));
+								}
+								break;
+							case "else":
+								stack.Push(new PPStack(!stack.Pop().wasActive, true));
+								break;
+							case "elif":
+								var item = stack.Pop();
+								if (item.wasActive)
+									stack.Push(new PPStack(false, true));
+								else
+								{
+									var contains = defines.ContainsKey(ReadPPLine(text, ref i, isWhitespace));
+									stack.Push(new PPStack(contains, contains));
+								}
+								break;
+							case "endif":
+								stack.Pop();
+								break;
+							case null:
+								break;
+							default: // line, pragma, error
+								while (!IsNewline(text.GetCharAt(++i))) ;
+								break;
+						}
+					} else if(!Char.IsWhiteSpace(c))
+					{
+						validStart = false;
+					}
+				}
+			}
+		}
+
+		string ReadPPLine(ITextBufferStrategy text, ref int i, Func<char, bool> test)
+		{
+			char c;
+			do
+			{
+				c = text.GetCharAt(++i);
+				if (IsNewline(c))
+					return null;
+			} while (Char.IsWhiteSpace(c));
+			int start = i++;
+			int length = -1;
+			while (!test(text.GetCharAt(i + ++length))) ;
+			return text.GetText(start, length); 
 		}
 
 		public override ICompletionData[] GenerateCompletionData(string fileName,
